@@ -52,13 +52,13 @@ Admin quản lý toàn bộ hệ thống:
 # 2. Địa chỉ API (Base URL)
 
 ```
-
+/api/v1
 ```
 
 Ví dụ:
 
 ```
-
+http://localhost:8080/api/v1/restaurants
 ```
 
 ---
@@ -575,6 +575,7 @@ CANCELLED
 ```
 
 ---
+
 
 
 
