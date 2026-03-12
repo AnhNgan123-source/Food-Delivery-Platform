@@ -1,0 +1,108 @@
+/* =========================================
+   1. SETUP CHUNG (GLOBAL STYLES)
+   ========================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+body { background: #f0f2f5; color: #2d3436; line-height: 1.6; }
+a { text-decoration: none; transition: 0.3s; }
+ul { list-style: none; }
+
+/* =========================================
+   2. GIAO DIỆN AUTH (LOGIN / REGISTER)
+   ========================================= */
+.auth-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; }
+.container { display: flex; width: 950px; height: 650px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+.left-side { 
+    flex: 1; background: #fef9f3 url('/image/logologindangnhapnh.png') no-repeat center; 
+    background-size: contain; position: relative; border-right: 1px solid #eee; 
+}
+.left-side::after { 
+    content: "Yummy Food Delivery"; position: absolute; bottom: 40px; 
+    width: 100%; text-align: center; color: #d35400; font-size: 18px; font-weight: 600; 
+}
+
+.right-side { flex: 1.2; padding: 40px 50px; display: flex; flex-direction: column; justify-content: center; }
+.form-row { display: flex; gap: 15px; margin-bottom: 12px; }
+
+input, select { 
+    width: 100%; padding: 12px 15px; border: 1.5px solid #e0e0e0; 
+    border-radius: 10px; outline: none; transition: 0.3s; background: #fafafa; font-size: 14px;
+}
+input:focus, select:focus { border-color: #28a745; background: white; box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1); }
+
+.btn-primary { 
+    width: 100%; padding: 14px; background: #28a745; color: white; 
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 600; 
+    cursor: pointer; margin-top: 15px; transition: 0.3s;
+}
+.btn-primary:hover { background: #218838; transform: translateY(-2px); }
+.error-msg { color: #d63031; font-size: 13px; margin-top: 10px; text-align: center; font-weight: 500; }
+
+/* =========================================
+   3. GIAO DIỆN DASHBOARD (ADMIN / RESTAURANT)
+   ========================================= */
+.dashboard-layout { display: flex; height: 100vh; background: #fff; }
+
+.sidebar { 
+    width: 260px; background: #f8f9fa; border-right: 1px solid #ddd; 
+    padding: 25px 15px; display: flex; flex-direction: column; 
+}
+.sidebar h3 { color: #28a745; font-size: 22px; margin-bottom: 30px; padding-left: 10px; }
+.sidebar li { 
+    padding: 12px 15px; cursor: pointer; border-radius: 10px; 
+    margin-bottom: 5px; color: #636e72; font-weight: 500;
+}
+.sidebar li:hover, .sidebar li.active { background: #e9ecef; color: #28a745; font-weight: 700; }
+
+.main-content { flex: 1; padding: 35px; overflow-y: auto; background: #fff; }
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+.btn-logout { 
+    margin-top: auto; padding: 12px; background: #ff7675; color: white; 
+    border: none; border-radius: 10px; cursor: pointer; font-weight: 600;
+}
+
+/* =========================================
+   4. GIAO DIỆN KHÁCH HÀNG (CUSTOMER)
+   ========================================= */
+.customer-layout { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+.hero-section { 
+    height: 250px; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80');
+    background-size: cover; background-position: center; border-radius: 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;
+}
+
+.cat-bar { display: flex; gap: 15px; justify-content: center; margin: 30px 0; overflow-x: auto; padding: 10px; }
+.cat-item { 
+    padding: 10px 25px; background: white; border: 1.5px solid #eee; 
+    border-radius: 50px; cursor: pointer; white-space: nowrap; font-weight: 500;
+}
+.cat-item.active { background: #28a745; color: white; border-color: #28a745; }
+
+/* =========================================
+   5. GRID VÀ CARD (DÙNG CHUNG)
+   ========================================= */
+.grid-container { 
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+    gap: 25px; margin-top: 20px; 
+}
+.card { 
+    background: white; border: 1px solid #eee; border-radius: 15px; 
+    overflow: hidden; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.02); 
+}
+.card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+
+.card-img { height: 160px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.card-body { padding: 20px; }
+.card-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #2d3436; }
+.card-price { color: #28a745; font-weight: 700; font-size: 16px; }
+
+.card-btn { 
+    width: 100%; padding: 10px; background: #2d3436; color: white; 
+    border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600;
+}
+.card-btn.success { background: #28a745; }
+
+/* Loader xoay xoay khi chờ dữ liệu */
+.loader { text-align: center; padding: 50px; color: #636e72; font-style: italic; }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <h3>Admin Panel</h3>
+            <ul>
+                <li onclick="loadFragment('approve-res')">Duyệt nhà hàng</li>
+                <li onclick="loadFragment('manage-res')">Quản lý nhà hàng</li>
+            </ul>
+            <button onclick="handleLogout()" class="btn-logout">Đăng xuất</button>
+        </aside>
+        <main class="main-content" id="content-area">
+            <h2>Chào sếp Admin!</h2>
+            <p>Chọn chức năng bên trái nhé.</p>
+        </main>
+    </div>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

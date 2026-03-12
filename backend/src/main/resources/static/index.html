@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Yummy Food - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="screen-auth" class="auth-screen">
+        <div class="container">
+            <div class="left-side"></div>
+            <div class="right-side">
+                <div id="view-login">
+                    <h2>Welcome Back!</h2>
+                    <input type="text" id="l-user" placeholder="Username">
+                    <input type="password" id="l-pass" placeholder="Password">
+                    <button class="btn-primary" onclick="handleLogin()">Sign In</button>
+                    <div id="l-msg" class="error-msg"></div>
+                    <p style="text-align:center; margin-top:15px;">Chưa có tài khoản? <a href="#" onclick="switchView('register')">Đăng ký</a></p>
+                </div>
+                <div id="view-register" style="display:none;">
+    <h2>Join Us!</h2>
+    <p class="subtitle">Trở thành thành viên của Yummy Food ngay hôm nay!</p>
+    
+    <div class="form-row">
+        <input type="text" id="r-user" placeholder="Tên đăng nhập *">
+        <input type="password" id="r-pass" placeholder="Mật khẩu *">
+    </div>
+    
+    <input type="email" id="r-email" placeholder="Địa chỉ Email *" style="margin-bottom: 12px;">
+    
+    <div class="form-row">
+        <input type="text" id="r-name" placeholder="Họ và tên *">
+        <input type="text" id="r-phone" placeholder="Số điện thoại *">
+    </div>
+    
+    <div class="form-row">
+        <select id="province" onchange="loadDistricts()"><option value="">Tỉnh/Thành *</option></select>
+        <select id="district" onchange="loadWards()"><option value="">Quận/Huyện *</option></select>
+    </div>
+    
+    <div class="form-row">
+        <select id="ward"><option value="">Phường/Xã *</option></select>
+        <input type="text" id="r-address-detail" placeholder="Số nhà, tên đường *">
+    </div>
+    
+    <select id="r-role" style="margin-bottom: 15px;">
+        <option value="CUSTOMER">Vai trò: Khách hàng (Người mua)</option>
+        <option value="RESTAURANT">Vai trò: Nhà hàng (Người bán)</option>
+    </select>
+    
+    <button class="btn-primary" style="background:#007bff;" onclick="handleRegister()">Tạo tài khoản</button>
+    
+    <p style="text-align:center; margin-top:15px;">Đã có tài khoản? <a href="#" onclick="switchView('login')" style="color:#28a745; font-weight:bold;">Quay lại Đăng nhập</a></p>
+    <div id="r-msg" class="error-msg"></div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+</body>
+</html>
