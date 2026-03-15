@@ -6,11 +6,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
-@Data // Tự động tạo Getter/Setter nếu Ngân có cài Lombok
+@Data
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Integer user_id;
 
     @Column(nullable = false, unique = true)
@@ -19,25 +20,28 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('ADMIN', 'CUSTOMER', 'RESTAURANT')")
     private Role role;
 
+    @Column(name = "full_name")
     private String full_name;
+
     private String phone;
     private String address;
     
+    @Column(name = "is_active")
     private Integer is_active = 1;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime created_at;
     
+    @Column(name = "updated_at")
     private LocalDateTime updated_at;
 
-    // Tự động gán thời gian khi tạo mới
     @PrePersist
     protected void onCreate() {
         created_at = LocalDateTime.now();

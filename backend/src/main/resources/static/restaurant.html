@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Manager - Yummy Food</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <h3>Yummy Hub</h3>
+                <p id="res-name-display" style="font-size: 12px; color: #28a745; font-weight: bold;">Nhà hàng của bạn</p>
+            </div>
+            <ul>
+                <li onclick="loadFragment('manage-menu', event)" class="active">
+                    <i class="fas fa-utensils"></i> Quản lý menu
+                </li>
+                <li onclick="loadFragment('toggle-items', event)">
+                    <i class="fas fa-toggle-on"></i> Bật/tắt món
+                </li>
+                <li onclick="loadFragment('new-orders', event)">
+                    <i class="fas fa-shopping-bag"></i> Đơn hàng mới
+                </li>
+                <li onclick="loadFragment('order-status', event)">
+                    <i class="fas fa-truck"></i> Trạng thái đơn
+                </li>
+                <li onclick="loadFragment('revenue-stats', event)">
+                    <i class="fas fa-chart-line"></i> Doanh thu
+                </li>
+                <li onclick="loadFragment('res-info', event)">
+                    <i class="fas fa-store"></i> Thông tin quán
+                </li>
+                <li onclick="loadFragment('profile', event)">
+                    <i class="fas fa-user-circle"></i> Hồ sơ cá nhân
+                </li>
+            </ul>
+            <button onclick="handleLogout()" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div id="fragment-title">
+                    <h2 id="current-page-title">Quản lý menu</h2>
+                </div>
+                <div class="user-profile-mini">
+                    <span id="user-display">Restaurant Admin</span>
+                    <div class="avatar-mini" id="header-avatar">R</div>
+                </div>
+            </header>
+
+            <div id="content-area">
+                <div class="loader">🔄 Đang tải dữ liệu...</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/profile.js"></script>
+    <script src="js/dashboard.js"></script>
+    
+    <script>
+        // Kiểm tra quyền và load trang mặc định
+        window.onload = () => {
+            const role = localStorage.getItem('role');
+            const fullName = localStorage.getItem('full_name'); // Nếu Ngân có lưu lúc login
+
+            if (role !== 'RESTAURANT') {
+                alert("Bạn không có quyền truy cập!");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (fullName) {
+                document.getElementById('user-display').innerText = fullName;
+                document.getElementById('header-avatar').innerText = fullName.charAt(0).toUpperCase();
+            }
+
+            // Load fragment mặc định
+            loadFragment('profile');
+        }
+    </script>
+</body>
+</html>

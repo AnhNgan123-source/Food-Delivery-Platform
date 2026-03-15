@@ -2,59 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Yummy Food - Đặt món ngay!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Manager - Yummy Food</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <nav class="customer-nav">
-        <div class="nav-container">
-            <div class="logo">Yummy Food</div>
-            <div class="search-bar">
-                <input type="text" placeholder="Tìm kiếm món ăn, nhà hàng...">
-            </div>
-            <div class="user-actions">
-                <span id="p-fullname">Chào, Ngân!</span>
-                <button onclick="handleLogout()" class="link-btn">Đăng xuất</button>
-                <div class="cart-icon">🛒 <span id="cart-count">0</span></div>
-            </div>
-        </div>
-    </nav>
 
-    <div class="customer-layout">
-        <header class="hero-section">
-            <div class="hero-content">
-                <h1>Giảm 50% cho đơn đầu tiên!</h1>
-                <p>Hàng ngàn món ngon đang chờ bạn khám phá.</p>
-                <button class="btn-order">Đặt ngay</button>
-            </div>
-        </header>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <h3>Restaurant Hub</h3>
+            <p class="sidebar-label">Tên quán của bạn</p>
+            <ul>
+                <li onclick="loadFragment('menu_management')" class="active">Quản lý menu</li>
+                <li onclick="loadFragment('toggle_items')">Bật/tắt món hết hàng</li>
+                <li onclick="loadFragment('orders')">Nhận & xác nhận đơn mới</li>
+                <li onclick="loadFragment('order_status')">Trạng thái đơn hàng</li>
+                <li onclick="loadFragment('revenue')">Xem thống kê doanh thu</li>
+                <li onclick="loadFragment('restaurant_info')">Quản lý thông tin nhà hàng</li>
+                
+                <li onclick="loadFragment('profile')">Hồ sơ cá nhân</li>
+            </ul>
 
-        <section class="category-section">
-            <div class="cat-bar">
-                <button class="cat-item active" onclick="filterCategory('all')">Tất cả</button>
-                <button class="cat-item" onclick="filterCategory('rice')">Cơm</button>
-                <button class="cat-item" onclick="filterCategory('noodle')">Món nước</button>
-                <button class="cat-item" onclick="filterCategory('pizza')">Pizza</button>
-                <button class="cat-item" onclick="filterCategory('drink')">Thức uống</button>
-                <button class="cat-item" onclick="filterCategory('sushi')">Sushi</button>
-            </div>
-        </section>
+            <button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>
+        </aside>
 
-        <main class="food-listing">
-            <h2 class="section-title">Nhà hàng dành cho bạn</h2>
-            <div class="grid-container" id="customer-main-grid">
-                <div class="loader">Đang tìm quán ngon...</div>
+        <main class="main-content" id="main-content">
+            <div class="header-flex">
+                <h2 id="content-title">Quản lý menu</h2>
+                <div class="user-brief">
+                    <span id="display-username">Restaurant Admin</span>
+                    <div class="mini-avatar">R</div>
+                </div>
+            </div>
+            <hr>
+            
+            <div id="content-area">
+                <p class="loader">Đang tải dữ liệu...</p>
             </div>
         </main>
     </div>
 
-    <script src="js/customer.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/dashboard.js"></script>
+    
     <script>
+        // Kiểm tra quyền truy cập ngay khi mở trang
         window.onload = () => {
-            if (!localStorage.getItem('token')) window.location.href = 'index.html';
-            document.getElementById('p-fullname').innerText = "Chào, " + localStorage.getItem('username');
-            // Gọi hàm lấy danh sách nhà hàng thật từ API của Ngân
-            fetchRestaurants(); 
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            if (!token || role !== 'CUSTOMER') {
+                alert("Bạn không có quyền truy cập!");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Hiển thị tên admin lên góc phải
+            document.getElementById('display-username').innerText = localStorage.getItem('username');
+            
+            // Mặc định load trang quản lý menu
+            loadFragment('manage-menu');
+        };
+
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
         }
     </script>
 </body>
