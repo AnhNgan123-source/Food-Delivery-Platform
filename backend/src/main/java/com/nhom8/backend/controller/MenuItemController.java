@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/menu")
 public class MenuItemController {
@@ -19,7 +20,7 @@ public class MenuItemController {
     // Lấy menu của nhà hàng
     @GetMapping("/restaurant/{resId}")
     public List<MenuItem> getMenu(@PathVariable Integer resId) {
-        return menuItemService.getMenuByRestaurant(resId);
+        return menuItemService.getAllMenuByRestaurant(resId);
     }
 
     // Tạo món mới

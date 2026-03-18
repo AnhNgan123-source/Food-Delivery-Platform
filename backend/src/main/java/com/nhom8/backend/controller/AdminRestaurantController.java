@@ -12,7 +12,7 @@ import java.util.List;
  * Base URL:
  * /api/admin/restaurants
  */
-
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/admin/restaurants")
 public class AdminRestaurantController {

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableWebSecurity 
 public class SecurityConfig {
 
     @Autowired
@@ -34,14 +36,27 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())    // Tắt CSRF để dùng JWT
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Không dùng Session truyền thống
             .authorizeHttpRequests(auth -> auth
-                // Cho phép xem giao diện tĩnh
+                // 1. Cho phép xem giao diện tĩnh (Không cần đăng nhập)
                 .requestMatchers("/", "/index.html", "/admin.html", "/restaurant.html", 
                                "/customer.html", "/css/**", "/js/**", "/image/**", 
-                               "/auth/**", "/fragments/**", "/favicon.ico/**").permitAll()
-                // API đăng nhập không cần token
+                               "/auth/**", "/fragments/**", "/favicon.ico/**", "/assets/**").permitAll()
+                
+                // 2. API đăng ký/đăng nhập (Không cần đăng nhập)
                 .requestMatchers("/api/auth/**").permitAll()
-                // API Profile BẮT BUỘC phải đăng nhập
-                .requestMatchers("/api/user/profile").authenticated()
+                
+                // 3. API Dành cho ADMIN (Ví dụ: Thêm nhà hàng)
+                // Yêu cầu: Bắt buộc phải có token và Role phải là ADMIN
+                .requestMatchers("/api/v1/admin/**").permitAll()
+                
+                // 4. API Dành cho Khách hàng (Xem nhà hàng, menu)
+                // Yêu cầu: Bắt buộc phải có token (Role CUSTOMER thường là hợp lý, nhưng ở đây có thể cho cả ADMIN/RESTAURANT xem thử)
+                .requestMatchers("/api/v1/restaurants/**").authenticated() 
+
+                // 5. API chung (Profile, Đổi mật khẩu...)
+                // Yêu cầu: Đã đăng nhập (Bất kỳ Role nào)
+                .requestMatchers("/api/user/profile/**").authenticated()
+                
+                // Các API khác chưa định nghĩa rõ: Bắt buộc đăng nhập
                 .anyRequest().authenticated()
             );
 

@@ -1,0 +1,198 @@
+/* =========================================
+   1. SETUP CHUNG (GLOBAL STYLES)
+   ========================================= */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+body { background: #f0f2f5; color: #2d3436; line-height: 1.6; }
+a { text-decoration: none; transition: 0.3s; }
+ul { list-style: none; }
+
+/* =========================================
+   2. GIAO DIỆN AUTH (LOGIN / REGISTER)
+   ========================================= */
+.auth-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background: #f0f2f5; }
+.container { display: flex; width: 950px; height: 650px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+.left-side { 
+    flex: 1; background: #fef9f3 url('./assets/logologindangnhapnh.png') no-repeat center; 
+    background-size: cover; position: relative; border-right: 1px solid #eee; 
+}
+.left-side::after { 
+    content: "Yummy Food Delivery"; position: absolute; bottom: 40px; 
+    width: 100%; text-align: center; color: #d35400; font-size: 18px; font-weight: 600; 
+}
+
+.right-side { flex: 1.2; padding: 40px 50px; display: flex; flex-direction: column; justify-content: center; }
+.form-row { display: flex; gap: 15px; margin-bottom: 12px; }
+
+input, select { 
+    width: 100%; padding: 12px 15px; border: 1.5px solid #e0e0e0; 
+    border-radius: 10px; outline: none; transition: 0.3s; background: #fafafa; font-size: 14px;
+}
+input:focus, select:focus { border-color: #28a745; background: white; box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1); }
+
+.btn-primary { 
+    width: 100%; padding: 14px; background: #28a745; color: white; 
+    border: none; border-radius: 10px; font-size: 16px; font-weight: 600; 
+    cursor: pointer; margin-top: 15px; transition: 0.3s;
+}
+.btn-primary:hover { background: #218838; transform: translateY(-2px); }
+.error-msg { color: #d63031; font-size: 13px; margin-top: 10px; text-align: center; font-weight: 500; }
+
+/* =========================================
+   3. GIAO DIỆN DASHBOARD (ADMIN / RESTAURANT)
+   ========================================= */
+.dashboard-layout { display: flex; height: 100vh; background: #fff; }
+
+.sidebar { 
+    width: 260px; background: #f8f9fa; border-right: 1px solid #ddd; 
+    padding: 25px 15px; display: flex; flex-direction: column; 
+}
+.sidebar h3 { color: #28a745; font-size: 22px; margin-bottom: 30px; padding-left: 10px; }
+.sidebar li { 
+    padding: 12px 15px; cursor: pointer; border-radius: 10px; 
+    margin-bottom: 5px; color: #636e72; font-weight: 500;
+}
+.sidebar li:hover, .sidebar li.active { background: #e9ecef; color: #28a745; font-weight: 700; }
+
+.main-content { flex: 1; padding: 35px; overflow-y: auto; background: #fff; }
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+.btn-logout { 
+    margin-top: auto; padding: 12px; background: #ff7675; color: white; 
+    border: none; border-radius: 10px; cursor: pointer; font-weight: 600;
+}
+
+/* =========================================
+   4. GRID VÀ CARD (DÙNG CHUNG)
+   ========================================= */
+.grid-container { 
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+    gap: 25px; margin-top: 20px; 
+}
+.card { 
+    background: white; border: 1px solid #eee; border-radius: 15px; 
+    overflow: hidden; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.02); 
+}
+.card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+
+.card-img { height: 160px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.card-body { padding: 20px; }
+.card-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #2d3436; }
+.card-price { color: #28a745; font-weight: 700; font-size: 16px; }
+
+.card-btn { 
+    width: 100%; padding: 10px; background: #2d3436; color: white; 
+    border: none; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600;
+}
+.card-btn.success { background: #28a745; }
+
+/* Loader xoay xoay khi chờ dữ liệu */
+.loader { text-align: center; padding: 50px; color: #636e72; font-style: italic; width: 100%; }
+
+/* =========================================
+   5. GIAO DIỆN HỒ SƠ (PROFILE)
+   ========================================= */
+.profile-card {
+    max-width: 500px; margin: 40px auto; background: #ffffff;
+    border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+.profile-header { text-align: center; margin-bottom: 25px; }
+.avatar-circle {
+    width: 90px; height: 90px; background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: bold; margin: 0 auto 15px; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+.main-name { margin: 0; color: #2c3e50; font-size: 24px; }
+.role-badge { display: inline-block; background: #e8f6ef; color: #27ae60; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 8px; text-transform: uppercase; }
+.divider { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+
+.info-row { display: flex; align-items: center; margin-bottom: 20px; padding: 10px; border-radius: 10px; transition: background 0.3s; }
+.info-row:hover { background: #f9f9f9; }
+.info-icon { width: 40px; height: 40px; background: #f1f2f6; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #27ae60; margin-right: 15px; font-size: 18px; }
+.info-content { flex: 1; }
+.info-content label { display: block; font-size: 12px; color: #95a5a6; margin-bottom: 2px; font-weight: 600; }
+.info-data { display: block; font-size: 15px; color: #2c3e50; font-weight: 500; }
+
+.edit-input { width: 100%; padding: 8px 0; border: none; border-bottom: 2px solid #27ae60; font-size: 15px; color: #2c3e50; outline: none; }
+
+.profile-actions { margin-top: 30px; }
+.btn-edit, .btn-save, .btn-cancel { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
+.btn-edit { background: #27ae60; color: white; }
+.btn-edit:hover { background: #219150; box-shadow: 0 5px 15px rgba(39,174,96,0.3); }
+.edit-mode-buttons { display: flex; gap: 10px; }
+.btn-save { background: #27ae60; color: white; flex: 2; }
+.btn-cancel { background: #ecf0f1; color: #7f8c8d; flex: 1; }
+
+/* =========================================
+   6. GIAO DIỆN KHÁCH HÀNG (MENU - DÙNG CHUNG)
+   ========================================= */
+.btn-back { background: transparent; border: none; color: #27ae60; font-size: 16px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+.section-title { font-size: 22px; color: #2c3e50; margin: 20px 0; border-left: 4px solid #27ae60; padding-left: 10px; }
+
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+.menu-card { display: flex; background: #fff; border-radius: 12px; padding: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); align-items: center; }
+.menu-card img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; margin-right: 15px; }
+.menu-info { flex: 1; }
+.menu-info h5 { margin: 0 0 5px; font-size: 16px; color: #333; }
+.menu-desc { margin: 0 0 8px; font-size: 12px; color: #7f8c8d; }
+.menu-price { margin: 0; color: #e74c3c; font-weight: bold; font-size: 15px; }
+.btn-add-cart { background: #27ae60; color: #fff; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: 0.2s; }
+.btn-add-cart:hover { background: #219150; transform: scale(1.1); }
+
+/* =========================================
+   7. GIAO DIỆN KHÁCH HÀNG (CHUẨN WIREFRAME MỚI)
+   ========================================= */
+/* Header dính trên cùng */
+.wf-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky; top: 0; z-index: 100;
+}
+.wf-header-left { display: flex; align-items: center; gap: 20px; }
+.wf-logo { font-size: 24px; font-weight: bold; color: #27ae60; }
+.wf-location { color: #555; font-size: 14px; border: 1px solid #ddd; padding: 8px 15px; border-radius: 5px; }
+
+/* Thanh tìm kiếm */
+.wf-search-box {
+    display: flex; align-items: center; background: #f1f2f6;
+    padding: 10px 20px; border-radius: 30px; width: 400px; transition: 0.3s;
+}
+.wf-search-box:focus-within { box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.3); background: #fff; }
+.wf-search-box i { color: #95a5a6; }
+.wf-search-box input { border: none; background: transparent; outline: none; margin-left: 10px; width: 100%; font-size: 14px; }
+
+/* Nút giỏ hàng & user */
+.wf-header-right { display: flex; gap: 15px; }
+.wf-icon-btn { border: 1px solid #ddd; background: #fff; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; color: #555; transition: 0.3s;}
+.wf-icon-btn:hover { background: #f1f2f6; color: #27ae60; border-color: #27ae60; }
+
+/* Phần thân chính (Banner, Menu) */
+.wf-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+.wf-banner {
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80') center/cover;
+    height: 300px; border-radius: 12px; display: flex; align-items: center; padding-left: 50px; margin-bottom: 30px; color: white;
+}
+.wf-banner-text h2 { font-size: 36px; margin-bottom: 10px; }
+.wf-banner-text p { font-size: 18px; opacity: 0.9; }
+
+/* Danh mục món ăn */
+.wf-categories { 
+    display: flex; gap: 15px; margin-bottom: 30px; padding: 20px; 
+    border: 1px solid #ddd; border-radius: 8px; background: #fff; overflow-x: auto; 
+}
+.wf-cat-btn { 
+    border: 1px solid #ddd; background: #fff; padding: 10px 30px; 
+    border-radius: 5px; cursor: pointer; font-weight: bold; color: #555; transition: 0.3s; white-space: nowrap;
+}
+.wf-cat-btn.active, .wf-cat-btn:hover { border-color: #27ae60; color: #27ae60; background: #e8f6ef; }
+
+/* Grid 4 cột hiển thị nhà hàng */
+.wf-restaurant-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.restaurant-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.3s; }
+.restaurant-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #27ae60; }
+.restaurant-card img { width: 100%; height: 180px; object-fit: cover; }
+.restaurant-card .card-body { padding: 15px; }
+.restaurant-card h4 { margin: 0 0 10px 0; font-size: 18px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.res-address { font-size: 13px; color: #7f8c8d; margin: 0 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.res-rating { color: #f39c12; font-weight: bold; font-size: 14px; }

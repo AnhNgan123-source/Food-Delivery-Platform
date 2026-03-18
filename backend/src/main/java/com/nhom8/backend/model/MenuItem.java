@@ -12,16 +12,16 @@ public class MenuItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer itemId;
 
-    private Integer resId; // ID nhà hàng sở hữu món này
-    private Integer catId; // ID danh mục (Pizza, Burger...)
+    private Integer res_id; // ID nhà hàng sở hữu món này
+    private Integer cat_id; // ID danh mục (Pizza, Burger...)
 
     @Column(nullable = false)
-    private String itemName;
+    private String item_name;
 
     private BigDecimal price;
     private String description;
-    private String itemImage;
+    private String item_image;
 
     @Column(name = "is_available")
-    private Integer isAvailable = 1; // 1 là còn bán, 0 là hết hàng
+    private Integer is_available = 1; // 1 là còn bán, 0 là hết hàng
 }

@@ -1,12 +1,11 @@
 package com.nhom8.backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+//import lombok.Data;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "Restaurant")
-@Data
 public class Restaurant {
 
     @Id
@@ -31,4 +30,62 @@ public class Restaurant {
 
     @Column(name = "is_active")
     private Integer isActive = 0; // 0 = chưa duyệt, 1 = đang hoạt động
+
+    public Integer getResId() {
+        return resId;
+    }
+
+    public void setResId(Integer resId) {
+        this.resId = resId;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getResName() {
+        return resName;
+    }
+
+    public void setResName(String resName) {
+        this.resName = resName;
+    }
+
+    public String getResAddress() {
+        return resAddress;
+    }
+
+    public void setResAddress(String resAddress) {
+        this.resAddress = resAddress;
+    }
+
+    public String getResImage() {
+        return resImage;
+    }
+
+    public void setResImage(String resImage) {
+        this.resImage = resImage;
+    }
+
+    public BigDecimal getRatingAvg() {
+        return ratingAvg;
+    }
+
+    public void setRatingAvg(BigDecimal ratingAvg) {
+        this.ratingAvg = ratingAvg;
+    }
+
+    public Integer getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Integer isActive) {
+        this.isActive = isActive;
+    }
+
+    
 }

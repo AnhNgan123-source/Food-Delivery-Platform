@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "*") // THÊM DÒNG NÀY ĐỂ MỞ CỬA CHO REACT
 public class AuthController {
 
     @Autowired private UserRepository userRepository;
@@ -30,7 +32,9 @@ public class AuthController {
 
     if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
         // TẠO TOKEN THẬT Ở ĐÂY
-        String token = jwtUtil.generateToken(username);
+
+        User user = userOpt.get();
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
         
         Map<String, String> data = new HashMap<>();
         data.put("token", token);
