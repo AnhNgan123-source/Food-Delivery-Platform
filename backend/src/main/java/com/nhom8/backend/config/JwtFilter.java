@@ -26,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -37,28 +37,28 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        
+
         try {
             username = jwtUtil.extractUsername(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                
+
                 if (jwtUtil.validateToken(jwt)) {
                     // 1. LẤY ROLE TỪ TOKEN RA (Ví dụ: "ADMIN", "CUSTOMER", "RESTAURANT")
-                    String role = jwtUtil.extractRole(jwt); 
-                    
+                    String role = jwtUtil.extractRole(jwt);
+
                     // 2. GẮN CHỮ "ROLE_" VÀO TRƯỚC (Bắt buộc theo chuẩn của Spring Security)
-                    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+                    List<GrantedAuthority> authorities = Collections
+                            .singletonList(new SimpleGrantedAuthority("ROLE_" + role));
 
                     // 3. TRUYỀN QUYỀN VÀO THAY VÌ ARRAYLIST RỖNG NHƯ CŨ
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            authorities 
-                    );
-                    
+                            authorities);
+
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    
+
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }

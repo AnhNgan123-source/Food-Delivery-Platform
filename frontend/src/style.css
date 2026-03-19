@@ -164,7 +164,7 @@ input:focus, select:focus { border-color: #28a745; background: white; box-shadow
 /* Nút giỏ hàng & user */
 .wf-header-right { display: flex; gap: 15px; }
 .wf-icon-btn { border: 1px solid #ddd; background: #fff; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; color: #555; transition: 0.3s;}
-.wf-icon-btn:hover { background: #f1f2f6; color: #27ae60; border-color: #27ae60; }
+.wf-icon-btn:hover { background: #f1f2f6; color: hwb(145 15% 32%); border-color: #27ae60; }
 
 /* Phần thân chính (Banner, Menu) */
 .wf-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
@@ -196,3 +196,96 @@ input:focus, select:focus { border-color: #28a745; background: white; box-shadow
 .restaurant-card h4 { margin: 0 0 10px 0; font-size: 18px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .res-address { font-size: 13px; color: #7f8c8d; margin: 0 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .res-rating { color: #f39c12; font-weight: bold; font-size: 14px; }
+
+
+/* =========================================
+   7. GIAO DIỆN form thêm món 
+   ========================================= */
+.wf-form-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.form-title {
+    font-size: 20px;
+    margin-bottom: 25px;
+    color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+/* Group & Input */
+.form-group { margin-bottom: 20px; }
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #444;
+}
+
+/* Làm textarea đẹp và khớp với input */
+.wf-main-form input, 
+.wf-main-form select, 
+.wf-main-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc; /* Màu viền trung tính như wireframe */
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+    transition: 0.2s;
+}
+
+.wf-main-form textarea {
+    resize: none; /* Không cho kéo giãn lung tung */
+    font-family: inherit;
+}
+
+.wf-main-form input:focus, 
+.wf-main-form textarea:focus {
+    border-color: #333;
+}
+
+/* Cụm nút save với cacel */
+.wf-modal-actions {
+    display: flex;
+    justify-content: flex-end; /* Đẩy sang phải */
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.wf-btn-secondary, .wf-btn-primary {
+    padding: 10px 25px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    min-width: 100px;
+}
+
+/* Nút Hủy - Màu xám nhạt */
+.wf-btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+.wf-btn-secondary:hover { background: #d0d0d0; }
+
+/* Nút Lưu - Màu xanh */
+.wf-btn-primary {
+    background:  #27ae60;
+    color: #fff;
+}
+.wf-btn-primary:hover { background: #000; }
+
+/* Chia cột cho Giá và Danh mục */
+.form-row-flex {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+

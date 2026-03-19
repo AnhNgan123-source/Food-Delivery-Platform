@@ -63,9 +63,8 @@ const Auth = () => {
         }
     }, [selectedDist.code]);
 
-    // === HÀM XỬ LÝ ĐĂNG NHẬP ===
+    // === HÀM XỬ LÝ ĐĂNG NHẬP  ===
     const handleLogin = async (e) => {
-        // 1. Thêm dòng này để CHẶN trình duyệt tải lại trang
         if (e) e.preventDefault(); 
         
         setLoginMsg('');
@@ -78,17 +77,26 @@ const Auth = () => {
             const result = await response.json();
 
             if (result.status === "success") {
+                // Lưu các thông tin chung
                 localStorage.setItem('token', result.data.token);
                 localStorage.setItem('username', loginUser);
                 localStorage.setItem('role', result.data.role);
                 
-                // 2. DÙNG NAVIGATE CỦA REACT CHO MƯỢT (Chuẩn SPA)
-                if (result.data.role === 'ADMIN') {
-                    navigate("/admin"); 
-                } else if (result.data.role === 'RESTAURANT') {
+                // LƯU THÊM resId Ở ĐÂY
+                if (result.data.role === 'RESTAURANT') {
+                    const resId = result.data.restaurantId || result.data.id; 
+                    
+                    if (resId) {
+                        localStorage.setItem('resId', resId);
+                        console.log("Đã lưu resId:", resId);
+                    } else {
+                        console.error("Backend không trả về ID nhà hàng!");
+                    }
+                    
                     navigate("/restaurant");
+                } else if (result.data.role === 'ADMIN') {
+                    navigate("/admin"); 
                 } else {
-                    // Lưu ý: Trong App.jsx bạn đặt tên đường dẫn là /home
                     navigate("/home"); 
                 }
             } else {

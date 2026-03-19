@@ -1,7 +1,6 @@
 package com.nhom8.backend.config;
 
 import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,11 +17,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity 
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
-    private JwtFilter jwtFilter; // Đảm bảo Ngân đã tạo file JwtFilter mình đưa ở trên
+    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -32,50 +31,49 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) // Cho phép Frontend gọi API
-            .csrf(csrf -> csrf.disable())    // Tắt CSRF để dùng JWT
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Không dùng Session truyền thống
-            .authorizeHttpRequests(auth -> auth
-                // 1. Cho phép xem giao diện tĩnh (Không cần đăng nhập)
-                .requestMatchers("/", "/index.html", "/admin.html", "/restaurant.html", 
-                               "/customer.html", "/css/**", "/js/**", "/image/**", 
-                               "/auth/**", "/fragments/**", "/favicon.ico/**", "/assets/**").permitAll()
-                
-                // 2. API đăng ký/đăng nhập (Không cần đăng nhập)
-                .requestMatchers("/api/auth/**").permitAll()
-                
-                // 3. API Dành cho ADMIN (Ví dụ: Thêm nhà hàng)
-                // Yêu cầu: Bắt buộc phải có token và Role phải là ADMIN
-                .requestMatchers("/api/v1/admin/**").permitAll()
-                
-                // 4. API Dành cho Khách hàng (Xem nhà hàng, menu)
-                // Yêu cầu: Bắt buộc phải có token (Role CUSTOMER thường là hợp lý, nhưng ở đây có thể cho cả ADMIN/RESTAURANT xem thử)
-                .requestMatchers("/api/v1/restaurants/**").authenticated() 
+                .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // 1. Giữ nguyên các file tĩnh
+                        .requestMatchers("/", "/index.html", "/admin.html", "/restaurant.html",
+                                "/customer.html", "/css/**", "/js/**", "/image/**",
+                                "/auth/**", "/fragments/**", "/favicon.ico/**", "/assets/**")
+                        .permitAll()
 
-                // 5. API chung (Profile, Đổi mật khẩu...)
-                // Yêu cầu: Đã đăng nhập (Bất kỳ Role nào)
-                .requestMatchers("/api/user/profile/**").authenticated()
-                
-                // Các API khác chưa định nghĩa rõ: Bắt buộc đăng nhập
-                .anyRequest().authenticated()
-            );
+                        // ✅ THÊM DÒNG NÀY: Để thả xích cho hình ảnh món ăn
+                        .requestMatchers("/api/menu/image/**").permitAll()
 
-        // QUAN TRỌNG: Chèn bộ lọc JWT vào trước quy trình kiểm tra của Spring
+                        // SỬA 1: Mở rộng đường dẫn cho Auth
+                        .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+
+                        // SỬA 2: Cho phép các API liên quan đến Menu và Category
+                        .requestMatchers("/api/menu/**").permitAll()
+                        .requestMatchers("/api/categories/**").permitAll()
+
+                        .requestMatchers("/api/v1/admin/**").permitAll()
+
+                        .requestMatchers("/api/v1/restaurants/**").authenticated()
+                        .requestMatchers("/api/user/profile/**").authenticated()
+
+                        // SỬA 3: anyRequest permitAll để debug
+                        .anyRequest().permitAll());
+
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); 
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); 
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }
