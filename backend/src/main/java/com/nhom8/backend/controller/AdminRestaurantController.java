@@ -8,13 +8,12 @@ import java.util.List;
 
 /*
  * Controller dành riêng cho ADMIN quản lý nhà hàng
- *
- * Base URL:
- * /api/admin/restaurants
+ * * Base URL đã được sửa để khớp với Frontend:
+ * /api/v1/admin/restaurants
  */
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/admin/restaurants")
+@RequestMapping("/api/v1/admin/restaurants") // Thêm /v1/ để khớp với gọi lệnh từ Frontend
 public class AdminRestaurantController {
 
     private final RestaurantService restaurantService;
@@ -26,8 +25,7 @@ public class AdminRestaurantController {
     /*
      * API 1
      * Lấy danh sách tất cả nhà hàng
-     *
-     * GET /api/admin/restaurants
+     * GET /api/v1/admin/restaurants
      */
     @GetMapping
     public List<Restaurant> getAllRestaurants() {
@@ -37,8 +35,7 @@ public class AdminRestaurantController {
     /*
      * API 2
      * Lấy chi tiết 1 nhà hàng
-     *
-     * GET /api/admin/restaurants/{id}
+     * GET /api/v1/admin/restaurants/{id}
      */
     @GetMapping("/{id}")
     public Restaurant getRestaurant(@PathVariable Integer id) {
@@ -48,8 +45,7 @@ public class AdminRestaurantController {
     /*
      * API 3
      * Tạo nhà hàng mới
-     *
-     * POST /api/admin/restaurants
+     * POST /api/v1/admin/restaurants
      */
     @PostMapping
     public Restaurant createRestaurant(@RequestBody Restaurant restaurant) {
@@ -58,9 +54,8 @@ public class AdminRestaurantController {
 
     /*
      * API 4
-     * Cập nhật nhà hàng
-     *
-     * PUT /api/admin/restaurants/{id}
+     * Cập nhật nhà hàng (Dùng để sửa thông tin hoặc Duyệt/Khóa qua isActive)
+     * PUT /api/v1/admin/restaurants/{id}
      */
     @PutMapping("/{id}")
     public Restaurant updateRestaurant(
@@ -73,14 +68,11 @@ public class AdminRestaurantController {
     /*
      * API 5
      * Xóa nhà hàng
-     *
-     * DELETE /api/admin/restaurants/{id}
+     * DELETE /api/v1/admin/restaurants/{id}
      */
     @DeleteMapping("/{id}")
     public String deleteRestaurant(@PathVariable Integer id) {
-
         restaurantService.deleteRestaurant(id);
-
         return "Xóa nhà hàng thành công";
     }
 }

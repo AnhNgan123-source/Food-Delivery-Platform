@@ -1,7 +1,12 @@
 import React from 'react';
 
 const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
-    const isAvailable = food.is_available === 1;
+    const isAvailable = food.is_available === 1 || food.isAvailable === 1;
+    const foodId = food.itemId || food.item_id; 
+    const imageName = food.item_image || food.itemImage;
+
+    // Ảnh mặc định bằng Base64 (Cực nhẹ, 100% hiện)
+    const fallbackImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
     return (
         <div className="card" style={{ 
@@ -15,22 +20,24 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
             backgroundColor: '#fff',
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
         }}>
-            {/* PHẦN HÌNH ẢNH */}
-            <div className="card-img">
+            <div className="card-img" style={{ backgroundColor: '#f0f0f0' }}>
                 <img 
-                    src={`http://localhost:8080/api/menu${food.item_image || '/uploads/default.jpg'}`} 
-                    alt={food.item_name}
+                    // ✅ THÊM: Timestamp ?t= để trình duyệt luôn tải ảnh mới nhất nếu cùng tên file
+                    src={imageName ? `http://localhost:8080/uploads/${imageName}?t=${Date.now()}` : fallbackImage} 
+                    alt={food.item_name || food.itemName}
                     style={{ 
                         width: '100%', 
                         height: '160px', 
                         objectFit: 'cover',
                         filter: isAvailable ? 'none' : 'grayscale(100%) opacity(0.7)'
                     }}
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=No+Image'; }}
+                    onError={(e) => { 
+                        e.target.onerror = null; 
+                        e.target.src = fallbackImage; 
+                    }}
                 />
             </div>
 
-            {/* NỘI DUNG CARD */}
             <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '15px' }}>
                 <div className="card-title" style={{ 
                     fontWeight: '600', 
@@ -38,7 +45,7 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
                     marginBottom: '5px',
                     color: isAvailable ? '#333' : '#999'
                 }}>
-                    {food.item_name}
+                    {food.item_name || food.itemName}
                 </div>
 
                 <div className="card-price" style={{ 
@@ -50,19 +57,16 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
                     {Number(food.price).toLocaleString()} đ
                 </div>
 
-                {/* DÒNG CHÂN CARD HIỆN ĐẠI */}
                 <div style={{ 
                     marginTop: 'auto', 
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center' 
                 }}>
-                    
-                    {/* NÚT BẬT/TẮT (GÓC TRÁI) - Dùng icon cũ của bạn */}
                     <button 
                         onClick={(e) => {
                             e.stopPropagation();
-                            onToggleStatus(food.itemId, isAvailable);
+                            onToggleStatus(foodId, isAvailable);
                         }}
                         style={{
                             backgroundColor: isAvailable ? 'rgba(40, 167, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)',
@@ -82,14 +86,13 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
                         {isAvailable ? 'Hiện' : 'Ẩn'}
                     </button>
 
-                    {/* CỤM NÚT SỬA/XÓA (GÓC PHẢI) - Màu nhạt trong suốt */}
                     <div style={{ display: 'flex', gap: '8px' }}>
                         <button 
                             onClick={() => onEdit(food)} 
                             title="Sửa"
                             style={{ 
                                 padding: '8px 10px', 
-                                backgroundColor: 'rgba(255, 193, 7, 0.15)', // Vàng nhạt trong suốt
+                                backgroundColor: 'rgba(255, 193, 7, 0.15)', 
                                 color: '#d39e00',
                                 border: 'none', 
                                 borderRadius: '8px', 
@@ -99,11 +102,11 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
                             <i className="fas fa-edit"></i>
                         </button>
                         <button 
-                            onClick={() => onDelete(food.itemId)} 
+                            onClick={() => onDelete(foodId)} 
                             title="Xóa"
                             style={{ 
                                 padding: '8px 10px', 
-                                backgroundColor: 'rgba(220, 53, 69, 0.1)', // Đỏ nhạt trong suốt
+                                backgroundColor: 'rgba(220, 53, 69, 0.1)', 
                                 color: '#dc3545',
                                 border: 'none', 
                                 borderRadius: '8px', 
@@ -113,7 +116,6 @@ const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
                             <i className="fas fa-trash"></i>
                         </button>
                     </div>
-
                 </div>
             </div>
         </div>

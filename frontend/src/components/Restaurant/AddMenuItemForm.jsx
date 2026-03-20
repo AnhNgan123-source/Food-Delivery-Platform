@@ -31,9 +31,11 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
                 description: initialData.description || '',
                 cat_id: initialData.cat_id || ''
             });
-            // ✅ Cập nhật logic hiện ảnh cũ từ server
+            
+            // ✅ SỬA TẠI ĐÂY: Gọi trực tiếp qua WebConfig đường dẫn /uploads/
             if (initialData.item_image) {
-                setPreviewUrl(`http://localhost:8080/api/menu/image/${initialData.item_image}`);
+                // Không dùng /api/menu/image/ nữa mà dùng thẳng /uploads/
+                setPreviewUrl(`http://localhost:8080/uploads/${initialData.item_image}`);
             }
         }
     }, [initialData]);

@@ -4,12 +4,18 @@ import com.nhom8.backend.model.MenuItem;
 import com.nhom8.backend.repository.MenuItemRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
 public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
+    // Đường dẫn để tìm và xóa file vật lý
+    private static final String UPLOAD_DIR = "uploads/";
 
     public MenuItemService(MenuItemRepository menuItemRepository) {
         this.menuItemRepository = menuItemRepository;
@@ -18,7 +24,7 @@ public class MenuItemService {
     // ==========================================
     // PHẦN 1: DÀNH CHO KHÁCH HÀNG (CUSTOMER)
     // ==========================================
-    
+
     // Khách hàng chỉ xem được món đang mở bán
     public List<MenuItem> getAvailableMenuForCustomer(Integer resId) {
         return menuItemRepository.findAvailableMenu(resId);
@@ -43,11 +49,19 @@ public class MenuItemService {
         MenuItem item = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found"));
 
-        // Lưu ý: Tên hàm có dấu gạch dưới theo chuẩn Entity
+        // ✅ Xử lý ảnh: Nếu có ảnh mới, xóa ảnh cũ trước khi cập nhật
+        if (newItem.getItem_image() != null && item.getItem_image() != null) {
+            deletePhysicalFile(item.getItem_image());
+            item.setItem_image(newItem.getItem_image());
+        } else if (newItem.getItem_image() != null) {
+            // Trường hợp trước đó chưa có ảnh, giờ mới thêm
+            item.setItem_image(newItem.getItem_image());
+        }
+        // Nếu newItem.getItem_image() là null, ta giữ nguyên item.getItem_image() cũ
+
         item.setItem_name(newItem.getItem_name());
         item.setPrice(newItem.getPrice());
         item.setDescription(newItem.getDescription());
-        item.setItem_image(newItem.getItem_image());
         item.setCat_id(newItem.getCat_id());
 
         return menuItemRepository.save(item);
@@ -55,6 +69,12 @@ public class MenuItemService {
 
     // Xóa món
     public void deleteMenuItem(Integer id) {
+        // ✅ Trước khi xóa trong DB, tìm để xóa file vật lý
+        menuItemRepository.findById(id).ifPresent(item -> {
+            if (item.getItem_image() != null) {
+                deletePhysicalFile(item.getItem_image());
+            }
+        });
         menuItemRepository.deleteById(id);
     }
 
@@ -67,5 +87,18 @@ public class MenuItemService {
         item.setIs_available(item.getIs_available() == 1 ? 0 : 1);
 
         return menuItemRepository.save(item);
+    }
+
+    /**
+     * Hàm phụ trợ để xóa file khỏi thư mục uploads
+     */
+    private void deletePhysicalFile(String fileName) {
+        try {
+            Path path = Paths.get(UPLOAD_DIR + fileName);
+            Files.deleteIfExists(path);
+            System.out.println("Đã xóa file vật lý: " + fileName);
+        } catch (IOException e) {
+            System.err.println("Lỗi khi xóa file: " + e.getMessage());
+        }
     }
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Profile from './Profile';
 import AddMenuItemForm from '../components/Restaurant/AddMenuItemForm';
 import MenuList from '../components/Restaurant/MenuList';
+import RestaurantInfoForm from '../components/Restaurant/RestaurantInfoForm';
 
 const Restaurant = () => {
     const navigate = useNavigate();
@@ -130,7 +131,7 @@ const Restaurant = () => {
         }
     };
 
-    // === HÀM BẬT/TẮT TRẠNG THÁI MÓN (Dùng ngay tại Card) ===
+    // === HÀM BẬT/TẮT TRẠNG THÁI MÓN ===
     const handleToggleStatus = async (id, isCurrentlyAvailable) => {
         const action = isCurrentlyAvailable ? "ẨN (Hết hàng)" : "HIỆN (Còn hàng)";
         if (!window.confirm(`Bạn có chắc muốn ${action} món này không?`)) return;
@@ -184,9 +185,9 @@ const Restaurant = () => {
                             <button 
                                 className="btn-primary" 
                                 onClick={handleAddFood}
-                                style={{ width: 'auto', padding: '10px 25px' }}
+                                style={{ width: 'auto', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}
                             >
-                                + Thêm món
+                                <i className="fas fa-plus"></i> Thêm món
                             </button>
                         </div>
 
@@ -219,10 +220,17 @@ const Restaurant = () => {
                     />
                 );
 
-            case 'new-orders': return <h3>Đơn hàng đang chờ xử lý...</h3>;
-            case 'order-status': return <h3>Lịch sử đơn hàng</h3>;
-            case 'revenue-stats': return <h3>Thống kê doanh thu</h3>;
-            case 'res-info': return <h3>Thông tin cửa hàng</h3>;
+            case 'manage-orders': 
+                return (
+                    <div className="orders-container">
+                        <h3><i className="fas fa-shopping-basket"></i> Quản lý Đơn hàng</h3>
+                        <p>Duyệt đơn mới và cập nhật trạng thái chế biến tại đây.</p>
+                    </div>
+                );
+
+            case 'revenue-stats': return <h3><i className="fas fa-file-invoice-dollar"></i> Thống kê doanh thu</h3>;
+            case 'res-info': 
+                return <RestaurantInfoForm />;
             case 'profile': return <Profile />;
 
             default: return null;
@@ -234,10 +242,9 @@ const Restaurant = () => {
         const titles = {
             'manage-menu': 'Quản lý menu',
             'add-food': editingItem ? 'Cập nhật món ăn' : 'Thêm món mới', 
-            'new-orders': 'Đơn hàng mới',
-            'order-status': 'Trạng thái đơn',
-            'revenue-stats': 'Doanh thu',
-            'res-info': 'Thông tin quán',
+            'manage-orders': 'Quản lý Đơn hàng',
+            'revenue-stats': 'Thống kê Doanh thu',
+            'res-info': 'Thông tin nhà hàng',
             'profile': 'Hồ sơ cá nhân'
         };
         return titles[activeTab] || 'Dashboard';
@@ -246,29 +253,29 @@ const Restaurant = () => {
     return (
         <div className="dashboard-layout">
             <aside className="sidebar">
-                <div className="brand">
-                    <h3>Yummy Hub</h3>
-                    <p style={{ fontSize: '12px', color: '#28a745', fontWeight: 'bold' }}>Nhà hàng của bạn</p>
+                <div className="brand" style={{ padding: '0 10px 20px' }}>
+                    <h3 style={{ color: '#28a745', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-utensils"></i> Yummy Hub
+                    </h3>
+                    <p style={{ fontSize: '12px', color: '#666', fontWeight: 'bold', marginTop: '5px' }}>Nhà hàng của bạn</p>
                 </div>
 
                 <ul>
                     <li className={(activeTab === 'manage-menu' || activeTab === 'add-food') ? 'active' : ''} onClick={() => setActiveTab('manage-menu')}> 
-                        <i className="fas fa-utensils"></i> Quản lý menu
+                        <i className="fas fa-list-alt"></i> Quản lý menu
                     </li>
-                    <li className={activeTab === 'new-orders' ? 'active' : ''} onClick={() => setActiveTab('new-orders')}>
-                        <i className="fas fa-shopping-bag"></i> Đơn hàng mới
-                    </li>
-                    <li className={activeTab === 'order-status' ? 'active' : ''} onClick={() => setActiveTab('order-status')}>
-                        <i className="fas fa-truck"></i> Trạng thái đơn
+                    <li className={activeTab === 'manage-orders' ? 'active' : ''} onClick={() => setActiveTab('manage-orders')}>
+                        <i className="fas fa-shopping-bag"></i> Đơn hàng
                     </li>
                     <li className={activeTab === 'revenue-stats' ? 'active' : ''} onClick={() => setActiveTab('revenue-stats')}>
-                        <i className="fas fa-chart-line"></i> Doanh thu
+                        <i className="fas fa-chart-pie"></i> Doanh thu
                     </li>
                     <li className={activeTab === 'res-info' ? 'active' : ''} onClick={() => setActiveTab('res-info')}>
-                        <i className="fas fa-store"></i> Thông tin quán
+                        <i className="fas fa-store-alt"></i> Thông tin quán
                     </li>
+                    <hr style={{ margin: '15px 0', opacity: '0.1' }} />
                     <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
-                        <i className="fas fa-user-circle"></i> Hồ sơ cá nhân
+                        <i className="fas fa-user-cog"></i> Hồ sơ cá nhân
                     </li>
                 </ul>
 
@@ -277,21 +284,41 @@ const Restaurant = () => {
                 </button>
             </aside>
 
-            <main className="main-content">
-                <header className="main-header">
-                    <div>
-                        <h2>{getPageTitle()}</h2>
-                    </div>
-                    <div className="user-profile-mini">
-                        <span>{fullName}</span>
-                        <div className="avatar-mini">{avatarChar}</div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <header className="main-header" style={{
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '15px 35px',
+                    background: '#fff',
+                    borderBottom: '1px solid #eee'
+                }}>
+                    <h2 style={{ fontSize: '20px', margin: 0, color: '#333' }}>{getPageTitle()}</h2>
+                    <div className="user-profile-mini" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ textAlign: 'right' }}>
+                            <span style={{ display: 'block', fontWeight: 'bold', fontSize: '14px' }}>{fullName}</span>
+                            <span style={{ fontSize: '12px', color: '#28a745' }}>Chủ cửa hàng</span>
+                        </div>
+                        <div className="avatar-mini" style={{
+                            width: '35px', 
+                            height: '35px', 
+                            background: '#28a745', 
+                            color: '#fff', 
+                            borderRadius: '50%', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            fontWeight: 'bold'
+                        }}>{avatarChar}</div>
                     </div>
                 </header>
 
-                <div id="content-area">
-                    {renderContent()}
-                </div>
-            </main>
+                <main className="main-content" style={{ flex: 1, padding: '30px 35px' }}>
+                    <div id="content-area">
+                        {renderContent()}
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };

@@ -41,8 +41,13 @@ public class SecurityConfig {
                                 "/auth/**", "/fragments/**", "/favicon.ico/**", "/assets/**")
                         .permitAll()
 
-                        // ✅ THÊM DÒNG NÀY: Để thả xích cho hình ảnh món ăn
-                        .requestMatchers("/api/menu/image/**").permitAll()
+                        .requestMatchers("/api/menu/uploads/**").permitAll()
+
+                        // Cho phép truy cập thư mục uploads chung (để xem hình ảnh nhà hàng)
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // Cho phép API upload ảnh hoạt động
+                        .requestMatchers("/api/v1/restaurant/upload").permitAll()
 
                         // SỬA 1: Mở rộng đường dẫn cho Auth
                         .requestMatchers("/auth/**", "/api/auth/**").permitAll()

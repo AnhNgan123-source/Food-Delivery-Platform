@@ -54,8 +54,8 @@ input:focus, select:focus { border-color: #28a745; background: white; box-shadow
 }
 .sidebar li:hover, .sidebar li.active { background: #e9ecef; color: #28a745; font-weight: 700; }
 
-.main-content { flex: 1; padding: 35px; overflow-y: auto; background: #fff; }
-.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+.main-content { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
+.main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
 
 .btn-logout { 
     margin-top: auto; padding: 12px; background: #ff7675; color: white; 
@@ -289,3 +289,58 @@ input:focus, select:focus { border-color: #28a745; background: white; box-shadow
     gap: 20px;
 }
 
+/* --- STYLE BẢNG CHO ADMIN --- */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.admin-table th {
+    background: #f8f9fa;
+    color: #555;
+    font-weight: 600;
+    text-align: left;
+    padding: 15px;
+    font-size: 14px;
+    border-bottom: 2px solid #eee;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+    vertical-align: middle;
+}
+
+.admin-table tr:hover {
+    background-color: #fcfdfc;
+}
+
+/* Nút thao tác nhanh */
+.btn-approve {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+.btn-approve:hover { background: #219150; }
+
+.btn-reject {
+    background: #fff;
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-reject:hover { background: #fff5f5; }

@@ -2,27 +2,34 @@ package com.nhom8.backend.controller;
 
 import com.nhom8.backend.config.JwtUtil;
 import com.nhom8.backend.model.User;
+import com.nhom8.backend.model.Restaurant; // THÊM DÒNG NÀY
 import com.nhom8.backend.repository.UserRepository;
+import com.nhom8.backend.repository.RestaurantRepository; // THÊM DÒNG NÀY
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal; // THÊM DÒNG NÀY
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*") // THÊM DÒNG NÀY ĐỂ MỞ CỬA CHO REACT
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
+    private RestaurantRepository restaurantRepository; // THÊM DÒNG NÀY
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil; // Gọi công cụ JWT vào
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> request) {
@@ -36,11 +43,10 @@ public class AuthController {
             User user = userOpt.get();
             String token = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
 
-            Map<String, Object> data = new HashMap<>(); // Đổi sang Object để chứa cả Long
+            Map<String, Object> data = new HashMap<>();
             data.put("token", token);
             data.put("role", user.getRole().toString());
 
-            // LẤY ID NHÀ HÀNG NẾU LÀ ROLE RESTAURANT
             if (user.getRole().toString().equals("RESTAURANT")) {
                 data.put("restaurantId", user.getUser_id());
             }
@@ -58,7 +64,6 @@ public class AuthController {
     public Map<String, Object> register(@RequestBody User user) {
         Map<String, Object> response = new HashMap<>();
 
-        // 1. Chặn nếu để trống các trường bắt buộc
         if (user.getUsername() == null || user.getUsername().trim().isEmpty() ||
                 user.getPassword() == null || user.getPassword().trim().isEmpty() ||
                 user.getEmail() == null || user.getEmail().trim().isEmpty()) {
@@ -68,18 +73,32 @@ public class AuthController {
             return response;
         }
 
-        // 2. Kiểm tra tên đăng nhập đã tồn tại chưa
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             response.put("status", "error");
             response.put("message", "Tên đăng nhập đã tồn tại!");
             return response;
         }
-        // Dòng này sẽ biến "123456" thành chuỗi bảo mật trước khi lưu vào MySQL
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setIs_active(1);
 
-        userRepository.save(user);
+        // Lưu User vào database
+        User savedUser = userRepository.save(user);
 
+        // --- BẮT ĐẦU PHẦN THÊM MỚI ---
+        // Nếu đăng ký với vai trò RESTAURANT, tự động tạo 1 bản ghi nhà hàng trống
+        if ("RESTAURANT".equals(savedUser.getRole().toString())) {
+            Restaurant newRes = new Restaurant();
+            newRes.setOwnerId(savedUser.getUser_id()); // Gắn ID chủ quán vừa tạo
+            newRes.setResName("Nhà hàng của " + savedUser.getFull_name());
+            newRes.setResAddress(savedUser.getAddress() != null ? savedUser.getAddress() : "Chưa cập nhật địa chỉ");
+            newRes.setRatingAvg(BigDecimal.ZERO); // Mặc định 0 sao
+            newRes.setIsActive(0); // Mặc định chưa được duyệt
+            // resImage để mặc định là null hoặc chuỗi rỗng tùy
+
+            restaurantRepository.save(newRes);
+        }
+        // --- KẾT THÚC PHẦN THÊM MỚI ---
         response.put("status", "success");
         response.put("message", "Đăng ký thành công!");
         return response;

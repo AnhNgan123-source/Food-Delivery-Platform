@@ -22,18 +22,24 @@ public class RestaurantService {
     // lấy thông tin quán theo owner
     public Restaurant getRestaurantByOwner(Integer ownerId) {
         return restaurantRepository.findByOwnerId(ownerId)
-                .orElseThrow(() -> new RuntimeException("Không tim thấy nhà hàng"));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhà hàng"));
     }
 
-    // update thông tin quán
+    // UPDATE THÔNG TIN QUÁN (Chủ quán tự sửa)
     public Restaurant updateRestaurant(Integer resId, Restaurant newData) {
 
         Restaurant res = restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
+        // Cập nhật các trường cho phép
         res.setResName(newData.getResName());
         res.setResAddress(newData.getResAddress());
-        res.setResImage(newData.getResImage());
+
+        // CHỈ cập nhật ảnh nếu newData có chứa đường dẫn ảnh mới (không null/rỗng)
+        // Điều này giúp giữ lại ảnh cũ nếu chủ quán chỉ muốn sửa tên/địa chỉ
+        if (newData.getResImage() != null && !newData.getResImage().trim().isEmpty()) {
+            res.setResImage(newData.getResImage());
+        }
 
         return restaurantRepository.save(res);
     }
