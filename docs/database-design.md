@@ -131,6 +131,15 @@
     CONSTRAINT fk_rev_user FOREIGN KEY (customer_id) REFERENCES User(user_id),
     CONSTRAINT fk_rev_res FOREIGN KEY (res_id) REFERENCES Restaurant(res_id)
     ) ENGINE=InnoDB;
+
+    -- -- 11. Bảng Shipping_Config: Cấu hình phí ship đơn giản
+    CREATE TABLE Shipping_Config (
+    config_id    INT PRIMARY KEY AUTO_INCREMENT,
+    area_name    VARCHAR(50) NOT NULL, -- 'Nội thành', 'Ngoại thành'
+    price        DECIMAL(10, 2) NOT NULL, -- Giá tiền cố định
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
+    
 # SƠ ĐỒ ERD DIAGRAM
 <img width="738" height="1246" alt="ERD Diagram" src="https://github.com/user-attachments/assets/035a5e74-97bd-40b5-a506-8b7f1ddea0de" />
 

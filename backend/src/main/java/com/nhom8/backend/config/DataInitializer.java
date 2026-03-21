@@ -3,12 +3,16 @@ package com.nhom8.backend.config;
 import com.nhom8.backend.model.User;
 import com.nhom8.backend.model.Role;
 import com.nhom8.backend.model.Category;
+import com.nhom8.backend.model.ShippingConfig; // Nhớ import model mới
 import com.nhom8.backend.repository.CategoryRepository;
 import com.nhom8.backend.repository.UserRepository;
+import com.nhom8.backend.repository.ShippingConfigRepository; // Nhớ import repo mới
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -22,33 +26,28 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private ShippingConfigRepository shippingConfigRepository; // Thêm repo này
+
     @Override
     public void run(String... args) throws Exception {
-        // ===== INIT ADMIN =====
-        // 1. Kiểm tra xem trong DB đã có tài khoản admin chưa
+        // ===== 1. INIT ADMIN =====
         if (userRepository.findByUsername("admin").isEmpty()) {
-
             User admin = new User();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("123456"));
             admin.setEmail("nhuvy.admin@gmail.com");
             admin.setRole(Role.ADMIN);
-
-            // --- THÊM CÁC THÔNG TIN MỚI Ở ĐÂY ---
             admin.setFull_name("Nguyễn Như Vy");
             admin.setPhone("0912345678");
             admin.setAddress("TP. Hồ Chí Minh, Việt Nam");
             admin.setIs_active(1);
-            // ------------------------------------
 
             userRepository.save(admin);
-
             System.out.println(">>>>> Đã khởi tạo tài khoản Admin: Nguyễn Như Vy (admin/123456) <<<<<");
-        } else {
-            System.out.println(">>>>> Tài khoản Admin đã tồn tại, không cập nhật thêm. <<<<<");
         }
 
-        // ================== INIT CATEGORY ==================
+        // ===== 2. INIT CATEGORY =====
         if (categoryRepository.count() == 0) {
             String[] names = {
                     "Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên",
@@ -62,8 +61,24 @@ public class DataInitializer implements CommandLineRunner {
                 cat.setCat_name(n);
                 categoryRepository.save(cat);
             }
-
             System.out.println(">>>>> Đã khởi tạo 16 CATEGORY thành công! <<<<<");
+        }
+
+        // ===== 3. INIT SHIPPING CONFIG (NỘI THÀNH/NGOẠI THÀNH) =====
+        if (shippingConfigRepository.count() == 0) {
+            // Tạo dòng Nội thành
+            ShippingConfig noiThanh = new ShippingConfig();
+            noiThanh.setAreaName("Nội thành");
+            noiThanh.setPrice(new BigDecimal("20000"));
+            shippingConfigRepository.save(noiThanh);
+
+            // Tạo dòng Ngoại thành
+            ShippingConfig ngoaiThanh = new ShippingConfig();
+            ngoaiThanh.setAreaName("Ngoại thành");
+            ngoaiThanh.setPrice(new BigDecimal("35000"));
+            shippingConfigRepository.save(ngoaiThanh);
+
+            System.out.println(">>>>> Đã khởi tạo phí ship: Nội thành (20k) & Ngoại thành (35k) <<<<<");
         }
     }
 }

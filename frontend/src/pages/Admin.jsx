@@ -120,6 +120,12 @@ const Admin = () => {
     const [selectedRes, setSelectedRes] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
+    // === STATE CHO CẤU HÌNH PHÍ SHIP MỚI ===
+    const [shippingFees, setShippingFees] = useState([
+        { areaName: 'Nội thành', price: 20000 },
+        { areaName: 'Ngoại thành', price: 35000 }
+    ]);
+
     const actionBtnBase = {
         padding: '8px 16px',
         borderRadius: '10px',
@@ -153,8 +159,20 @@ const Admin = () => {
         finally { setIsLoading(false); }
     };
 
+    // === HÀM LẤY PHÍ SHIP TỪ DB ===
+    const fetchShippingFees = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config");
+            if (response.ok) {
+                const data = await response.json();
+                if (data.length > 0) setShippingFees(data);
+            }
+        } catch (error) { console.error("Lỗi lấy phí ship:", error); }
+    };
+
     useEffect(() => {
         if (activeTab === 'approve-res' || activeTab === 'manage-res') fetchRestaurants();
+        if (activeTab === 'shipping-fee') fetchShippingFees(); // Load phí ship khi mở tab
     }, [activeTab]);
 
     const handleUpdateStatus = async (res, newStatus) => {
@@ -170,7 +188,6 @@ const Admin = () => {
         } catch (error) { alert("Lỗi!"); }
     };
 
-    // === HÀM XÓA NHÀ HÀNG MỚI THÊM ===
     const handleDeleteRestaurant = async (resId) => {
         if (!window.confirm("Sếp có chắc chắn muốn XÓA VĨNH VIỄN nhà hàng này không?")) return;
         try {
@@ -186,6 +203,18 @@ const Admin = () => {
         } catch (error) { console.error("Lỗi:", error); }
     };
 
+    // === HÀM LƯU PHÍ SHIP MỚI ===
+    const handleSaveShippingFees = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config", {
+                method: 'POST', // Hoặc PUT tùy sếp thiết kế API
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(shippingFees)
+            });
+            if (response.ok) alert("Đã cập nhật bảng giá phí ship!");
+        } catch (error) { alert("Lỗi lưu phí ship!"); }
+    };
+
     const handleLogout = () => {
         if (window.confirm("Sếp có chắc chắn muốn đăng xuất?")) {
             localStorage.clear();
@@ -198,7 +227,6 @@ const Admin = () => {
             case 'approve-res':
             case 'manage-res':
                 const isApproveTab = activeTab === 'approve-res';
-                // LỌC DỮ LIỆU: Tab duyệt hiện isActive=0, Tab quản lý hiện isActive=1
                 const list = isApproveTab 
                     ? restaurants.filter(r => r.isActive === 0) 
                     : restaurants.filter(r => r.isActive === 1);
@@ -251,7 +279,6 @@ const Admin = () => {
                                                         <button style={{ ...actionBtnBase, background: '#ef4444', color: '#fff' }} onClick={() => handleUpdateStatus(res, 0)}>
                                                             <i className="fas fa-lock"></i> Khóa
                                                         </button>
-                                                        {/* NÚT XÓA BÊN NGOÀI LIST QUẢN LÝ NHÀ HÀNG */}
                                                         <button 
                                                             style={{ ...actionBtnBase, background: '#334155', color: '#fff' }} 
                                                             onClick={() => handleDeleteRestaurant(res.resId)}
@@ -269,31 +296,64 @@ const Admin = () => {
                     </div>
                 );
             
+            // === CẬU TRÚC PHẦN CẤU HÌNH PHÍ SHIP MỚI TỐI GIẢN ===
             case 'shipping-fee':
                 return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-                        <div style={{ background: '#fff', borderRadius: '20px', padding: '30px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                            <h3 style={{ fontSize: '18px', color: '#1e293b', marginBottom: '20px', fontWeight: '700' }}>Biểu phí theo khoảng cách</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-                                {[
-                                    { range: "0 - 2km", price: "15.000đ", icon: "fa-walking" },
-                                    { range: "2 - 5km", price: "25.000đ", icon: "fa-bicycle" },
-                                    { range: "Trên 5km", price: "+5.000đ/km", icon: "fa-motorcycle" }
-                                ].map((item, idx) => (
-                                    <div key={idx} style={{ padding: '20px', borderRadius: '16px', border: '1px solid #f1f5f9', background: '#f8fafc' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '15px' }}>
-                                            <div style={{ width: '40px', height: '40px', background: '#fff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                                                <i className={`fas ${item.icon}`}></i>
-                                            </div>
-                                            <span style={{ fontWeight: '600', color: '#475569' }}>{item.range}</span>
-                                        </div>
-                                        <input type="text" defaultValue={item.price} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none', fontWeight: '700', color: '#1e293b' }} />
+                    <div style={{ background: '#fff', borderRadius: '20px', padding: '35px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                        <div style={{ marginBottom: '30px' }}>
+                            <h3 style={{ fontSize: '20px', color: '#1e293b', fontWeight: '700', margin: '0 0 10px 0' }}>
+                                <i className="fas fa-map-marked-alt" style={{ color: '#3b82f6', marginRight: '10px' }}></i> 
+                                Cấu hình phí vận chuyển TP.HCM
+                            </h3>
+                            <p style={{ color: '#64748b', fontSize: '14px' }}>Thiết lập mức phí vận chuyển cố định cho khu vực Nội thành và Ngoại thành.</p>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                            {shippingFees.map((fee, idx) => (
+                                <div key={idx} style={{ 
+                                    padding: '25px', 
+                                    borderRadius: '20px', 
+                                    background: fee.areaName === 'Nội thành' ? '#f0f9ff' : '#fff7ed', 
+                                    border: `1px solid ${fee.areaName === 'Nội thành' ? '#e0f2fe' : '#ffedd5'}`,
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '80px', opacity: '0.05', color: '#000' }}>
+                                        <i className={fee.areaName === 'Nội thành' ? 'fas fa-city' : 'fas fa-tree'}></i>
                                     </div>
-                                ))}
-                            </div>
+                                    <h4 style={{ color: fee.areaName === 'Nội thành' ? '#0369a1' : '#9a3412', margin: '0 0 8px 0', fontSize: '18px' }}>{fee.areaName}</h4>
+                                    <p style={{ fontSize: '12px', color: fee.areaName === 'Nội thành' ? '#0c4a6e' : '#7c2d12', marginBottom: '20px' }}>
+                                        {fee.areaName === 'Nội thành' ? 'Áp dụng cho các Quận trung tâm (Q.1, 3, 5, 10...)' : 'Áp dụng cho các Huyện (Cần Giờ, Nhà Bè, Củ Chi...)'}
+                                    </p>
+                                    <div style={{ position: 'relative' }}>
+                                        <input 
+                                            type="number" 
+                                            value={fee.price} 
+                                            onChange={(e) => {
+                                                const newFees = [...shippingFees];
+                                                newFees[idx].price = e.target.value;
+                                                setShippingFees(newFees);
+                                            }}
+                                            style={{ width: '100%', padding: '15px 50px 15px 20px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '20px', fontWeight: '800', color: '#1e293b', outline: 'none' }} 
+                                        />
+                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', fontWeight: '700', color: '#94a3b8' }}>đ</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '30px', textAlign: 'right' }}>
+                            <button 
+                                className="wf-btn-primary" 
+                                onClick={handleSaveShippingFees}
+                                style={{ padding: '15px 40px', borderRadius: '12px', fontWeight: '700', fontSize: '15px', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)' }}
+                            >
+                                <i className="fas fa-save" style={{ marginRight: '8px' }}></i> Lưu thay đổi
+                            </button>
                         </div>
                     </div>
                 );
+
             case 'profile': return <Profile />;
             default: return <div style={{ textAlign: 'center', padding: '100px 0' }}><h2 style={{ color: '#1e293b' }}>Chào mừng sếp trở lại! 👋</h2><p style={{ color: '#64748b' }}>Chọn một mục ở menu bên trái để bắt đầu quản lý hệ thống.</p></div>;
         }
