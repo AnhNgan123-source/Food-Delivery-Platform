@@ -88,6 +88,9 @@
     final_amount     DECIMAL(10, 2) NOT NULL,   -- Tổng tiền thanh toán (Subtotal + Ship - Discount)
     order_status     ENUM('PENDING', 'CONFIRMED', 'PREPARING', 'SHIPPING', 'COMPLETED', 'CANCELLED') DEFAULT 'PENDING', -- Tiến độ đơn hàng
     payment_method   VARCHAR(50) DEFAULT 'CASH', -- Phương thức (CASH, MOMO, VNPAY)
+    payment_status   VARCHAR(50) DEFAULT 'UNPAID', --- Trạng thái thanh toán: UNPAID, PAID, FAILED
+    paid_at          DATETIME,                     --- Thời gian thanh toán
+    completed        DATETIME,                     --- Thời gian hoàn thành đơn hàng
     delivery_address TEXT NOT NULL,             -- Địa chỉ nhận hàng thực tế
     note             TEXT,                      -- Ghi chú (Ví dụ: Không ăn hành)
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -102,6 +105,7 @@
     order_item_id    INT PRIMARY KEY AUTO_INCREMENT,
     order_id         INT NOT NULL,              -- Thuộc đơn hàng nào
     item_id          INT NOT NULL,              -- Món nào
+    item_name        VARCHAR(255),              --- Tên món
     quantity         INT NOT NULL DEFAULT 1 CHECK (quantity > 0), -- Số lượng đặt
     price_at_order   DECIMAL(10, 2) NOT NULL,   -- Giá món tại thời điểm đặt (để đối soát nếu quán đổi giá sau này)
     CONSTRAINT fk_item_order FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
@@ -141,6 +145,6 @@
     ) ENGINE=InnoDB;
     
 # SƠ ĐỒ ERD DIAGRAM
-<img width="738" height="1246" alt="ERD Diagram" src="https://github.com/user-attachments/assets/035a5e74-97bd-40b5-a506-8b7f1ddea0de" />
+<img width="696" height="1223" alt="ERD_DIAGRAM_UPDATE" src="https://github.com/user-attachments/assets/dfc7174c-9456-487e-b019-5f1615ca63f3" />
 
 
