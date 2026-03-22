@@ -50,19 +50,19 @@ public class MenuItemService {
                 .orElseThrow(() -> new RuntimeException("Menu item not found"));
 
         // ✅ Xử lý ảnh: Nếu có ảnh mới, xóa ảnh cũ trước khi cập nhật
-        if (newItem.getItem_image() != null && item.getItem_image() != null) {
-            deletePhysicalFile(item.getItem_image());
-            item.setItem_image(newItem.getItem_image());
-        } else if (newItem.getItem_image() != null) {
+        if (newItem.getItemImage() != null && item.getItemImage() != null) {
+            deletePhysicalFile(item.getItemImage());
+            item.setItemImage(newItem.getItemImage());
+        } else if (newItem.getItemImage() != null) {
             // Trường hợp trước đó chưa có ảnh, giờ mới thêm
-            item.setItem_image(newItem.getItem_image());
+            item.setItemImage(newItem.getItemImage());
         }
         // Nếu newItem.getItem_image() là null, ta giữ nguyên item.getItem_image() cũ
 
-        item.setItem_name(newItem.getItem_name());
+        item.setItemName(newItem.getItemName());
         item.setPrice(newItem.getPrice());
         item.setDescription(newItem.getDescription());
-        item.setCat_id(newItem.getCat_id());
+        item.setCatId(newItem.getCatId());
 
         return menuItemRepository.save(item);
     }
@@ -71,8 +71,8 @@ public class MenuItemService {
     public void deleteMenuItem(Integer id) {
         // ✅ Trước khi xóa trong DB, tìm để xóa file vật lý
         menuItemRepository.findById(id).ifPresent(item -> {
-            if (item.getItem_image() != null) {
-                deletePhysicalFile(item.getItem_image());
+            if (item.getItemImage() != null) {
+                deletePhysicalFile(item.getItemImage());
             }
         });
         menuItemRepository.deleteById(id);
@@ -84,7 +84,7 @@ public class MenuItemService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy món"));
 
         // Logic đổi trạng thái cực gọn: Đang 1 thì thành 0, đang 0 thì thành 1
-        item.setIs_available(item.getIs_available() == 1 ? 0 : 1);
+        item.setIsAvailable(item.getIsAvailable() == 1 ? 0 : 1);
 
         return menuItemRepository.save(item);
     }

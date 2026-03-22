@@ -2,17 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Profile from './Profile';
 
-// === COMPONENT MODAL SỬA NHÀ HÀNG (GIỮ NGUYÊN) ===
+// === 1. COMPONENT MODAL SỬA NHÀ HÀNG (BẢN DARK MODE) ===
 const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
-    const [formData, setFormData] = useState({ 
-        resId: resData.resId,
-        resName: resData.resName,
-        resAddress: resData.resAddress,
-        resImage: resData.resImage,
-        isActive: resData.isActive 
-    });
-
-    const noLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'><rect width='250' height='250' fill='%23f8f9fa'/><text x='50%25' y='50%25' font-family='Arial' font-size='14' fill='%23ccc' text-anchor='middle' dy='.3em'>No Image</text></svg>";
+    const [formData, setFormData] = useState({ ...resData });
+    const noLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'><rect width='250' height='250' fill='%232d313d'/><text x='50%25' y='50%25' font-family='Arial' font-size='14' fill='%23888' text-anchor='middle' dy='.3em'>No Image</text></svg>";
 
     const handleFileUpload = async (e) => {
         const file = e.target.files[0];
@@ -46,109 +39,76 @@ const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, backdropFilter: 'blur(8px)' }}>
-            <div style={{ background: '#fff', padding: '40px', borderRadius: '24px', width: '600px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-                    <h3 style={{ color: '#1e293b', fontSize: '22px', margin: 0, fontWeight: '700' }}>Cập nhật thông tin</h3>
-                    <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', color: '#64748b' }}>×</button>
+        <div style={styles.modalOverlay}>
+            <div style={styles.modalContent}>
+                <div style={styles.modalHeader}>
+                    <h3 style={styles.modalTitle}>Cập nhật nhà hàng</h3>
+                    <button onClick={onClose} style={styles.closeBtn}>×</button>
                 </div>
-                
                 <div style={{ display: 'flex', gap: '30px' }}>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ position: 'relative', width: '180px', height: '180px', borderRadius: '20px', overflow: 'hidden', border: '4px solid #f8f9fa', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                        <div style={styles.imageBox}>
                             <img 
                                 src={formData.resImage ? `http://localhost:8080/uploads/${formData.resImage}` : noLogo} 
                                 alt="res" 
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                             />
-                            <label style={{ position: 'absolute', bottom: '0', left: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '8px', fontSize: '12px', cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
-                                <i className="fas fa-camera"></i> Thay ảnh
+                            <label style={styles.uploadLabel}>
+                                <i className="fas fa-camera"></i>
                                 <input type="file" onChange={handleFileUpload} style={{ display: 'none' }} />
                             </label>
                         </div>
                     </div>
-                    
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div>
-                            <label style={{ fontSize: '14px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '8px' }}>Tên nhà hàng</label>
+                            <label style={styles.inputLabel}>Tên nhà hàng</label>
                             <input 
-                                className="form-control" 
+                                style={styles.input}
                                 value={formData.resName} 
                                 onChange={e => setFormData({ ...formData, resName: e.target.value })} 
-                                style={{ borderRadius: '12px', padding: '12px 16px', border: '1px solid #e2e8f0', width: '100%', outline: 'none', transition: 'border 0.2s' }} 
                             />
                         </div>
-                        
                         <div>
-                            <label style={{ fontSize: '14px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '8px' }}>Địa chỉ chi tiết</label>
+                            <label style={styles.inputLabel}>Địa chỉ chi tiết</label>
                             <textarea 
-                                className="form-control" 
-                                rows="4"
+                                rows="3"
+                                style={{...styles.input, resize: 'none'}}
                                 value={formData.resAddress} 
                                 onChange={e => setFormData({ ...formData, resAddress: e.target.value })} 
-                                style={{ borderRadius: '12px', padding: '12px 16px', border: '1px solid #e2e8f0', width: '100%', outline: 'none', resize: 'none' }} 
                             />
                         </div>
                     </div>
                 </div>
-
-                <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                    <button 
-                        style={{ background: '#f1f5f9', color: '#64748b', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: '600', cursor: 'pointer' }} 
-                        onClick={onClose}
-                    >
-                        Hủy bỏ
-                    </button>
-                    <button 
-                        className="wf-btn-primary" 
-                        style={{ padding: '12px 30px', borderRadius: '12px', boxShadow: '0 4px 14px 0 rgba(0, 118, 255, 0.19)' }} 
-                        onClick={handleSave}
-                    >
-                        Lưu dữ liệu
-                    </button>
+                <div style={styles.modalFooter}>
+                    <button style={styles.cancelBtn} onClick={onClose}>Hủy</button>
+                    <button style={styles.saveBtn} onClick={handleSave}>Lưu dữ liệu</button>
                 </div>
             </div>
         </div>
     );
 };
 
+// === 2. COMPONENT ADMIN CHÍNH ===
 const Admin = () => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('welcome');
     const [restaurants, setRestaurants] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [selectedRes, setSelectedRes] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
-    // === STATE CHO CẤU HÌNH PHÍ SHIP MỚI ===
+    // ✅ LOGIC PHÍ SHIP TỪ BẢN 1
     const [shippingFees, setShippingFees] = useState([
         { areaName: 'Nội thành', price: 20000 },
         { areaName: 'Ngoại thành', price: 35000 }
     ]);
 
-    const actionBtnBase = {
-        padding: '8px 16px',
-        borderRadius: '10px',
-        fontSize: '13px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        border: 'none',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '8px',
-        transition: 'transform 0.1s, opacity 0.2s',
-    };
-
     useEffect(() => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
-        if (!token || role !== 'ADMIN') {
-            navigate('/'); 
-        }
+        if (!token || role !== 'ADMIN') navigate('/'); 
     }, [navigate]);
 
     const fetchRestaurants = async () => {
-        setIsLoading(true);
         try {
             const response = await fetch("http://localhost:8080/api/v1/admin/restaurants");
             if (response.ok) {
@@ -156,10 +116,9 @@ const Admin = () => {
                 setRestaurants(data);
             }
         } catch (error) { console.error("Lỗi:", error); }
-        finally { setIsLoading(false); }
     };
 
-    // === HÀM LẤY PHÍ SHIP TỪ DB ===
+    // ✅ HÀM LẤY PHÍ SHIP TỪ DB (LOGIC BẢN 1)
     const fetchShippingFees = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config");
@@ -172,7 +131,7 @@ const Admin = () => {
 
     useEffect(() => {
         if (activeTab === 'approve-res' || activeTab === 'manage-res') fetchRestaurants();
-        if (activeTab === 'shipping-fee') fetchShippingFees(); // Load phí ship khi mở tab
+        if (activeTab === 'shipping-fee') fetchShippingFees();
     }, [activeTab]);
 
     const handleUpdateStatus = async (res, newStatus) => {
@@ -182,108 +141,86 @@ const Admin = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...res, isActive: newStatus })
             });
-            if (response.ok) {
-                fetchRestaurants(); 
-            }
+            if (response.ok) fetchRestaurants();
         } catch (error) { alert("Lỗi!"); }
     };
 
     const handleDeleteRestaurant = async (resId) => {
-        if (!window.confirm("Sếp có chắc chắn muốn XÓA VĨNH VIỄN nhà hàng này không?")) return;
+        if (!window.confirm("Sếp chắc chắn muốn XÓA VĨNH VIỄN không?")) return;
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/admin/restaurants/${resId}`, {
-                method: 'DELETE'
-            });
-            if (response.ok) {
-                alert("Đã xóa nhà hàng thành công!");
-                fetchRestaurants();
-            } else {
-                alert("Lỗi khi xóa nhà hàng!");
-            }
-        } catch (error) { console.error("Lỗi:", error); }
+            const response = await fetch(`http://localhost:8080/api/v1/admin/restaurants/${resId}`, { method: 'DELETE' });
+            if (response.ok) { alert("Đã xóa xong!"); fetchRestaurants(); }
+        } catch (error) { console.error(error); }
     };
 
-    // === HÀM LƯU PHÍ SHIP MỚI ===
-    const handleSaveShippingFees = async () => {
+    // ✅ HÀM LƯU PHÍ SHIP XUỐNG DB (LOGIC BẢN 1)
+    const handleSaveShippingFees = async (e) => {
         try {
             const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config", {
-                method: 'POST', // Hoặc PUT tùy sếp thiết kế API
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(shippingFees)
             });
-            if (response.ok) alert("Đã cập nhật bảng giá phí ship!");
+            if (response.ok) alert("Đã cập nhật bảng giá phí ship thành công!");
         } catch (error) { alert("Lỗi lưu phí ship!"); }
-    };
-
-    const handleLogout = () => {
-        if (window.confirm("Sếp có chắc chắn muốn đăng xuất?")) {
-            localStorage.clear();
-            navigate('/');
-        }
     };
 
     const renderContent = () => {
         switch (activeTab) {
             case 'approve-res':
             case 'manage-res':
-                const isApproveTab = activeTab === 'approve-res';
-                const list = isApproveTab 
-                    ? restaurants.filter(r => r.isActive === 0) 
-                    : restaurants.filter(r => r.isActive === 1);
-                
+                const isApprove = activeTab === 'approve-res';
+                const list = isApprove ? restaurants.filter(r => r.isActive === 0) : restaurants.filter(r => r.isActive === 1);
                 return (
-                    <div className="admin-section" style={{ background: '#fff', borderRadius: '20px', padding: '25px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '25px', alignItems: 'center' }}>
-                            <div style={{ fontSize: '15px', color: '#64748b' }}>
-                                {isApproveTab ? "Danh sách chờ duyệt: " : "Danh sách đang hoạt động: "}
-                                <span style={{ color: '#1e293b', fontWeight: '700' }}>{list.length}</span> nhà hàng
+                    <div style={styles.sectionContainer}>
+                        <div style={styles.sectionHeader}>
+                            <div style={styles.statsLabel}>
+                                {isApprove ? "Hồ sơ chờ duyệt: " : "Đang hoạt động: "}
+                                <span style={{ color: '#2ecc71', fontWeight: 'bold' }}>{list.length}</span>
                             </div>
-                            <button className="wf-btn-primary" onClick={fetchRestaurants} style={{ padding: '10px 20px', borderRadius: '10px', fontSize: '13px' }}>
-                                <i className="fas fa-sync-alt"></i> Làm mới dữ liệu
+                            <button style={styles.refreshBtn} onClick={fetchRestaurants}>
+                                <i className="fas fa-sync-alt"></i> Làm mới
                             </button>
                         </div>
-                        
-                        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+                        <table style={styles.table}>
                             <thead>
-                                <tr style={{ color: '#94a3b8', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                    <th style={{ textAlign: 'left', padding: '15px' }}>Mã ID</th>
-                                    <th style={{ textAlign: 'left', padding: '15px' }}>Tên nhà hàng</th>
-                                    <th style={{ textAlign: 'left', padding: '15px' }}>Trạng thái</th>
-                                    <th style={{ textAlign: 'right', padding: '15px' }}>Thao tác quản trị</th>
+                                <tr style={styles.tableHeadRow}>
+                                    <th style={styles.tableTh}>ID</th>
+                                    <th style={styles.tableTh}>Tên nhà hàng</th>
+                                    <th style={styles.tableTh}>Trạng thái</th>
+                                    <th style={{...styles.tableTh, textAlign: 'right'}}>Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {list.map(res => (
-                                    <tr key={res.resId} style={{ background: '#fff', transition: 'all 0.2s' }} className="table-row-hover">
-                                        <td style={{ padding: '15px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', borderLeft: '1px solid #f1f5f9', borderRadius: '12px 0 0 12px', color: '#64748b' }}>#{res.resId}</td>
-                                        <td style={{ padding: '15px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' }}>
-                                            <div style={{ color: '#1e293b', fontWeight: '600' }}>{res.resName}</div>
+                                    <tr key={res.resId} style={styles.tableRow}>
+                                        <td style={styles.tableTd}>#{res.resId}</td>
+                                        <td style={styles.tableTd}><span style={{fontWeight: '600'}}>{res.resName}</span></td>
+                                        <td style={styles.tableTd}>
+                                            <span style={{
+                                                ...styles.statusBadge,
+                                                color: res.isActive === 1 ? '#2ecc71' : '#e67e22',
+                                                backgroundColor: res.isActive === 1 ? 'rgba(46, 204, 113, 0.1)' : 'rgba(230, 126, 34, 0.1)'
+                                            }}>
+                                                ● {res.isActive === 1 ? 'Hoạt động' : 'Chờ duyệt'}
+                                            </span>
                                         </td>
-                                        <td style={{ padding: '15px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' }}>
-                                            {res.isActive === 1 ? 
-                                                <span style={{ background: '#ecfdf5', color: '#059669', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>● Hoạt động</span> : 
-                                                <span style={{ background: '#fef2f2', color: '#dc2626', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>● Chờ duyệt</span>
-                                            }
-                                        </td>
-                                        <td style={{ padding: '15px', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9', borderRight: '1px solid #f1f5f9', borderRadius: '0 12px 12px 0', textAlign: 'right' }}>
-                                            <div style={{ display: 'inline-flex', gap: '8px' }}>
-                                                {isApproveTab ? (
-                                                    <button style={{ ...actionBtnBase, background: '#10b981', color: '#fff' }} onClick={() => handleUpdateStatus(res, 1)}>
+                                        <td style={{...styles.tableTd, textAlign: 'right'}}>
+                                            <div style={{ display: 'inline-flex', gap: '10px' }}>
+                                                {isApprove ? (
+                                                    <button style={styles.approveBtn} onClick={() => handleUpdateStatus(res, 1)}>
                                                         <i className="fas fa-check"></i> Duyệt
                                                     </button>
                                                 ) : (
                                                     <>
-                                                        <button style={{ ...actionBtnBase, background: '#f59e0b', color: '#fff' }} onClick={() => { setSelectedRes(res); setShowEditModal(true); }}>
-                                                            <i className="fas fa-edit"></i> Sửa
+                                                        <button style={styles.editIconBtn} onClick={() => { setSelectedRes(res); setShowEditModal(true); }}>
+                                                            <i className="fas fa-edit"></i>
                                                         </button>
-                                                        <button style={{ ...actionBtnBase, background: '#ef4444', color: '#fff' }} onClick={() => handleUpdateStatus(res, 0)}>
-                                                            <i className="fas fa-lock"></i> Khóa
+                                                        <button style={styles.lockIconBtn} onClick={() => handleUpdateStatus(res, 0)}>
+                                                            <i className="fas fa-lock"></i>
                                                         </button>
-                                                        <button 
-                                                            style={{ ...actionBtnBase, background: '#334155', color: '#fff' }} 
-                                                            onClick={() => handleDeleteRestaurant(res.resId)}
-                                                        >
-                                                            <i className="fas fa-trash-alt"></i> Xóa
+                                                        <button style={styles.deleteIconBtn} onClick={() => handleDeleteRestaurant(res.resId)}>
+                                                            <i className="fas fa-trash-alt"></i>
                                                         </button>
                                                     </>
                                                 )}
@@ -295,37 +232,22 @@ const Admin = () => {
                         </table>
                     </div>
                 );
-            
-            // === CẬU TRÚC PHẦN CẤU HÌNH PHÍ SHIP MỚI TỐI GIẢN ===
             case 'shipping-fee':
                 return (
-                    <div style={{ background: '#fff', borderRadius: '20px', padding: '35px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                    <div style={styles.sectionContainer}>
                         <div style={{ marginBottom: '30px' }}>
-                            <h3 style={{ fontSize: '20px', color: '#1e293b', fontWeight: '700', margin: '0 0 10px 0' }}>
-                                <i className="fas fa-map-marked-alt" style={{ color: '#3b82f6', marginRight: '10px' }}></i> 
-                                Cấu hình phí vận chuyển TP.HCM
+                            <h3 style={styles.sectionTitle}>
+                                <i className="fas fa-truck-loading" style={{color: '#2ecc71', marginRight: '10px'}}></i>
+                                Cấu hình phí vận chuyển hệ thống
                             </h3>
-                            <p style={{ color: '#64748b', fontSize: '14px' }}>Thiết lập mức phí vận chuyển cố định cho khu vực Nội thành và Ngoại thành.</p>
+                            <p style={{color: '#888', fontSize: '14px'}}>Thiết lập mức phí vận chuyển cố định theo khu vực (Nội thành/Ngoại thành).</p>
                         </div>
-                        
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                        <div style={styles.feeGrid}>
                             {shippingFees.map((fee, idx) => (
-                                <div key={idx} style={{ 
-                                    padding: '25px', 
-                                    borderRadius: '20px', 
-                                    background: fee.areaName === 'Nội thành' ? '#f0f9ff' : '#fff7ed', 
-                                    border: `1px solid ${fee.areaName === 'Nội thành' ? '#e0f2fe' : '#ffedd5'}`,
-                                    position: 'relative',
-                                    overflow: 'hidden'
-                                }}>
-                                    <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '80px', opacity: '0.05', color: '#000' }}>
-                                        <i className={fee.areaName === 'Nội thành' ? 'fas fa-city' : 'fas fa-tree'}></i>
-                                    </div>
-                                    <h4 style={{ color: fee.areaName === 'Nội thành' ? '#0369a1' : '#9a3412', margin: '0 0 8px 0', fontSize: '18px' }}>{fee.areaName}</h4>
-                                    <p style={{ fontSize: '12px', color: fee.areaName === 'Nội thành' ? '#0c4a6e' : '#7c2d12', marginBottom: '20px' }}>
-                                        {fee.areaName === 'Nội thành' ? 'Áp dụng cho các Quận trung tâm (Q.1, 3, 5, 10...)' : 'Áp dụng cho các Huyện (Cần Giờ, Nhà Bè, Củ Chi...)'}
-                                    </p>
-                                    <div style={{ position: 'relative' }}>
+                                <div key={idx} style={styles.feeCard}>
+                                    <i className={`fas ${fee.areaName === 'Nội thành' ? 'fa-city' : 'fa-shuttle-van'}`} style={styles.feeIcon}></i>
+                                    <span style={styles.feeRange}>{fee.areaName}</span>
+                                    <div style={{position: 'relative'}}>
                                         <input 
                                             type="number" 
                                             value={fee.price} 
@@ -334,78 +256,95 @@ const Admin = () => {
                                                 newFees[idx].price = e.target.value;
                                                 setShippingFees(newFees);
                                             }}
-                                            style={{ width: '100%', padding: '15px 50px 15px 20px', borderRadius: '12px', border: '1px solid #cbd5e1', fontSize: '20px', fontWeight: '800', color: '#1e293b', outline: 'none' }} 
+                                            style={styles.feeInput} 
                                         />
-                                        <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', fontWeight: '700', color: '#94a3b8' }}>đ</span>
+                                        <span style={{position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', color: '#888'}}>VNĐ</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
-
-                        <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '30px', textAlign: 'right' }}>
-                            <button 
-                                className="wf-btn-primary" 
-                                onClick={handleSaveShippingFees}
-                                style={{ padding: '15px 40px', borderRadius: '12px', fontWeight: '700', fontSize: '15px', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)' }}
-                            >
-                                <i className="fas fa-save" style={{ marginRight: '8px' }}></i> Lưu thay đổi
+                        <div style={{marginTop: '40px', textAlign: 'right', borderTop: '1px solid #2d313d', paddingTop: '30px'}}>
+                            <button style={styles.saveBtn} onClick={handleSaveShippingFees}>
+                                <i className="fas fa-save" style={{marginRight: '10px'}}></i>
+                                Lưu bảng giá mới
                             </button>
                         </div>
                     </div>
                 );
-
             case 'profile': return <Profile />;
-            default: return <div style={{ textAlign: 'center', padding: '100px 0' }}><h2 style={{ color: '#1e293b' }}>Chào mừng sếp trở lại! 👋</h2><p style={{ color: '#64748b' }}>Chọn một mục ở menu bên trái để bắt đầu quản lý hệ thống.</p></div>;
+            default: return <div style={styles.welcomeBox}><h2>Chào sếp! 🎩</h2><p>Hệ thống vận hành ổn định. Sếp muốn kiểm tra mục nào?</p></div>;
         }
     };
 
     return (
-        <div className="dashboard-layout">
-            <aside className="sidebar">
-                <h3 style={{padding: '0 20px'}}><i className="fas fa-tools"></i> Admin Panel</h3>
-                <ul>
-                    <li className={activeTab === 'approve-res' ? 'active' : ''} onClick={() => setActiveTab('approve-res')}><i className="fas fa-check-circle"></i> Duyệt nhà hàng</li>
-                    <li className={activeTab === 'manage-res' ? 'active' : ''} onClick={() => setActiveTab('manage-res')}><i className="fas fa-utensils"></i> Quản lý nhà hàng</li>
-                    <li className={activeTab === 'manage-shipper' ? 'active' : ''} onClick={() => setActiveTab('manage-shipper')}><i className="fas fa-user-tie"></i> Quản lý shipper</li>
-                    <li className={activeTab === 'manage-voucher' ? 'active' : ''} onClick={() => setActiveTab('manage-voucher')}><i className="fas fa-tags"></i> Quản lý voucher</li>
-                    <li className={activeTab === 'shipping-fee' ? 'active' : ''} onClick={() => setActiveTab('shipping-fee')}><i className="fas fa-shuttle-van"></i> Cấu hình phí ship</li>
-                    <li className={activeTab === 'reports' ? 'active' : ''} onClick={() => setActiveTab('reports')}><i className="fas fa-file-invoice-dollar"></i> Báo cáo hệ thống</li>
-                    <hr style={{margin: '10px 20px', opacity: '0.1'}} />
-                    <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}><i className="fas fa-id-card"></i> Hồ sơ cá nhân</li>
+        <div style={styles.layout}>
+            <aside style={styles.sidebar}>
+                <div style={styles.logo}>Yummy Hub Admin</div>
+                <ul style={styles.nav}>
+                    <li style={activeTab === 'approve-res' ? styles.navActive : styles.navItem} onClick={() => setActiveTab('approve-res')}><i className="fas fa-check-circle"></i> Duyệt quán</li>
+                    <li style={activeTab === 'manage-res' ? styles.navActive : styles.navItem} onClick={() => setActiveTab('manage-res')}><i className="fas fa-utensils"></i> Quản lý quán</li>
+                    <li style={activeTab === 'shipping-fee' ? styles.navActive : styles.navItem} onClick={() => setActiveTab('shipping-fee')}><i className="fas fa-truck"></i> Phí giao hàng</li>
+                    <hr style={{margin: '20px 0', borderColor: '#2d313d'}} />
+                    <li style={activeTab === 'profile' ? styles.navActive : styles.navItem} onClick={() => setActiveTab('profile')}><i className="fas fa-user-shield"></i> Cá nhân</li>
                 </ul>
-                <button onClick={handleLogout} className="btn-logout"><i className="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                <button onClick={() => navigate('/')} style={styles.logoutBtn}>Đăng xuất</button>
             </aside>
-            
-            <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 35px', background: '#fff', borderBottom: '1px solid #f1f5f9' }}>
-                    <h2 style={{fontSize: '18px', margin: 0, color: '#1e293b', fontWeight: '700'}}>
-                        {activeTab === 'approve-res' ? 'Hồ sơ chờ duyệt' : activeTab === 'shipping-fee' ? 'Cấu hình vận chuyển' : 'Danh sách nhà hàng hệ thống'}
-                    </h2>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>Administrator</div>
-                            <div style={{ fontSize: '11px', color: '#94a3b8' }}>Hệ thống Yummy Hub</div>
-                        </div>
-                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>
-                            <i className="fas fa-user"></i>
-                        </div>
-                    </div>
+            <main style={styles.mainContent}>
+                <header style={styles.header}>
+                    <span style={{fontSize: '20px', fontWeight: 'bold'}}>Hệ thống Quản trị Yummy Hub</span>
+                    <div style={styles.adminBadge}><i className="fas fa-user-circle"></i> Administrator</div>
                 </header>
-
-                <main style={{ flex: 1, padding: '30px', background: '#f8fafc', overflowY: 'auto' }}>
-                    {renderContent()}
-                </main>
-            </div>
-
-            {showEditModal && (
-                <EditRestaurantModal 
-                    resData={selectedRes} 
-                    onClose={() => setShowEditModal(false)} 
-                    onSaveSuccess={fetchRestaurants} 
-                />
-            )}
+                <div style={{padding: '30px'}}>{renderContent()}</div>
+            </main>
+            {showEditModal && <EditRestaurantModal resData={selectedRes} onClose={() => setShowEditModal(false)} onSaveSuccess={fetchRestaurants} />}
         </div>
     );
+};
+
+// === 3. HỆ THỐNG STYLES (DARK MODE) ===
+const styles = {
+    layout: { display: 'flex', height: '100vh', backgroundColor: '#0f1014', color: '#fff', fontFamily: 'Inter, sans-serif' },
+    sidebar: { width: '280px', backgroundColor: '#1c1e26', padding: '30px', display: 'flex', flexDirection: 'column', borderRight: '1px solid #2d313d' },
+    logo: { fontSize: '22px', fontWeight: 'bold', color: '#2ecc71', marginBottom: '40px', textAlign: 'center' },
+    nav: { listStyle: 'none', padding: 0, flex: 1 },
+    navItem: { padding: '15px 20px', borderRadius: '12px', cursor: 'pointer', marginBottom: '8px', color: '#888', transition: '0.3s', display: 'flex', alignItems: 'center', gap: '12px' },
+    navActive: { padding: '15px 20px', borderRadius: '12px', cursor: 'pointer', marginBottom: '8px', backgroundColor: 'rgba(46, 204, 113, 0.1)', color: '#2ecc71', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '12px', borderLeft: '4px solid #2ecc71' },
+    logoutBtn: { backgroundColor: 'transparent', border: '1px solid #3d4251', color: '#e74c3c', padding: '12px', borderRadius: '10px', cursor: 'pointer' },
+    mainContent: { flex: 1, overflowY: 'auto' },
+    header: { height: '80px', borderBottom: '1px solid #2d313d', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 40px', backgroundColor: '#1c1e26' },
+    adminBadge: { color: '#888', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' },
+    sectionContainer: { backgroundColor: '#1c1e26', borderRadius: '24px', padding: '30px', border: '1px solid #2d313d' },
+    sectionTitle: { margin: 0, fontSize: '22px', fontWeight: '700' },
+    sectionHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '25px' },
+    refreshBtn: { backgroundColor: 'rgba(0, 86, 179, 0.2)', border: '1px solid #0056b3', color: '#fff', padding: '8px 16px', borderRadius: '10px', cursor: 'pointer' },
+    table: { width: '100%', borderCollapse: 'collapse' },
+    tableHeadRow: { color: '#5c6273', textTransform: 'uppercase', fontSize: '12px' },
+    tableTh: { padding: '15px', borderBottom: '1px solid #2d313d', textAlign: 'left' },
+    tableRow: { borderBottom: '1px solid #2d313d' },
+    tableTd: { padding: '15px', color: '#ccc' },
+    statusBadge: { padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' },
+    approveBtn: { backgroundColor: '#2ecc71', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer' },
+    editIconBtn: { backgroundColor: '#f39c12', color: '#fff', border: 'none', width: '35px', height: '35px', borderRadius: '8px', cursor: 'pointer' },
+    lockIconBtn: { backgroundColor: '#34495e', color: '#fff', border: 'none', width: '35px', height: '35px', borderRadius: '8px', cursor: 'pointer' },
+    deleteIconBtn: { backgroundColor: '#e74c3c', color: '#fff', border: 'none', width: '35px', height: '35px', borderRadius: '8px', cursor: 'pointer' },
+    welcomeBox: { textAlign: 'center', padding: '100px', color: '#888' },
+    modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' },
+    modalContent: { background: '#1c1e26', padding: '40px', borderRadius: '24px', width: '650px', border: '1px solid #2d313d' },
+    modalHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '30px' },
+    modalTitle: { margin: 0, fontSize: '24px' },
+    closeBtn: { background: 'none', border: 'none', color: '#888', fontSize: '24px', cursor: 'pointer' },
+    imageBox: { position: 'relative', width: '180px', height: '180px', borderRadius: '20px', overflow: 'hidden', border: '2px solid #2d313d' },
+    uploadLabel: { position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.5)', padding: '10px', cursor: 'pointer' },
+    inputLabel: { color: '#5c6273', fontSize: '12px', textTransform: 'uppercase', marginBottom: '8px', display: 'block' },
+    input: { width: '100%', backgroundColor: '#2d313d', border: '1px solid #3d4251', borderRadius: '12px', padding: '12px', color: '#fff' },
+    modalFooter: { marginTop: '40px', display: 'flex', justifyContent: 'flex-end', gap: '15px' },
+    cancelBtn: { backgroundColor: 'transparent', border: '1px solid #3d4251', color: '#888', padding: '10px 20px', borderRadius: '10px', cursor: 'pointer' },
+    saveBtn: { backgroundColor: '#2ecc71', color: '#fff', border: 'none', padding: '12px 30px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' },
+    feeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' },
+    feeCard: { backgroundColor: '#2d313d', padding: '25px', borderRadius: '20px', textAlign: 'center', border: '1px solid #3d4251' },
+    feeIcon: { fontSize: '35px', color: '#2ecc71', marginBottom: '15px' },
+    feeRange: { display: 'block', color: '#888', fontSize: '16px', fontWeight: '600', marginBottom: '15px' },
+    feeInput: { width: '100%', textAlign: 'center', backgroundColor: '#1c1e26', border: '1px solid #3d4251', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: 'bold', fontSize: '18px', outline: 'none' }
 };
 
 export default Admin;

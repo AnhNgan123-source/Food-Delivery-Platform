@@ -17,4 +17,9 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Integer> {
     @Query(value = "SELECT * FROM Menu_Item WHERE res_id = :resId AND is_available = 1", nativeQuery = true)
     List<MenuItem> findAvailableMenu(@Param("resId") Integer resId);
 
+    @Query(value = "SELECT * FROM Menu_Item WHERE res_id = :resId AND is_available = 1", nativeQuery = true)
+    List<MenuItem> findByResId(Integer resId);
+
+
+
 }

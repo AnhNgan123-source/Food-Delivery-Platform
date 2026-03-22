@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 const Profile = () => {
     // === STATE QUẢN LÝ DỮ LIỆU NGƯỜI DÙNG ===
     const [user, setUser] = useState({
-        username: '...',
-        full_name: 'Đang tải...',
+        userName: '...',
+        fullName: 'Đang tải...',
         email: '...',
         phone: '...',
         role: 'ROLE'
@@ -13,7 +13,7 @@ const Profile = () => {
     // === STATE QUẢN LÝ CHẾ ĐỘ CHỈNH SỬA ===
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({
-        full_name: '',
+        fullName: '',
         email: '',
         phone: ''
     });
@@ -36,7 +36,7 @@ const Profile = () => {
                 setUser(data);
                 // Đồng bộ dữ liệu vào form sửa luôn
                 setEditData({
-                    full_name: data.full_name || '',
+                    fullName: data.fullName || '',
                     email: data.email || '',
                     phone: data.phone || ''
                 });
@@ -51,7 +51,7 @@ const Profile = () => {
         if (!isEditing) {
             // Khi bắt đầu sửa, copy lại dữ liệu từ user hiện tại vào form
             setEditData({
-                full_name: user.full_name,
+                fullName: user.fullName,
                 email: user.email,
                 phone: user.phone || ''
             });
@@ -100,11 +100,11 @@ const Profile = () => {
             <div className="profile-header">
                 <div className="avatar-wrapper">
                     <div className="avatar-circle" id="user-avatar">
-                        {user.full_name ? user.full_name.charAt(0).toUpperCase() : '?'}
+                        {user.fullName ? user.fullName.charAt(0).toUpperCase() : '?'}
                     </div>
                     <div className="status-indicator"></div>
                 </div>
-                <h2 className="main-name">{user.full_name}</h2>
+                <h2 className="main-name">{user.fullName}</h2>
                 <span className="role-badge">{user.role}</span>
             </div>
 
@@ -117,7 +117,7 @@ const Profile = () => {
                     <div className="info-icon"><i className="fas fa-user-circle"></i></div>
                     <div className="info-content">
                         <label>Tên đăng nhập: </label>
-                        <span className="info-data">{user.username}</span>
+                        <span className="info-data">{user.userName}</span>
                     </div>
                 </div>
 
@@ -127,13 +127,13 @@ const Profile = () => {
                     <div className="info-content">
                         <label>Họ và tên</label>
                         {!isEditing ? (
-                            <span className="info-data">{user.full_name}</span>
+                            <span className="info-data">{user.fullName}</span>
                         ) : (
                             <input 
                                 type="text" 
-                                name="full_name"
+                                name="fullName"
                                 className="edit-input" 
-                                value={editData.full_name}
+                                value={editData.fullName}
                                 onChange={handleInputChange}
                             />
                         )}

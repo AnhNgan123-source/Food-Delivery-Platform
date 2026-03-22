@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,15 +19,14 @@ import java.util.UUID;
 public class MenuItemController {
 
     private final MenuItemService menuItemService;
-    // Đường dẫn gốc lưu file
+    // Thư mục lưu ảnh nằm cùng cấp với thư mục src của Backend
     private static final String UPLOAD_DIR = "uploads/";
 
     public MenuItemController(MenuItemService menuItemService) {
         this.menuItemService = menuItemService;
     }
 
-    // ✅ ĐÃ XÓA: Hàm getImage rườm rà (Vì WebConfig đã lo phần này)
-
+    // 1. THÊM MỚI MÓN ĂN
     @PostMapping
     public ResponseEntity<MenuItem> createMenuItem(
             @RequestParam("item_name") String itemName,
@@ -41,21 +39,22 @@ public class MenuItemController {
 
         try {
             MenuItem item = new MenuItem();
-            item.setItem_name(itemName);
+            // --- Sửa lại cho khớp với MenuItem.java của Ngân ---
+            item.setItemName(itemName); 
             item.setPrice(price);
             item.setDescription(description);
-            item.setCat_id(catId);
-            item.setRes_id(resId);
-            item.setIs_available(isAvailable);
+            item.setCatId(catId);
+            item.setResId(resId);
+            item.setIsAvailable(isAvailable);
 
             if (file != null && !file.isEmpty()) {
+                // Dùng UUID để tên file không bao giờ bị trùng
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
                 Path path = Paths.get(UPLOAD_DIR + fileName);
                 Files.createDirectories(path.getParent());
                 Files.write(path, file.getBytes());
 
-                // ✅ SỬA: Chỉ lưu tên file (ví dụ: "abc.jpg") thay vì "/uploads/abc.jpg"
-                item.setItem_image(fileName);
+                item.setItemImage(fileName); // Lưu tên file vào DB
             }
 
             MenuItem savedItem = menuItemService.createMenuItem(item);
@@ -66,11 +65,7 @@ public class MenuItemController {
         }
     }
 
-    @GetMapping("/restaurant/{resId}")
-    public List<MenuItem> getMenu(@PathVariable Integer resId) {
-        return menuItemService.getAllMenuByRestaurant(resId);
-    }
-
+    // 2. CẬP NHẬT MÓN ĂN
     @PutMapping("/{id}")
     public ResponseEntity<MenuItem> updateMenuItem(
             @PathVariable Integer id,
@@ -82,10 +77,11 @@ public class MenuItemController {
 
         try {
             MenuItem newItemData = new MenuItem();
-            newItemData.setItem_name(itemName);
+            // --- Sửa lại cho khớp với MenuItem.java của Ngân ---
+            newItemData.setItemName(itemName);
             newItemData.setPrice(price);
             newItemData.setDescription(description);
-            newItemData.setCat_id(catId);
+            newItemData.setCatId(catId);
 
             if (file != null && !file.isEmpty()) {
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
@@ -93,12 +89,10 @@ public class MenuItemController {
                 Files.createDirectories(path.getParent());
                 Files.write(path, file.getBytes());
 
-                // ✅ SỬA: Lưu tên file mới
-                newItemData.setItem_image(fileName);
+                newItemData.setItemImage(fileName); 
             } else {
-                // ✅ THÊM: Nếu không có file mới, set là null để Service biết là giữ nguyên ảnh
-                // cũ
-                newItemData.setItem_image(null);
+                // Nếu không up ảnh mới, truyền null để Service biết giữ ảnh cũ
+                newItemData.setItemImage(null);
             }
 
             MenuItem updatedItem = menuItemService.updateMenuItem(id, newItemData);
@@ -107,6 +101,11 @@ public class MenuItemController {
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/restaurant/{resId}")
+    public List<MenuItem> getMenu(@PathVariable Integer resId) {
+        return menuItemService.getAllMenuByRestaurant(resId);
     }
 
     @DeleteMapping("/{id}")

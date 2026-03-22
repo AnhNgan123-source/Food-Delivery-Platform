@@ -2,17 +2,18 @@ package com.nhom8.backend.config;
 
 import com.nhom8.backend.model.User;
 import com.nhom8.backend.model.Role;
+import com.nhom8.backend.model.ShippingConfig;
 import com.nhom8.backend.model.Category;
-import com.nhom8.backend.model.ShippingConfig; // Nhớ import model mới
 import com.nhom8.backend.repository.CategoryRepository;
+import com.nhom8.backend.repository.ShippingConfigRepository;
 import com.nhom8.backend.repository.UserRepository;
-import com.nhom8.backend.repository.ShippingConfigRepository; // Nhớ import repo mới
+
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -31,40 +32,66 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // ===== 1. INIT ADMIN =====
-        if (userRepository.findByUsername("admin").isEmpty()) {
+        // ===== INIT ADMIN =====
+        // 1. Kiểm tra xem trong DB đã có tài khoản admin chưa
+        if (userRepository.findByUserName("admin").isEmpty()) {
+
             User admin = new User();
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("123456"));
+            admin.setUserName("admin");
+            admin.setPassWord(passwordEncoder.encode("123456"));
             admin.setEmail("nhuvy.admin@gmail.com");
             admin.setRole(Role.ADMIN);
-            admin.setFull_name("Nguyễn Như Vy");
+
+            // --- THÊM CÁC THÔNG TIN MỚI Ở ĐÂY ---
+            admin.setFullName("Nguyễn Như Vy");
             admin.setPhone("0912345678");
             admin.setAddress("TP. Hồ Chí Minh, Việt Nam");
-            admin.setIs_active(1);
+            admin.setIsActive(1);
+            // ------------------------------------
 
             userRepository.save(admin);
+
             System.out.println(">>>>> Đã khởi tạo tài khoản Admin: Nguyễn Như Vy (admin/123456) <<<<<");
+        } else {
+            System.out.println(">>>>> Tài khoản Admin đã tồn tại, không cập nhật thêm. <<<<<");
         }
 
-        // ===== 2. INIT CATEGORY =====
-        if (categoryRepository.count() == 0) {
+        // ================== INIT CATEGORY ==================
+        // if (categoryRepository.count() == 0) {
+        //     String[] names = {
+        //             "Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên",
+        //             "Đồ nướng", "Lẩu", "Hải sản", "Ăn vặt",
+        //             "Tráng miệng", "Đồ uống", "Cơm tấm", "Bánh mì",
+        //             "Bánh xèo", "Gỏi / Salad"
+        //     };
+
+        //     for (String n : names) {
+        //         Category cat = new Category();
+        //         cat.setCat_name(n);
+        //         categoryRepository.save(cat);
+        //     }
+
+        //     System.out.println(">>>>> Đã khởi tạo 16 CATEGORY thành công! <<<<<");
+        // }
+        // ================== INIT CATEGORY (VERSION THÔNG MINH) ==================
             String[] names = {
-                    "Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên",
-                    "Đồ nướng", "Lẩu", "Hải sản", "Ăn vặt",
-                    "Tráng miệng", "Đồ uống", "Cơm tấm", "Bánh mì",
-                    "Bánh xèo", "Gỏi / Salad"
+                "Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên",
+                "Đồ nướng", "Lẩu", "Hải sản", "Ăn vặt",
+                "Tráng miệng", "Đồ uống", "Cơm tấm", "Bánh mì",
+                "Bánh xèo", "Gỏi / Salad"
             };
 
             for (String n : names) {
-                Category cat = new Category();
-                cat.setCat_name(n);
-                categoryRepository.save(cat);
+                if (categoryRepository.findByCatName(n).isEmpty()) { // Sửa ở đây
+                    Category cat = new Category();
+                    cat.setCatName(n); // Sửa ở đây
+                    categoryRepository.save(cat);
+                    System.out.println(">> Đã thêm danh mục mới: " + n);
+                }
             }
-            System.out.println(">>>>> Đã khởi tạo 16 CATEGORY thành công! <<<<<");
-        }
-
-        // ===== 3. INIT SHIPPING CONFIG (NỘI THÀNH/NGOẠI THÀNH) =====
+            System.out.println(">>>>> Kiểm tra xong danh sách CATEGORY! <<<<<");
+        
+            // ===== 3. INIT SHIPPING CONFIG (NỘI THÀNH/NGOẠI THÀNH) =====
         if (shippingConfigRepository.count() == 0) {
             // Tạo dòng Nội thành
             ShippingConfig noiThanh = new ShippingConfig();
@@ -82,3 +109,4 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 }
+    

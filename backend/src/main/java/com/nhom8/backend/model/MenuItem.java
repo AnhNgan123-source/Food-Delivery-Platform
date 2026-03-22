@@ -1,27 +1,58 @@
 package com.nhom8.backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "Menu_Item")
-@Data
+@Table(name = "menu_item") // Tên bảng trong MySQL
 public class MenuItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "item_id") // Map với cột item_id trong DB
     private Integer itemId;
 
-    private Integer res_id; // ID nhà hàng sở hữu món này
-    private Integer cat_id; // ID danh mục (Pizza, Burger...)
+    @Column(name = "res_id")
+    private Integer resId;
 
-    @Column(nullable = false)
-    private String item_name;
+    @Column(name = "cat_id")
+    private Integer catId;
+
+    @Column(name = "item_name", nullable = false)
+    private String itemName;
 
     private BigDecimal price;
     private String description;
-    private String item_image;
+
+    @Column(name = "item_image")
+    private String itemImage;
 
     @Column(name = "is_available")
-    private Integer is_available = 1; // 1 là còn bán, 0 là hết hàng
+    private Integer isAvailable = 1; // 1: Còn, 0: Hết
+
+    // --- GETTERS & SETTERS (Viết theo kiểu camelCase) ---
+
+    public Integer getItemId() { return itemId; }
+    public void setItemId(Integer itemId) { this.itemId = itemId; }
+
+    public Integer getResId() { return resId; }
+    public void setResId(Integer resId) { this.resId = resId; }
+
+    public Integer getCatId() { return catId; }
+    public void setCatId(Integer catId) { this.catId = catId; }
+
+    public String getItemName() { return itemName; }
+    public void setItemName(String itemName) { this.itemName = itemName; }
+
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getItemImage() { return itemImage; }
+    public void setItemImage(String itemImage) { this.itemImage = itemImage; }
+
+    public Integer getIsAvailable() { return isAvailable; }
+    public void setIsAvailable(Integer isAvailable) { this.isAvailable = isAvailable; }
 }

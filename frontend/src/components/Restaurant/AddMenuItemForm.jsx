@@ -25,17 +25,15 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
     useEffect(() => {
         if (initialData) {
             setFormData({
-                item_name: initialData.item_name || '',
+                itemName: initialData.itemName || '',
                 // Chia 1000 vì input bạn nhập 50 (cho 50.000)
                 price: initialData.price ? initialData.price / 1000 : '',
                 description: initialData.description || '',
-                cat_id: initialData.cat_id || ''
+                catId: initialData.catId || ''
             });
-            
-            // ✅ SỬA TẠI ĐÂY: Gọi trực tiếp qua WebConfig đường dẫn /uploads/
-            if (initialData.item_image) {
-                // Không dùng /api/menu/image/ nữa mà dùng thẳng /uploads/
-                setPreviewUrl(`http://localhost:8080/uploads/${initialData.item_image}`);
+            // ✅ Cập nhật logic hiện ảnh cũ từ server
+            if (initialData.itemImage) {
+            setPreviewUrl(`http://localhost:8080/uploads/${initialData.itemImage}`);
             }
         }
     }, [initialData]);
@@ -60,17 +58,17 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
         const resId = localStorage.getItem('resId');
         const token = localStorage.getItem('token'); // ✅ Lấy token để sửa lỗi 403
 
-        if (!formData.item_name || !formData.price || !formData.cat_id) {
+        if (!formData.itemName || !formData.price || !formData.catId) {
             alert("Vui lòng nhập đầy đủ thông tin bắt buộc!");
             return;
         }
 
         try {
             const data = new FormData();
-            data.append("item_name", formData.item_name);
+            data.append("item_name", formData.itemName);
             data.append("price", parseInt(formData.price) * 1000);
             data.append("description", formData.description);
-            data.append("cat_id", formData.cat_id);
+            data.append("cat_id", formData.catId);
             data.append("res_id", resId);
             data.append("is_available", 1);
 
@@ -80,10 +78,10 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
 
             // ✅ Tự động chọn POST hoặc PUT dựa trên initialData
             const method = initialData ? "PUT" : "POST";
+            // Chắc chắn lấy được ID món dù Backend trả về tên gì
             const url = initialData 
-                ? `http://localhost:8080/api/menu/${initialData.item_id || initialData.itemId}` 
-                : "http://localhost:8080/api/menu";
-
+            ? `http://localhost:8080/api/menu/${initialData.itemId}` 
+            : "http://localhost:8080/api/menu";
             const response = await fetch(url, {
                 method: method,
                 headers: {
@@ -113,10 +111,10 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
                 <div className="form-group">
                     <label>Tên món ăn</label>
                     <input
-                        name="item_name"
+                        name="itemName"
                         type="text"
                         placeholder="Ví dụ: Cơm tấm sườn"
-                        value={formData.item_name}
+                        value={formData.itemName}
                         onChange={handleChange}
                         required
                     />
@@ -138,15 +136,15 @@ const AddMenuItemForm = ({ onCancel, onSuccess, initialData }) => {
                     <div className="form-group">
                         <label>Danh mục</label>
                         <select 
-                            name="cat_id" 
-                            value={formData.cat_id} 
+                            name="catId" 
+                            value={formData.catId} 
                             onChange={handleChange} 
                             required
                         >
                             <option value="">-- Chọn danh mục --</option>
                             {categories.map((cat) => (
-                                <option key={cat.cat_id} value={cat.cat_id}>
-                                    {cat.cat_name}
+                                <option key={cat.catId} value={cat.catId}>
+                                    {cat.catName}
                                 </option>
                             ))}
                         </select>

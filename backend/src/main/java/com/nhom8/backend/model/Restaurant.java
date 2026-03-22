@@ -87,4 +87,5 @@ public class Restaurant {
         this.isActive = isActive;
     }
 
+    
 }
