@@ -2,6 +2,7 @@ package com.nhom8.backend.controller;
 
 import com.nhom8.backend.dto.OrderRequest;
 import com.nhom8.backend.model.Order;
+import com.nhom8.backend.dto.ResponseData;
 import com.nhom8.backend.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    
 
     // Constructor tay cho Ngân (không dùng Lombok)
     public OrderController(OrderService orderService) {
@@ -59,7 +61,7 @@ public class OrderController {
         }
     }
     @GetMapping("/history")
-public ResponseEntity<Map<String, Object>> getOrderHistory(@RequestParam Integer customerId) {
+    public ResponseEntity<Map<String, Object>> getOrderHistory(@RequestParam Integer customerId) {
     Map<String, Object> response = new HashMap<>();
     try {
         // Gọi Service lấy danh sách đơn hàng
@@ -75,6 +77,46 @@ public ResponseEntity<Map<String, Object>> getOrderHistory(@RequestParam Integer
         
         return ResponseEntity.status(500).body(response);
     }
-}
+    }
+    // Phải có đúng đường dẫn này thì Frontend mới không bị 404 nhé sếp
+    @GetMapping("/restaurant/{resId}")
+    public ResponseEntity<?> getOrdersByRestaurant(@PathVariable Integer resId) {
+    List<Order> orders = orderService.getOrdersByResId(resId);
+    return ResponseEntity.ok(new ResponseData("success", orders));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer id, @RequestParam String status, @RequestParam(required = false)String reason) {
+    try {
+        // Gọi service để cập nhật trong DB và bắn WebSocket
+        orderService.updateOrderStatus(id, status, reason);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Đã cập nhật trạng thái đơn hàng thành " + status);
+        
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(400).body(new ResponseData("error", e.getMessage()));
+    }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrderById(@PathVariable Integer id) {
+    try {
+        Order order = orderService.getOrderById(id);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("data", order);
+        
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(404).body(new HashMap<String, String>() {{
+            put("status", "error");
+            put("message", e.getMessage());
+        }});
+    }
+    }
 }
 

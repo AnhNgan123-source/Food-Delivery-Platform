@@ -7,7 +7,7 @@ import Home from './pages/Home';           // Trang chủ dành cho Khách hàng
 import Restaurant from './pages/Restaurant'; // Trang quản lý của Nhà hàng
 import Admin from './pages/Admin';         // Trang quản trị của Admin
 import PaymentVNPay from './pages/PaymentVNPay'; // Đường dẫn tới file Ngân tạo
-
+import OrderTracking from './pages/OrderTracking';
 function App() {
   return (
     <Router>
@@ -19,10 +19,11 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/restaurant" element={<Restaurant />} />
         <Route path="/admin" element={<Admin />} />
-
-        {/* Nếu người dùng gõ link bậy bạ, tự động đẩy về lại trang Auth */}
-        <Route path="*" element={<Navigate to="/" />} />
         <Route path="/payment-vnpay" element={<PaymentVNPay />} />
+        {/* Đảm bảo đường dẫn này TRÙNG KHỚP với lệnh navigate của Ngân*/}
+        <Route path="/order-tracking/:orderId" element={<OrderTracking />} /> 
+        {/* Nếu người dùng gõ link bậy bạ, tự động đẩy về lại trang Auth */}
+        <Route path="*" element={<Navigate to="/" />} />  
       </Routes>
     </Router>
   );

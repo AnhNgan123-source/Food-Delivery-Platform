@@ -1,6 +1,6 @@
 import React from 'react';
 
-// ✅ Khai báo styles ở ngoài để component gọi lúc nào cũng thấy
+// Khai báo styles ở ngoài để component gọi lúc nào cũng thấy
 const styles = {
     card: { 
         position: 'relative', display: 'flex', flexDirection: 'column', height: '100%',

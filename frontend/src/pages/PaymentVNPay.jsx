@@ -25,21 +25,44 @@ const PaymentVNPay = () => {
     // hàm chuyên trạng thái thanh toán
     const handleConfirmPayment = async () => {
     const token = localStorage.getItem('token');
+    
+    if (timeLeft === 0) {
+        alert("Thời gian thanh toán đã hết, Ngân vui lòng đặt lại đơn mới nhé!");
+        navigate('/home');
+        return;
+    }
+
+    if (!orderId) {
+        alert("Không tìm thấy mã đơn hàng!");
+        return;
+    }
+
     try {
         const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/pay`, {
-            method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + token }
+            method: 'PUT', // Khớp với markAsPaid ở Backend của Ngân
+            headers: { 
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json' 
+            }
         });
+
+        if (response.status === 401 || response.status === 403) {
+            alert("Phiên làm việc hết hạn!");
+            navigate('/'); // Sửa lại cho khớp App.jsx của Ngân
+            return;
+        }
+        
         const result = await response.json();
 
         if (result.status === 'success') {
-            alert("✅ Hệ thống đã xác nhận thanh toán của Ngân!");
-            navigate('/home'); 
+            alert("Xác nhận thanh toán thành công! Đang chuyển đến trang theo dõi...");
+            // Chuyển sang trang Tracking mà tụi mình vừa làm nè
+            navigate(`/order-tracking/${orderId}`); 
         }
     } catch (error) {
-        console.error("Lỗi cập nhật thanh toán:", error);
+        console.error("Lỗi:", error);
+        alert("Lỗi kết nối server rồi sếp ơi!");
     }
-
 };
 
 

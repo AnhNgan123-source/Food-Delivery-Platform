@@ -43,6 +43,9 @@ public class Order {
     @Column(name = "order_status")
     private String orderStatus = "PENDING";
 
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
     @Column(name = "payment_method")
     private String paymentMethod;
 
@@ -150,11 +153,13 @@ public class Order {
     public String getOrderStatus() {
         return orderStatus;
     }
+    
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 
+    
     public String getPaymentMethod() {
         return paymentMethod;
     }
@@ -209,6 +214,12 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
     }
 
     

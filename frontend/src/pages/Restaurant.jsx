@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Profile from './Profile';
 import AddMenuItemForm from '../components/Restaurant/AddMenuItemForm';
 import MenuList from '../components/Restaurant/MenuList';
+import SockJS from 'sockjs-client'; 
+import Stomp from 'stompjs';
+
+import OrderCard from '../components/Restaurant/OrderCard';
+import OrderList from '../components/Restaurant/OrderList';
+
 
 const Restaurant = () => {
     const navigate = useNavigate();
@@ -17,6 +23,10 @@ const Restaurant = () => {
     const [filteredMenu, setFilteredMenu] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [newOrderCount, setNewOrderCount] = useState(0);
+    const [orders, setOrders] = useState([]);
+    const stompClientRef = useRef(null);
+    const isConnected = useRef(false);
 
     // Dùng để giữ thông tin món cần sửa
     const [editingItem, setEditingItem] = useState(null);
@@ -29,7 +39,8 @@ const Restaurant = () => {
         if (!token || role !== 'RESTAURANT') {
             alert("Bạn không có quyền truy cập vùng Nhà hàng!");
             navigate('/');
-            return;
+            return;  // return () => {}; bắt buộc phải có hàm return
+            //gd mounting là có hàm return, gd update là toàn bộ hàm useeffect, 
         }
 
         const storedName = localStorage.getItem('username');
@@ -38,14 +49,59 @@ const Restaurant = () => {
             setAvatarChar(storedName.charAt(0).toUpperCase());
         }
 
-    }, [navigate]);
+    }, [navigate]);// -> navigate là dependency: chạy lại nếu navigate thay đổi
 
     // === LOAD MENU KHI MỞ TAB ===
     useEffect(() => {
         if (activeTab === 'manage-menu') {
             fetchMenuData();
+        }else if (activeTab === 'new-orders' || activeTab === 'order-status') {
+            fetchOrders(); // Tự động tải đơn hàng khi vào tab Đơn hàng
         }
     }, [activeTab]);
+
+    //Logic lắng nghe Đơn hàng Real-time
+    useEffect(() => {
+    const resId = localStorage.getItem('resId');
+    const token = localStorage.getItem('token');
+    
+    // Nếu chưa đăng nhập hoặc không có resId thì không kết nối
+    if (!resId || !token) return;
+
+    const socket = new SockJS('http://localhost:8080/ws-delivery');
+    const client = Stomp.over(socket);
+    client.debug = null; 
+
+    client.connect({}, () => {
+        console.log(">>> [Restaurant] WebSocket đã thông!");
+        isConnected.current = true;
+        stompClientRef.current = client;
+
+        client.subscribe(`/topic/restaurant/${resId}`, (message) => {
+            if (message.body.startsWith("NEW_ORDER")) {
+                setNewOrderCount(prev => prev + 1);
+                alert("🔔 Ngân ơi! Có đơn hàng mới nổ kìa!");
+                
+                // Tự động tải lại đơn nếu đang xem tab đơn hàng
+                if (activeTab === 'new-orders' || activeTab === 'order-status') {
+                    fetchOrders();
+                }
+            }
+        });
+    }, (err) => {
+        console.error("Lỗi kết nối WebSocket nhà hàng:", err);
+        isConnected.current = false;
+    });
+   return () => {
+        if (isConnected.current && stompClientRef.current) {
+            stompClientRef.current.disconnect(() => {
+                console.log("<<< [Restaurant] Đã đóng kết nối an toàn.");
+                isConnected.current = false;
+            });
+        }
+    };
+    }, [activeTab]); // Chạy lại khi đổi tab để đảm bảo data luôn mới
+
 
     const fetchMenuData = async () => {
         setIsLoading(true);
@@ -74,6 +130,22 @@ const Restaurant = () => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+
+    // HÀM LẤY DANH SÁCH ĐƠN HÀNG
+    const fetchOrders = async () => {
+    const token = localStorage.getItem('token');
+    const resId = localStorage.getItem('resId');
+    try {
+        const response = await fetch(`http://localhost:8080/api/v1/orders/restaurant/${resId}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const result = await response.json();
+        if (result.status === 'success') {
+            setOrders(result.data);
+        }
+    } catch (error) { console.error("Lỗi tải đơn hàng:", error); }
     };
 
     // === SEARCH ===
@@ -219,9 +291,29 @@ const Restaurant = () => {
                     />
                 );
 
-            case 'new-orders': return <h3>Đơn hàng đang chờ xử lý...</h3>;
-            case 'order-status': return <h3>Lịch sử đơn hàng</h3>;
-            case 'revenue-stats': return <h3>Thống kê doanh thu</h3>;
+            case 'new-orders':
+            return (/*CHỈ HIỆN CÁC ĐƠN ĐANG CHỜ DUYỆT*/ 
+                <div className="orders-grid">
+                    {orders.filter(o => o.orderStatus === 'PENDING').map(order => (
+                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
+                    ))}
+                </div>
+            );
+
+            case 'order-status': // HIỆN CÁC ĐƠN SAU KHI DUYỆT 
+            return (
+                <div className="orders-grid">
+                    {orders.filter(o => ['CONFIRMED', 'PREPARING', 'SHIPPING'].includes(o.orderStatus)).map(order => (                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
+                    ))}
+                </div>
+            );
+            case 'revenue-stats': 
+            return (//HIỆN CÁC ĐƠN ĐÃ HOÀN THÀNH HOẶC ĐÃ HỦY
+                <div className="orders-grid">
+                    {orders.filter(o => ['COMPLETED', 'CANCELLED'].includes(o.orderStatus)).map(order => (                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
+                    ))}
+                </div>
+            );
             case 'res-info': return <h3>Thông tin cửa hàng</h3>;
             case 'profile': return <Profile />;
 
@@ -243,57 +335,96 @@ const Restaurant = () => {
         return titles[activeTab] || 'Dashboard';
     };
 
+    // Hàm để nhà hàng cập nhật trạng thái đơn (Gửi tin cho khách)
+    const handleUpdateStatus = async (orderId, newStatus, reason = "") => {
+    const token = localStorage.getItem('token');
+    try {
+        const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/status?status=${newStatus}&reason=${encodeURIComponent(reason)}`, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (response.ok) {
+            // Cập nhật lại UI tại chỗ cho nhanh
+            setOrders(prev => prev.map(o => o.orderId === orderId ? {...o, orderStatus: newStatus, cancellationReason: reason} : o));
+        }
+    } catch (error) { alert("Lỗi cập nhật rồi Ngân ơi!"); }
+    };
+
+
+
     return (
-        <div className="dashboard-layout">
-            <aside className="sidebar">
-                <div className="brand">
-                    <h3>Yummy Hub</h3>
-                    <p style={{ fontSize: '12px', color: '#28a745', fontWeight: 'bold' }}>Nhà hàng của bạn</p>
+    <div className="dashboard-layout">
+        {/* --- 1. SIDEBAR (THANH ĐIỀU HƯỚNG BÊN TRÁI) --- */}
+        <aside className="sidebar">
+            <div className="brand">
+                <h3>Yummy Hub</h3>
+                <p style={{ fontSize: '12px', color: '#28a745', fontWeight: 'bold' }}>Nhà hàng của bạn</p>
+            </div>
+
+            <ul>
+                {/* Tab Quản lý Menu */}
+                <li className={(activeTab === 'manage-menu' || activeTab === 'add-food') ? 'active' : ''} 
+                    onClick={() => setActiveTab('manage-menu')}> 
+                    <i className="fas fa-utensils"></i> Quản lý menu
+                </li>
+
+                {/*Tab Đơn hàng mới - ĐÃ BỔ SUNG ĐỐM ĐỎ REAL-TIME */}
+                <li className={activeTab === 'new-orders' ? 'active' : ''} 
+                    onClick={() => {
+                        setActiveTab('new-orders');
+                        setNewOrderCount(0); // Bấm vào xem thì xóa số thông báo đi
+                    }}
+                    style={{ position: 'relative' }} // Để đốm đỏ nằm đè lên
+                >
+                    <i className="fas fa-shopping-bag"></i> Đơn hàng mới
+                    
+                    {/* Nếu có đơn mới (từ WebSocket bắn về) thì hiện số lượng ở đây */}
+                    {newOrderCount > 0 && (
+                        <span className="order-badge-notify">{newOrderCount}</span>
+                    )}
+                </li>
+
+                <li className={activeTab === 'order-status' ? 'active' : ''} onClick={() => setActiveTab('order-status')}>
+                    <i className="fas fa-truck"></i> Trạng thái đơn
+                </li>
+                
+                <li className={activeTab === 'revenue-stats' ? 'active' : ''} onClick={() => setActiveTab('revenue-stats')}>
+                    <i className="fas fa-chart-line"></i> Doanh thu
+                </li>
+
+                <li className={activeTab === 'res-info' ? 'active' : ''} onClick={() => setActiveTab('res-info')}>
+                    <i className="fas fa-store"></i> Thông tin quán
+                </li>
+
+                <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
+                    <i className="fas fa-user-circle"></i> Hồ sơ cá nhân
+                </li>
+            </ul>
+
+            <button onClick={handleLogout} className="btn-logout">
+                <i className="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </aside>
+
+        {/* --- 2. MAIN CONTENT (NỘI DUNG CHÍNH BÊN PHẢI) --- */}
+        <main className="main-content">
+            <header className="main-header">
+                <div>
+                    {/* Tiêu đề tự động đổi theo Tab */}
+                    <h2>{getPageTitle()}</h2>
                 </div>
-
-                <ul>
-                    <li className={(activeTab === 'manage-menu' || activeTab === 'add-food') ? 'active' : ''} onClick={() => setActiveTab('manage-menu')}> 
-                        <i className="fas fa-utensils"></i> Quản lý menu
-                    </li>
-                    <li className={activeTab === 'new-orders' ? 'active' : ''} onClick={() => setActiveTab('new-orders')}>
-                        <i className="fas fa-shopping-bag"></i> Đơn hàng mới
-                    </li>
-                    <li className={activeTab === 'order-status' ? 'active' : ''} onClick={() => setActiveTab('order-status')}>
-                        <i className="fas fa-truck"></i> Trạng thái đơn
-                    </li>
-                    <li className={activeTab === 'revenue-stats' ? 'active' : ''} onClick={() => setActiveTab('revenue-stats')}>
-                        <i className="fas fa-chart-line"></i> Doanh thu
-                    </li>
-                    <li className={activeTab === 'res-info' ? 'active' : ''} onClick={() => setActiveTab('res-info')}>
-                        <i className="fas fa-store"></i> Thông tin quán
-                    </li>
-                    <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
-                        <i className="fas fa-user-circle"></i> Hồ sơ cá nhân
-                    </li>
-                </ul>
-
-                <button onClick={handleLogout} className="btn-logout">
-                    <i className="fas fa-sign-out-alt"></i> Đăng xuất
-                </button>
-            </aside>
-
-            <main className="main-content">
-                <header className="main-header">
-                    <div>
-                        <h2>{getPageTitle()}</h2>
-                    </div>
-                    <div className="user-profile-mini">
-                        <span>{fullName}</span>
-                        <div className="avatar-mini">{avatarChar}</div>
-                    </div>
-                </header>
-
-                <div id="content-area">
-                    {renderContent()}
+                <div className="user-profile-mini">
+                    <span>{fullName}</span>
+                    <div className="avatar-mini">{avatarChar}</div>
                 </div>
-            </main>
-        </div>
-    );
-};
+            </header>
 
+            {/* Nơi hiển thị nội dung chi tiết của từng chức năng */}
+            <div id="content-area" style={{ padding: '20px' }}>
+                {renderContent()}
+            </div>
+        </main>
+    </div>
+);
+}
 export default Restaurant;

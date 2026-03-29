@@ -17,6 +17,7 @@ const Home = () => {
     const [dbShippingFees, setDbShippingFees] = useState([]); // Lưu phí ship lấy từ DB
     // 1. Thêm state để lưu danh sách đơn hàng
     const [orderHistory, setOrderHistory] = useState([]);
+    const [paymentMethod, setPaymentMethod] = useState('CASH');//Mặc định httt là tiền mặt
 
     // === STATE GIỎ HÀNG ===
     const [cart, setCart] = useState(() => {
@@ -177,33 +178,40 @@ const Home = () => {
     //========== LOGIC ĐẶT HÀNG & THANH TOÁN MOCK VNPAY ==========//
    
     const handleConfirmOrder = async () => {
-    // 1. LẤY dữ liệu ra từ LocalStorage (Dùng getItem, không phải setItem nha)
     const token = localStorage.getItem('token');
-    const customerId = localStorage.getItem('userId'); 
+    const customerId = localStorage.getItem('userId');
 
-    // Kiểm tra nhanh xem đã có ID chưa
     if (!customerId) {
-        alert("Ngân ơi, không tìm thấy ID người dùng. Hãy thử đăng xuất rồi đăng nhập lại nhé!");
+        alert("Ngân ơi, lỗi định danh rồi! Đăng nhập lại giúp mình nhé.");
         return;
     }
 
-    // 2. Tính toán phí ship và tổng tiền (như tụi mình đã làm ở bước trước)
-    const shipFee = calculateShippingFee(); 
+    // 1. Lấy danh sách món thực sự được chọn để đặt
+    const itemsToOrder = cart.filter(item => selectedItems.includes(item.itemId));
+    
+    if (itemsToOrder.length === 0) {
+        alert("Giỏ hàng đang trống hoặc Ngân chưa chọn món nào kìa!");
+        return;
+    }
+
+    // 2. Lấy resId an toàn (Kiểm tra từng bước để tránh lỗi undefined)
+    const resId = selectedResInfo?.resId || selectedResInfo?.res_id || itemsToOrder[0]?.resId;
+
+    const shipFee = calculateShippingFee();
     const subtotal = calculateTotal();
     const finalAmount = subtotal + shipFee;
 
-    // 3. Đóng gói dữ liệu gửi Backend
     const orderData = {
-        customerId: parseInt(customerId), // Ép kiểu về số nguyên cho chắc
-        resId: selectedResInfo?.res_id || selectedResInfo?.resId || cart[0].resId,
+        customerId: parseInt(customerId),
+        resId: resId,
         deliveryAddress: `${checkoutInfo.address}, ${checkoutInfo.district}, TP. HCM`,
         note: "Đơn hàng từ Web",
-        paymentMethod: "VNPAY",
+        paymentMethod: paymentMethod, // Lấy từ state sếp vừa tạo
         subtotal: subtotal,
         shippingFee: shipFee,
         totalDiscount: 0,
         finalAmount: finalAmount,
-        items: cart.filter(item => selectedItems.includes(item.itemId)).map(item => ({
+        items: itemsToOrder.map(item => ({
             itemId: item.itemId,
             quantity: item.quantity,
             priceAtOrder: item.price
@@ -211,7 +219,6 @@ const Home = () => {
     };
 
     try {
-        // Tới đây mới bắt đầu gọi API nè
         const response = await fetch('http://localhost:8080/api/v1/orders', {
             method: 'POST',
             headers: {
@@ -221,34 +228,33 @@ const Home = () => {
             body: JSON.stringify(orderData)
         });
 
-        // ĐÂY mới là lúc biến "result" xuất hiện
-        const result = await response.json(); 
+        const result = await response.json();
 
         if (result.status === 'success') {
-            alert("✨ Tuyệt vời! Đơn hàng của Ngân đã được hệ thống tiếp nhận.");
+            // ✅ QUAN TRỌNG: Phải lấy orderId từ result.data trả về
+            const newOrderId = result.data.orderId; 
 
-            // 1. CHỈ XÓA CÁC MÓN ĐÃ ĐẶT (Giữ lại những món khách chưa tích chọn)
+            alert(`✨ Tuyệt vời! Đơn hàng #${newOrderId} đã được tiếp nhận.`);
+
+            // Xóa các món đã đặt khỏi giỏ
             const remainingCart = cart.filter(item => !selectedItems.includes(item.itemId));
-            
-            // 2. CẬP NHẬT LẠI STATE VÀ LOCALSTORAGE
             setCart(remainingCart);
             localStorage.setItem('cart', JSON.stringify(remainingCart));
-            
-            // 3. RESET DANH SÁCH CHỌN VỀ RỖNG
             setSelectedItems([]);
 
-            // 4. CHUYỂN TRANG SANG MOCK VNPAY (Kèm theo Order ID và Số tiền để thanh toán)
-            // Lấy orderId từ dữ liệu Backend vừa trả về
-            const orderId = result.data.orderId; 
-            const totalAmount = orderData.finalAmount;
-
-            navigate(`/payment-vnpay?orderId=${orderId}&amount=${totalAmount}`);
-
+            // 🚀 Rẽ nhánh điều hướng
+            if (paymentMethod === 'ONLINE') {
+                navigate(`/payment-vnpay?orderId=${newOrderId}&amount=${finalAmount}`);
+            } else {
+                // Nếu tiền mặt, về thẳng trang theo dõi đơn
+                navigate(`/order-tracking/${newOrderId}`);
+            }
         } else {
-            alert("❌ Lỗi đặt hàng: " + result.message);
+            alert("❌ Lỗi: " + result.message);
         }
     } catch (error) {
-        console.error("Lỗi:", error);
+        console.error("Lỗi đặt hàng:", error);
+        alert("Hệ thống bận rồi Ngân ơi, thử lại sau nhé!");
     }
 };
 
@@ -533,6 +539,41 @@ return (
                                         <p><i className="fas fa-ticket-alt"></i> Voucher: Hiện tại chưa có mã giảm giá</p>
                                     </div>
 
+                                  {/* --- Phương thức thanh toán --- */}
+                            <div className="payment-selection-section" style={styles.paymentContainer}>
+                                <h4 style={styles.paymentTitle}>Phương thức thanh toán</h4>
+                                
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    {/* Lựa chọn Tiền mặt */}
+                                    <div 
+                                        style={{
+                                            ...styles.paymentItem,
+                                            borderColor: paymentMethod === 'CASH' ? '#2ecc71' : '#2d323e',
+                                            background: paymentMethod === 'CASH' ? 'rgba(46, 204, 113, 0.05)' : '#1a1c23'
+                                        }}
+                                        onClick={() => setPaymentMethod('CASH')}
+                                    >
+                                        <div style={{...styles.checkDot, background: paymentMethod === 'CASH' ? '#2ecc71' : 'transparent'}}></div>
+                                        <i className="fas fa-money-bill-wave" style={{fontSize: '20px', color: paymentMethod === 'CASH' ? '#2ecc71' : '#718096'}}></i>
+                                        <span style={{color: paymentMethod === 'CASH' ? '#fff' : '#a0aec0'}}>Tiền mặt (COD)</span>
+                                    </div>
+
+                                    {/* Lựa chọn Online */}
+                                    <div 
+                                        style={{
+                                            ...styles.paymentItem,
+                                            borderColor: paymentMethod === 'ONLINE' ? '#3498db' : '#2d323e',
+                                            background: paymentMethod === 'ONLINE' ? 'rgba(52, 152, 219, 0.05)' : '#1a1c23'
+                                        }}
+                                        onClick={() => setPaymentMethod('ONLINE')}
+                                    >
+                                        <div style={{...styles.checkDot, background: paymentMethod === 'ONLINE' ? '#3498db' : 'transparent'}}></div>
+                                        <i className="fas fa-credit-card" style={{fontSize: '20px', color: paymentMethod === 'ONLINE' ? '#3498db' : '#718096'}}></i>
+                                        <span style={{color: paymentMethod === 'ONLINE' ? '#fff' : '#a0aec0'}}>Thanh toán Online</span>
+                                    </div>
+                                </div>
+                            </div>
+                                    
                                     <div className="order-summary-final">
                                         <div className="summary-row">
                                             <span>Tổng tiền món:</span>
@@ -577,7 +618,7 @@ return (
                     </div>
                     <div className="orders-list">
                         {orderHistory.length === 0 ? (
-                            <div style={styles.emptyState}>Ngân chưa có đơn hàng nào. Thử ngay nhé!</div>
+                            <div style={styles.emptyState}>Bạn chưa có đơn hàng nào. Thử ngay nhé!</div>
                         ) : (
                             orderHistory.map(order => (
                                 <div key={order.orderId} style={styles.luxuryOrderCard}>
@@ -597,8 +638,19 @@ return (
                                             ● {order.orderStatus}
                                         </span>
                                     </div>
-
-                                    {/* 2. CHI TIẾT MÓN ĂN (Phần Ngân muốn nhất nè) */}
+                                    
+                        {order.orderStatus === 'CANCELLED' && order.cancellationReason && (
+                            <div style={styles.cancelAlertBox}>
+                                <p style={styles.cancelTitle}>
+                                    <i className="fas fa-exclamation-triangle"></i> ĐƠN HÀNG ĐÃ BỊ HỦY
+                                </p>
+                                <p style={styles.cancelText}>
+                                    Lý do từ nhà hàng: {order.cancellationReason}
+                                </p>
+                            </div>
+                        )}
+                                    
+                                    {/* 2. CHI TIẾT MÓN ĂN  */}
                                     <div style={styles.itemsSection}>
                                         <p style={{ color: '#5c6273', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '15px' }}>Chi tiết món ăn</p>
                                         {order.items && order.items.map((item, idx) => (
@@ -630,7 +682,22 @@ return (
                                         <div style={styles.infoLine}><i className="fas fa-credit-card" style={{width:'20px'}}></i> {order.paymentMethod} - <span style={{color: '#2ecc71'}}>{order.paymentStatus}</span></div>
                                         {order.note && <div style={styles.infoLine}><i className="fas fa-comment-dots" style={{width:'20px'}}></i> <em>"{order.note}"</em></div>}
                                     </div>
-                                </div>
+                                    {/* THÊM NÚT THEO DÕI VÀO ĐÂY NÈ NGÂN */}
+                                    <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
+                                        <button 
+                                            onClick={() => navigate(`/order-tracking/${order.orderId}`)}
+                                            style={styles.trackingBtn}
+                                        >
+                                            <i className="fas fa-search-location" style={{ marginRight: '8px' }}></i>
+                                            Theo dõi đơn hàng
+                                        </button>
+                                        
+                                        {/* Nút đặt lại (Option thêm cho chuyên nghiệp) */}
+                                        <button style={styles.reorderBtn}>
+                                            <i className="fas fa-redo"></i> Đặt lại
+                                        </button>
+                                    </div>
+                                    </div>
                             ))
                         )}
                     </div>
@@ -681,6 +748,123 @@ const styles = {
         borderRadius: '6px',
         fontSize: '12px',
         fontWeight: 'bold'
+    },
+    paymentContainer: {
+    marginTop: '30px',
+    padding: '25px',
+    background: '#1c1e26',
+    borderRadius: '20px',
+    border: '1px solid #2d313d',
+    textAlign: 'left'
+},
+paymentTitle: {
+    color: '#888',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    marginBottom: '20px',
+    letterSpacing: '1px'
+},
+paymentItem: {
+    flex: 1,
+    padding: '20px',
+    borderRadius: '16px',
+    border: '2px solid',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px',
+    transition: 'all 0.3s ease',
+    position: 'relative'
+},
+checkDot: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    border: '2px solid #2d313d'
+},
+trackingBtn: {
+        flex: 2,
+        background: 'rgba(245, 158, 11, 0.1)', // Màu Amber mờ
+        color: '#f59e0b',
+        border: '1px solid #f59e0b',
+        padding: '12px',
+        borderRadius: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: '14px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: '0.3s'
+    },
+    reorderBtn: {
+        flex: 1,
+        background: '#2d313d',
+        color: '#fff',
+        border: 'none',
+        padding: '12px',
+        borderRadius: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: '14px'
+    },
+    cancelAlertBox: {
+        background: 'rgba(231, 76, 60, 0.1)',
+        borderLeft: '4px solid #e74c3c',
+        padding: '12px 15px',
+        borderRadius: '8px',
+        margin: '15px 0',
+        textAlign: 'left'
+    },
+    cancelTitle: {
+        color: '#e74c3c',
+        fontSize: '11px',
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        margin: '0 0 5px 0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        letterSpacing: '1px'
+    },
+    cancelText: {
+        color: '#f1f5f9',
+        fontSize: '13px',
+        margin: 0,
+        fontStyle: 'italic',
+        lineHeight: '1.4'
+    },
+    
+    // Đảm bảo sếp đã có trackingBtn để nút không bị lỗi hiển thị
+    trackingBtn: {
+        flex: 2,
+        background: 'rgba(245, 158, 11, 0.1)',
+        color: '#f59e0b',
+        border: '1px solid #f59e0b',
+        padding: '12px',
+        borderRadius: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: '14px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '8px'
+    },
+    reorderBtn: {
+        flex: 1,
+        background: '#2d313d',
+        color: '#fff',
+        border: 'none',
+        padding: '12px',
+        borderRadius: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer'
     },
     priceContainer: { padding: '20px 0' },
     priceLine: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: '14px', marginBottom: '8px' },

@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                         // SỬA 1: Mở rộng đường dẫn cho Auth
                         .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/ws-delivery/**").permitAll()
 
                         // SỬA 2: Cho phép các API liên quan đến Menu và Category
                         .requestMatchers("/api/menu/**").permitAll()

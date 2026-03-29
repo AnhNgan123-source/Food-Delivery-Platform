@@ -12,7 +12,7 @@ const MenuList = ({ foods, onEdit, onDelete, onToggleStatus }) => {
         }}>
             {foods.map(food => (
                 <MenuItemCard 
-                    // ✅ SỬA: Dùng toán tử || để lấy đúng ID dù là itemId hay item_id
+                    // SỬA: Dùng toán tử || để lấy đúng ID dù là itemId hay item_id
                     key={food.itemId || food.item_id} 
                     food={food} 
                     onEdit={onEdit} 

@@ -44,7 +44,8 @@ public class AuthController {
         Map<String, Object> data = new HashMap<>();
         data.put("token", token);
         data.put("role", user.getRole().toString());
-        data.put("id", user.getUserId()); // Đây là ID người dùng (số 10)
+        data.put("id", user.getUserId());
+        data.put("username", user.getUserName() ); // Đây là ID người dùng (số 10)
 
         // === ĐOẠN QUAN TRỌNG ĐÂY NGÂN ƠI ===
         if (user.getRole() == Role.RESTAURANT) {

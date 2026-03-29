@@ -89,7 +89,7 @@ public class DataInitializer implements CommandLineRunner {
                     System.out.println(">> Đã thêm danh mục mới: " + n);
                 }
             }
-            System.out.println(">>>>> Kiểm tra xong danh sách CATEGORY! <<<<<");
+            System.out.println(">>>>> Kiem tra xong danh sach CATEGORY! <<<<<");
         
             // ===== 3. INIT SHIPPING CONFIG (NỘI THÀNH/NGOẠI THÀNH) =====
         if (shippingConfigRepository.count() == 0) {
@@ -105,7 +105,7 @@ public class DataInitializer implements CommandLineRunner {
             ngoaiThanh.setPrice(new BigDecimal("35000"));
             shippingConfigRepository.save(ngoaiThanh);
 
-            System.out.println(">>>>> Đã khởi tạo phí ship: Nội thành (20k) & Ngoại thành (35k) <<<<<");
+            System.out.println(">>>>> Đa khoi tao phi ship: Noi thanh (20k) & Ngoai thanh (35k) <<<<<");
         }
     }
 }
