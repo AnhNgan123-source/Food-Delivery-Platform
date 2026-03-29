@@ -48,7 +48,7 @@ public class OrderService {
         order.setFinalAmount(request.getFinalAmount());
         order.setCreatedAt(LocalDateTime.now());
         
-        // 2. LOGIC TRẠNG THÁI (Dành cho Tester GPA 9.3)
+        // 2. LOGIC TRẠNG THÁI
     if ("CASH".equalsIgnoreCase(request.getPaymentMethod())) {
         order.setOrderStatus("PENDING");   // Chờ nhà hàng xác nhận
         order.setPaymentStatus("UNPAID");  // Chưa trả tiền (trả sau)
@@ -118,7 +118,7 @@ public class OrderService {
             orderRepository.save(order);
         }
 
-        // Hàm lấy lịch sử đơn hàng cho Ngân nè
+        // Hàm lấy lịch sử đơn hàng 
         public List<Order> getOrdersByCustomerId(Integer customerId) {
         if (customerId == null) {
             throw new RuntimeException("Ngân ơi, ID khách hàng không được để trống!");
@@ -126,7 +126,7 @@ public class OrderService {
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }
 
-    // Hàm lấy lịch sử đơn hàng cho Ngân nè
+    // Hàm lấy lịch sử đơn hàng 
         public List<Order> getOrdersByResId(Integer resId) {
         // Gọi repo để lấy danh sách đơn hàng của quán
         return orderRepository.findByResIdOrderByCreatedAtDesc(resId);

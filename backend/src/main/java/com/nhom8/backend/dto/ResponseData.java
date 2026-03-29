@@ -4,7 +4,7 @@ public class ResponseData {
     private String status; // Chứa chữ "success" hoặc "error"
     private Object data;   // Chứa mảng Orders, User, hoặc thông tin món ăn
 
-    // Constructor để Ngân gọi cho nhanh
+    // Constructor 
     public ResponseData(String status, Object data) {
         this.status = status;
         this.data = data;
