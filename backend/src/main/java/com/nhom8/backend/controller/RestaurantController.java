@@ -2,6 +2,9 @@ package com.nhom8.backend.controller;
 
 import com.nhom8.backend.model.Restaurant;
 import com.nhom8.backend.service.RestaurantService;
+import com.nhom8.backend.repository.RestaurantRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile; // Thêm mới
@@ -21,7 +24,10 @@ import java.util.UUID;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
-  
+
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+
     public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
     }

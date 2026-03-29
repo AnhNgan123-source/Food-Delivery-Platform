@@ -11,21 +11,21 @@ public class UserService {
     private UserRepository userRepository;
 
     public User getProfile(String username) {
-        User user = userRepository.findByUserName(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng!"));
         
         // Bảo mật: Không gửi password về client
-        user.setPassWord(null); 
+        user.setPassword(null); 
         return user;
     }
    public User updateProfile(String username, User newData) {
     // 1. Tìm user cũ trong database
-    User existingUser = userRepository.findByUserName(username)
+    User existingUser = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("Ngân ơi, không tìm thấy người dùng này!"));
 
     // 2. Lấy thông tin MỚI từ client (newData) đắp vào user CŨ (existingUser)
     // Chỗ này Ngân phải gọi newData.get... thì nó mới lấy dữ liệu mới nhé!
-    existingUser.setFullName(newData.getFullName());
+    existingUser.setFull_name(newData.getFull_name());
     existingUser.setEmail(newData.getEmail());
     existingUser.setPhone(newData.getPhone());
     
