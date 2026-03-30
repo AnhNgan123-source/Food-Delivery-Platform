@@ -14,7 +14,8 @@
 
 | Thành viên            | MSSV       | Công việc                                                                                                                                                             | Link Commit/PR                                                                                                          |
 |-----------------------|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
-| Nguyễn Thị Thảo Ngân  | 2254050038 | **Backend:** Cấu hình Websocket để đẩy thông báo trạng thái đơn hàng.<br>**Fullstack:** Tính năng (4) Theo dõi đơn hàng real-time.                                     | [0e872f4](https://github.com/AnhNgan123-source/Food-Delivery-Platform/commit/0e872f4c63015e6e2ca1cf7859a0ab0912f83a50) |
+| Nguyễn Thị Thảo Ngân  | 2254050038 | **Backend:** Cấu hình Websocket để đẩy thông báo trạng thái đơn hàng.<br>**Fullstack:** Tính năng (4) Theo dõi đơn hàng real-time.                                     | [
+63cbe09](https://github.com/AnhNgan123-source/Food-Delivery-Platform/commit/63cbe093e0cbcf4e77e508af2bc91f7402c01708) |
 | **Nguyễn Như Vy** | **2254050085** | **Backend:** Xây dựng logic xử lý Order, Voucher, thống kê doanh thu và duyệt nhà hàng.<br>**Frontend:** Hoàn thiện UI Admin (Duyệt nhà hàng, cấu hình ship, quản lý Voucher) và UI Restaurant (Quản lý đơn hàng, thống kê). | [c84faaa](https://github.com/AnhNgan123-source/Food-Delivery-Platform/commit/c84faaa4dec0f58bec4b7f84ec3650a52462fefe) |
 
 ---
