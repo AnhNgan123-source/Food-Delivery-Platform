@@ -71,14 +71,13 @@ public class OrderController {
         }
     }
 
-    // Phải có đúng đường dẫn này thì Frontend mới không bị 404 
     @GetMapping("/restaurant/{resId}")
     public ResponseEntity<?> getOrdersByRestaurant(@PathVariable Integer resId) {
         List<Order> orders = orderService.getOrdersByResId(resId);
         return ResponseEntity.ok(new ResponseData("success", orders));
     }
 
-    // === THÊM ENDPOINT THỐNG KÊ DOANH THU (11) ===
+    // === THÊM ENDPOINT THỐNG KÊ DOANH THU ===
     @GetMapping("/restaurant/{resId}/stats")
     public ResponseEntity<?> getRestaurantStats(@PathVariable Integer resId) {
         try {
@@ -117,6 +116,35 @@ public class OrderController {
                 put("status", "error");
                 put("message", e.getMessage());
             }});
+        }
+    }
+
+    @PutMapping("/{orderId}/assign-shipper/{shipperId}")
+    public ResponseEntity<?> assignShipper(@PathVariable Integer orderId, @PathVariable Integer shipperId) {
+        try {
+            orderService.assignShipperToOrder(orderId, shipperId);
+            return ResponseEntity.ok(Map.of(
+                "status", "success", 
+                "message", "Đã điều phối shipper thành công!"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of(
+                "status", "error",
+                "message", e.getMessage()
+            ));
+        }
+    }
+    
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllOrders() {
+        try {
+            List<Order> orders = orderService.getAllOrders();
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("data", orders);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
 }

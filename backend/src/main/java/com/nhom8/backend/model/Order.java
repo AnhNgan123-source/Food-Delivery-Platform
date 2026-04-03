@@ -21,8 +21,14 @@ public class Order {
     @Column(name = "res_id", nullable = false)
     private Integer resId;
 
-    @Column(name = "shipper_id")
+    // Giữ nguyên trường cũ để không lỗi mapping
+    @Column(name = "shipper_id", insertable = false, updatable = false)
     private Integer shipperId;
+
+    // ✅ THÊM MỚI: Mối quan hệ để OrderService gọi được getShipper()
+    @ManyToOne
+    @JoinColumn(name = "shipper_id")
+    private Shipper shipper;
 
     @Column(name = "voucher_id")
     private Integer voucherId;
@@ -39,7 +45,6 @@ public class Order {
     @Column(name = "final_amount", precision = 10, scale = 2)
     private BigDecimal finalAmount;
 
-    // Trạng thái đơn hàng: PENDING, CONFIRMED, PREPARING, SHIPPING, COMPLETED, CANCELLED
     @Column(name = "order_status")
     private String orderStatus = "PENDING";
 
@@ -49,7 +54,6 @@ public class Order {
     @Column(name = "payment_method")
     private String paymentMethod;
 
-    // Trạng thái thanh toán: UNPAID, PAID, FAILED
     @Column(name = "payment_status")
     private String paymentStatus = "UNPAID";
 
@@ -57,7 +61,7 @@ public class Order {
     private LocalDateTime paidAt;
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt; // Thời gian khi Shipper giao hàng thành công
+    private LocalDateTime completedAt;
 
     @Column(name = "delivery_address", columnDefinition = "TEXT")
     private String deliveryAddress;
@@ -69,160 +73,70 @@ public class Order {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // ✅ Nối với bảng OrderItem
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
     private java.util.List<OrderItem> items; 
 
-    // Getter/Setter cho items để React có thể đọc được mảng này
+    // ✅ THÊM MỚI: Getter/Setter cho Shipper để OrderService hết báo lỗi
+    public Shipper getShipper() { return shipper; }
+    public void setShipper(Shipper shipper) { this.shipper = shipper; }
+
+    // --- Giữ nguyên toàn bộ Getter/Setter cũ của sếp ---
+
     public java.util.List<OrderItem> getItems() { return items; }
     public void setItems(java.util.List<OrderItem> items) { this.items = items; }
 
-    public Integer getOrderId() {
-        return orderId;
-    }
+    public Integer getOrderId() { return orderId; }
+    public void setOrderId(Integer orderId) { this.orderId = orderId; }
 
-    public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
-    }
+    public Integer getCustomerId() { return customerId; }
+    public void setCustomerId(Integer customerId) { this.customerId = customerId; }
 
-    public Integer getCustomerId() {
-        return customerId;
-    }
+    public Integer getResId() { return resId; }
+    public void setResId(Integer resId) { this.resId = resId; }
 
-    public void setCustomerId(Integer customerId) {
-        this.customerId = customerId;
-    }
+    public Integer getShipperId() { return shipperId; }
+    public void setShipperId(Integer shipperId) { this.shipperId = shipperId; }
 
-    public Integer getResId() {
-        return resId;
-    }
+    public Integer getVoucherId() { return voucherId; }
+    public void setVoucherId(Integer voucherId) { this.voucherId = voucherId; }
 
-    public void setResId(Integer resId) {
-        this.resId = resId;
-    }
+    public BigDecimal getSubtotal() { return subtotal; }
+    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
 
-    public Integer getShipperId() {
-        return shipperId;
-    }
+    public BigDecimal getShippingFee() { return shippingFee; }
+    public void setShippingFee(BigDecimal shippingFee) { this.shippingFee = shippingFee; }
 
-    public void setShipperId(Integer shipperId) {
-        this.shipperId = shipperId;
-    }
+    public BigDecimal getTotalDiscount() { return totalDiscount; }
+    public void setTotalDiscount(BigDecimal totalDiscount) { this.totalDiscount = totalDiscount; }
 
-    public Integer getVoucherId() {
-        return voucherId;
-    }
+    public BigDecimal getFinalAmount() { return finalAmount; }
+    public void setFinalAmount(BigDecimal finalAmount) { this.finalAmount = finalAmount; }
 
-    public void setVoucherId(Integer voucherId) {
-        this.voucherId = voucherId;
-    }
+    public String getOrderStatus() { return orderStatus; }
+    public void setOrderStatus(String orderStatus) { this.orderStatus = orderStatus; }
 
-    public BigDecimal getSubtotal() {
-        return subtotal;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
-    }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
 
-    public BigDecimal getShippingFee() {
-        return shippingFee;
-    }
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
 
-    public void setShippingFee(BigDecimal shippingFee) {
-        this.shippingFee = shippingFee;
-    }
+    public LocalDateTime getCompletedAt() { return completedAt; }
+    public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
 
-    public BigDecimal getTotalDiscount() {
-        return totalDiscount;
-    }
+    public String getDeliveryAddress() { return deliveryAddress; }
+    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
 
-    public void setTotalDiscount(BigDecimal totalDiscount) {
-        this.totalDiscount = totalDiscount;
-    }
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
 
-    public BigDecimal getFinalAmount() {
-        return finalAmount;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setFinalAmount(BigDecimal finalAmount) {
-        this.finalAmount = finalAmount;
-    }
-
-    public String getOrderStatus() {
-        return orderStatus;
-    }
-    
-
-    public void setOrderStatus(String orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
-    public LocalDateTime getPaidAt() {
-        return paidAt;
-    }
-
-    public void setPaidAt(LocalDateTime paidAt) {
-        this.paidAt = paidAt;
-    }
-
-    public LocalDateTime getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(LocalDateTime completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-    public String getCancellationReason() {
-        return cancellationReason;
-    }
-    public void setCancellationReason(String cancellationReason) {
-        this.cancellationReason = cancellationReason;
-    }
-
-    
-    
-    
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
 }

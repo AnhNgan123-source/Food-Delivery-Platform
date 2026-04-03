@@ -4,9 +4,11 @@ import com.nhom8.backend.dto.OrderRequest;
 import com.nhom8.backend.model.MenuItem;
 import com.nhom8.backend.model.Order;
 import com.nhom8.backend.model.OrderItem;
+import com.nhom8.backend.model.Shipper;
 import com.nhom8.backend.repository.MenuItemRepository;
 import com.nhom8.backend.repository.OrderItemRepository;
 import com.nhom8.backend.repository.OrderRepository;
+import com.nhom8.backend.repository.ShipperRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,50 +25,49 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final MenuItemRepository menuItemRepository; //Thêm Repository này để lấy tên món
+    private final MenuItemRepository menuItemRepository;
+    private final ShipperRepository shipperRepository; // Thêm ShipperRepository
     
     @Autowired
-    private SimpMessagingTemplate messagingTemplate; // Công cụ đẩy tin nhắn của Spring
+    private SimpMessagingTemplate messagingTemplate;
 
-   // Cập nhật Constructor để Inject thêm MenuItemRepository
+    // Cập nhật Constructor để Inject thêm ShipperRepository
     public OrderService(OrderRepository orderRepository, 
                         OrderItemRepository orderItemRepository,
                         MenuItemRepository menuItemRepository,
+                        ShipperRepository shipperRepository, // Inject vào đây
                         SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.menuItemRepository = menuItemRepository;
+        this.shipperRepository = shipperRepository; // Gán vào đây
         this.messagingTemplate = messagingTemplate;
     }
 
     @Transactional
     public Order createOrder(OrderRequest request) {
-        // 1. Tạo thực thực Order từ DTO gửi lên
         Order order = new Order();
         order.setCustomerId(request.getCustomerId());
         order.setResId(request.getResId());
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setNote(request.getNote());
-        order.setPaymentMethod(request.getPaymentMethod()); // CASH OR VNPAY
+        order.setPaymentMethod(request.getPaymentMethod());
         order.setSubtotal(request.getSubtotal());
         order.setShippingFee(request.getShippingFee());
         order.setTotalDiscount(request.getTotalDiscount());
         order.setFinalAmount(request.getFinalAmount());
         order.setCreatedAt(LocalDateTime.now());
         
-        // 2. LOGIC TRẠNG THÁI
         if ("CASH".equalsIgnoreCase(request.getPaymentMethod())) {
-            order.setOrderStatus("PENDING");   // Chờ nhà hàng xác nhận
-            order.setPaymentStatus("UNPAID");  // Chưa trả tiền (trả sau)
+            order.setOrderStatus("PENDING");
+            order.setPaymentStatus("UNPAID");
         } else {
-            order.setOrderStatus("AWAITING_PAYMENT"); // Trạng thái chờ thanh toán Online
-            order.setPaymentStatus("UNPAID");         // Chưa trả tiền
+            order.setOrderStatus("AWAITING_PAYMENT");
+            order.setPaymentStatus("UNPAID");
         }
 
-        // 3. Lưu đơn hàng tổng
         Order savedOrder = orderRepository.save(order);
 
-        // 4. Lưu chi tiết món ăn
         List<OrderItem> orderItems = request.getItems().stream().map(itemRequest -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(savedOrder.getOrderId());
@@ -84,13 +85,9 @@ public class OrderService {
 
         orderItemRepository.saveAll(orderItems);
 
-        // 5.WEBSOCKET CHO NHÀ HÀNG (Nếu là Tiền mặt)
         if ("CASH".equalsIgnoreCase(savedOrder.getPaymentMethod())) {
             String restaurantTopic = "/topic/restaurant/" + savedOrder.getResId();
             messagingTemplate.convertAndSend(restaurantTopic, "NEW_ORDER:" + savedOrder.getOrderId());
-            System.out.println(">>> Đơn tiền mặt: Đã báo tin cho nhà hàng " + savedOrder.getResId());
-        } else {
-            System.out.println(">>> Đơn Online: Đang chờ khách thanh toán, chưa báo nhà hàng.");
         }
 
         return savedOrder;
@@ -101,13 +98,13 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
         
-        order.setPaymentStatus("PAID"); // Cập nhật trạng thái thanh toán
-        order.setPaidAt(LocalDateTime.now()); // LƯU GIỜ THANH TOÁN VÀO ĐÂY
-        order.setOrderStatus("CONFIRMED"); // Tự động xác nhận đơn luôn cho máu
+        order.setPaymentStatus("PAID");
+        order.setPaidAt(LocalDateTime.now());
+        order.setOrderStatus("CONFIRMED");
         orderRepository.save(order);
 
-        messagingTemplate.convertAndSend("/topic/order/" + orderId, "CONFIRMED");//báo cho khách
-        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), "NEW_ORDER:" + orderId);//báo cho nhà hàng
+        messagingTemplate.convertAndSend("/topic/order/" + orderId, "CONFIRMED");
+        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), "NEW_ORDER:" + orderId);
     }
 
     @Transactional
@@ -115,13 +112,19 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
         
-        order.setOrderStatus("COMPLETED"); // Trạng thái hoàn thành (Mục 10 tài liệu)
-        order.setCompletedAt(LocalDateTime.now()); // LƯU GIỜ HOÀN THÀNH VÀO ĐÂY
+        order.setOrderStatus("COMPLETED");
+        order.setCompletedAt(LocalDateTime.now());
         
+        // Nếu có shipper, trả shipper về trạng thái IDLE khi hoàn thành đơn
+        if (order.getShipper() != null) {
+            Shipper shipper = order.getShipper();
+            shipper.setStatus(Shipper.ShipperStatus.IDLE);
+            shipperRepository.save(shipper);
+        }
+
         orderRepository.save(order);
     }
 
-    // === THÊM HÀM LẤY THỐNG KÊ DOANH THU (11) ===
     public Map<String, Object> getStatsByRestaurant(Integer resId) {
         Map<String, Object> stats = new HashMap<>();
         stats.put("summary", orderRepository.getRestaurantSummary(resId));
@@ -155,16 +158,51 @@ public class OrderService {
 
         if ("CANCELLED".equals(status) && reason != null) {
             order.setCancellationReason(reason);
+            // Nếu hủy đơn mà đã có shipper, giải phóng shipper luôn
+            if (order.getShipper() != null) {
+                Shipper s = order.getShipper();
+                s.setStatus(Shipper.ShipperStatus.IDLE);
+                shipperRepository.save(s);
+            }
         }
         
-        // Nếu chuyển sang COMPLETED thì cập nhật luôn thời gian hoàn thành để thống kê doanh thu
         if ("COMPLETED".equals(status)) {
             order.setCompletedAt(LocalDateTime.now());
+            if (order.getShipper() != null) {
+                Shipper s = order.getShipper();
+                s.setStatus(Shipper.ShipperStatus.IDLE);
+                shipperRepository.save(s);
+            }
         }
         
         orderRepository.save(order);
-
         messagingTemplate.convertAndSend("/topic/order/" + orderId, status + (reason != null ? ":" + reason : ""));
         messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), "UPDATE_LIST");
     }
+
+    // === THÊM HÀM GÁN SHIPPER MÀ CONTROLLER ĐANG GỌI ===
+    @Transactional
+    public void assignShipperToOrder(Integer orderId, Integer shipperId) {
+        Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+            
+        Shipper shipper = shipperRepository.findById(shipperId)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper"));
+
+        // Cập nhật quan hệ và trạng thái
+        order.setShipper(shipper);
+        order.setOrderStatus("SHIPPING");
+        shipper.setStatus(Shipper.ShipperStatus.BUSY);
+
+        orderRepository.save(order);
+        shipperRepository.save(shipper);
+
+        // Báo qua WebSocket cho khách hàng biết đang đi giao
+        messagingTemplate.convertAndSend("/topic/order/" + orderId, "SHIPPING");
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll(); 
+    }
+
 }
