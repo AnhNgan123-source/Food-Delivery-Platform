@@ -14,11 +14,11 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    // ✅ Ép Java map biến userName vào cột username trong MySQL
+    // Ép Java map biến userName vào cột username trong MySQL
     @Column(name = "username", nullable = false, unique = true)
     private String userName;
 
-   // ✅ Ép Java map biến passWord vào cột password trong MySQL
+   // Ép Java map biến passWord vào cột password trong MySQL
     @Column(name = "password", nullable = false)
     private String passWord;
 

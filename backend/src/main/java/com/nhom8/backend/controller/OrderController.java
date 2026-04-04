@@ -78,7 +78,7 @@ public class OrderController {
         return ResponseEntity.status(500).body(response);
     }
     }
-    // Phải có đúng đường dẫn này thì Frontend mới không bị 404 nhé sếp
+    // Phải có đúng đường dẫn này thì Frontend mới không bị 404 nhé
     @GetMapping("/restaurant/{resId}")
     public ResponseEntity<?> getOrdersByRestaurant(@PathVariable Integer resId) {
     List<Order> orders = orderService.getOrdersByResId(resId);

@@ -49,7 +49,7 @@ public class MenuItemService {
         MenuItem item = menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Menu item not found"));
 
-        // ✅ Xử lý ảnh: Nếu có ảnh mới, xóa ảnh cũ trước khi cập nhật
+        // Xử lý ảnh: Nếu có ảnh mới, xóa ảnh cũ trước khi cập nhật
         if (newItem.getItemImage() != null && item.getItemImage() != null) {
             deletePhysicalFile(item.getItemImage());
             item.setItemImage(newItem.getItemImage());
@@ -69,7 +69,7 @@ public class MenuItemService {
 
     // Xóa món
     public void deleteMenuItem(Integer id) {
-        // ✅ Trước khi xóa trong DB, tìm để xóa file vật lý
+        // Trước khi xóa trong DB, tìm để xóa file vật lý
         menuItemRepository.findById(id).ifPresent(item -> {
             if (item.getItemImage() != null) {
                 deletePhysicalFile(item.getItemImage());

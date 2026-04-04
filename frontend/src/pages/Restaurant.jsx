@@ -2,12 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Profile from './Profile';
 import AddMenuItemForm from '../components/Restaurant/AddMenuItemForm';
+import RestaurantOrders from '../components/Restaurant/RestaurantOrders';
+import RestaurantStats from '../components/Restaurant/RestaurantStats';
 import MenuList from '../components/Restaurant/MenuList';
 import SockJS from 'sockjs-client'; 
 import Stomp from 'stompjs';
-
-import OrderCard from '../components/Restaurant/OrderCard';
-import OrderList from '../components/Restaurant/OrderList';
 
 
 const Restaurant = () => {
@@ -24,7 +23,6 @@ const Restaurant = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [newOrderCount, setNewOrderCount] = useState(0);
-    const [orders, setOrders] = useState([]);
     const stompClientRef = useRef(null);
     const isConnected = useRef(false);
 
@@ -55,9 +53,7 @@ const Restaurant = () => {
     useEffect(() => {
         if (activeTab === 'manage-menu') {
             fetchMenuData();
-        }else if (activeTab === 'new-orders' || activeTab === 'order-status') {
-            fetchOrders(); // Tự động tải đơn hàng khi vào tab Đơn hàng
-        }
+        }else if (activeTab === 'new-orders' || activeTab === 'order-status') { }
     }, [activeTab]);
 
     //Logic lắng nghe Đơn hàng Real-time
@@ -80,12 +76,8 @@ const Restaurant = () => {
         client.subscribe(`/topic/restaurant/${resId}`, (message) => {
             if (message.body.startsWith("NEW_ORDER")) {
                 setNewOrderCount(prev => prev + 1);
-                alert("🔔 Ngân ơi! Có đơn hàng mới nổ kìa!");
-                
-                // Tự động tải lại đơn nếu đang xem tab đơn hàng
-                if (activeTab === 'new-orders' || activeTab === 'order-status') {
-                    fetchOrders();
-                }
+                // Alert này sẽ nhắc có đơn mới dù đang ở bất kỳ đâu
+                alert("Ngân ơi! Có đơn hàng mới nổ kìa!");
             }
         });
     }, (err) => {
@@ -100,7 +92,7 @@ const Restaurant = () => {
             });
         }
     };
-    }, [activeTab]); // Chạy lại khi đổi tab để đảm bảo data luôn mới
+    }, []); 
 
 
     const fetchMenuData = async () => {
@@ -133,20 +125,20 @@ const Restaurant = () => {
     };
 
 
-    // HÀM LẤY DANH SÁCH ĐƠN HÀNG
-    const fetchOrders = async () => {
-    const token = localStorage.getItem('token');
-    const resId = localStorage.getItem('resId');
-    try {
-        const response = await fetch(`http://localhost:8080/api/v1/orders/restaurant/${resId}`, {
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const result = await response.json();
-        if (result.status === 'success') {
-            setOrders(result.data);
-        }
-    } catch (error) { console.error("Lỗi tải đơn hàng:", error); }
-    };
+    // // HÀM LẤY DANH SÁCH ĐƠN HÀNG
+    // const fetchOrders = async () => {
+    // const token = localStorage.getItem('token');
+    // const resId = localStorage.getItem('resId');
+    // try {
+    //     const response = await fetch(`http://localhost:8080/api/v1/orders/restaurant/${resId}`, {
+    //         headers: { 'Authorization': 'Bearer ' + token }
+    //     });
+    //     const result = await response.json();
+    //     if (result.status === 'success') {
+    //         setOrders(result.data);
+    //     }
+    // } catch (error) { console.error("Lỗi tải đơn hàng:", error); }
+    // };
 
     // === SEARCH ===
     const handleSearch = (e) => {
@@ -292,28 +284,10 @@ const Restaurant = () => {
                 );
 
             case 'new-orders':
-            return (/*CHỈ HIỆN CÁC ĐƠN ĐANG CHỜ DUYỆT*/ 
-                <div className="orders-grid">
-                    {orders.filter(o => o.orderStatus === 'PENDING').map(order => (
-                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
-                    ))}
-                </div>
-            );
-
             case 'order-status': // HIỆN CÁC ĐƠN SAU KHI DUYỆT 
-            return (
-                <div className="orders-grid">
-                    {orders.filter(o => ['CONFIRMED', 'PREPARING', 'SHIPPING'].includes(o.orderStatus)).map(order => (                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
-                    ))}
-                </div>
-            );
+                return <RestaurantOrders key={newOrderCount} />;
             case 'revenue-stats': 
-            return (//HIỆN CÁC ĐƠN ĐÃ HOÀN THÀNH HOẶC ĐÃ HỦY
-                <div className="orders-grid">
-                    {orders.filter(o => ['COMPLETED', 'CANCELLED'].includes(o.orderStatus)).map(order => (                        <OrderCard key={order.orderId} order={order} onUpdateStatus={handleUpdateStatus} />
-                    ))}
-                </div>
-            );
+                return <RestaurantStats />
             case 'res-info': return <h3>Thông tin cửa hàng</h3>;
             case 'profile': return <Profile />;
 
@@ -335,20 +309,20 @@ const Restaurant = () => {
         return titles[activeTab] || 'Dashboard';
     };
 
-    // Hàm để nhà hàng cập nhật trạng thái đơn (Gửi tin cho khách)
-    const handleUpdateStatus = async (orderId, newStatus, reason = "") => {
-    const token = localStorage.getItem('token');
-    try {
-        const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/status?status=${newStatus}&reason=${encodeURIComponent(reason)}`, {
-            method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (response.ok) {
-            // Cập nhật lại UI tại chỗ cho nhanh
-            setOrders(prev => prev.map(o => o.orderId === orderId ? {...o, orderStatus: newStatus, cancellationReason: reason} : o));
-        }
-    } catch (error) { alert("Lỗi cập nhật rồi Ngân ơi!"); }
-    };
+    // // Hàm để nhà hàng cập nhật trạng thái đơn (Gửi tin cho khách)
+    // const handleUpdateStatus = async (orderId, newStatus, reason = "") => {
+    // const token = localStorage.getItem('token');
+    // try {
+    //     const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/status?status=${newStatus}&reason=${encodeURIComponent(reason)}`, {
+    //         method: 'PUT',
+    //         headers: { 'Authorization': 'Bearer ' + token }
+    //     });
+    //     if (response.ok) {
+    //         // Cập nhật lại UI tại chỗ cho nhanh
+    //         setOrders(prev => prev.map(o => o.orderId === orderId ? {...o, orderStatus: newStatus, cancellationReason: reason} : o));
+    //     }
+    // } catch (error) { alert("Lỗi cập nhật rồi Ngân ơi!"); }
+    // };
 
 
 

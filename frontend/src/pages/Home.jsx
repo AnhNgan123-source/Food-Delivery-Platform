@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import VoucherModal from '../components/Customer/VoucherModal';
 const Home = () => {
     const navigate = useNavigate();
 
@@ -15,9 +15,12 @@ const Home = () => {
     const [selectedResInfo, setSelectedResInfo] = useState(null);
     const [menuItems, setMenuItems] = useState([]);
     const [dbShippingFees, setDbShippingFees] = useState([]); // Lưu phí ship lấy từ DB
-    // 1. Thêm state để lưu danh sách đơn hàng
+    //lưu danh sách đơn hàng
     const [orderHistory, setOrderHistory] = useState([]);
     const [paymentMethod, setPaymentMethod] = useState('CASH');//Mặc định httt là tiền mặt
+    //voucher
+    const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
+    const [appliedVoucher, setAppliedVoucher] = useState(null);
 
     // === STATE GIỎ HÀNG ===
     const [cart, setCart] = useState(() => {
@@ -156,8 +159,7 @@ const Home = () => {
      const innerDistricts = [
         'Quận 1', 'Quận 3', 'Quận 4', 'Quận 5', 'Quận 6', 
         'Quận 10', 'Quận 11', 'Tân Bình', 'Tân Phú', 
-        'Bình Thạnh', 'Phú Nhuận', 'Gò Vấp'
-    ];
+        'Bình Thạnh', 'Phú Nhuận', 'Gò Vấp'];
     // tính số lượng trên giỏ hàng  
     const totalItemsInCart = cart.reduce((sum, item) => sum + item.quantity, 0);    
  
@@ -199,7 +201,8 @@ const Home = () => {
 
     const shipFee = calculateShippingFee();
     const subtotal = calculateTotal();
-    const finalAmount = subtotal + shipFee;
+    const discount = appliedVoucher ? appliedVoucher.discountValue : 0;
+    const finalAmount = subtotal + shipFee - discount;
 
     const orderData = {
         customerId: parseInt(customerId),
@@ -209,7 +212,7 @@ const Home = () => {
         paymentMethod: paymentMethod, // Lấy từ state sếp vừa tạo
         subtotal: subtotal,
         shippingFee: shipFee,
-        totalDiscount: 0,
+        totalDiscount: discount,
         finalAmount: finalAmount,
         items: itemsToOrder.map(item => ({
             itemId: item.itemId,
@@ -231,7 +234,7 @@ const Home = () => {
         const result = await response.json();
 
         if (result.status === 'success') {
-            // ✅ QUAN TRỌNG: Phải lấy orderId từ result.data trả về
+            // QUAN TRỌNG: Phải lấy orderId từ result.data trả về
             const newOrderId = result.data.orderId; 
 
             alert(`✨ Tuyệt vời! Đơn hàng #${newOrderId} đã được tiếp nhận.`);
@@ -441,7 +444,12 @@ return (
                                         <div className="cart-item-info">
                                             <h4>{item.itemName}</h4>
                                             <p className="price">{item.price?.toLocaleString('vi-VN')} đ</p>
-                                            <button className="btn-voucher-outline">Voucher</button>
+                                        <button 
+                                            className="btn-voucher-outline" 
+                                            onClick={() => setIsVoucherModalOpen(true)}
+                                        >
+                                            {appliedVoucher ? `Mã: ${appliedVoucher.code}` : 'Voucher'}
+                                        </button>
                                         </div>
                                         <div className="cart-item-controls">
                                             <div className="qty-selector">
@@ -534,9 +542,18 @@ return (
                                         />
                                     </div>
 
-                                    {/* Phần Voucher - Tạm thời để placeholder như Ngân muốn */}
-                                    <div className="voucher-placeholder">
-                                        <p><i className="fas fa-ticket-alt"></i> Voucher: Hiện tại chưa có mã giảm giá</p>
+                                    {/* Phần Voucher  */}
+                                    <div className="voucher-placeholder" 
+                                        onClick={() => setIsVoucherModalOpen(true)} 
+                                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <p>
+                                            <i className="fas fa-ticket-alt"></i> Voucher: {appliedVoucher ? (
+                                                <span style={{ color: '#2ecc71', fontWeight: 'bold' }}>{appliedVoucher.code}</span>
+                                            ) : (
+                                                "Chọn hoặc nhập mã"
+                                            )}
+                                        </p>
+                                        <i className="fas fa-chevron-right" style={{ fontSize: '12px', color: '#666' }}></i>
                                     </div>
 
                                   {/* --- Phương thức thanh toán --- */}
@@ -581,21 +598,24 @@ return (
                                         </div>
                                         
                                         <div className="summary-row">
-                                            <span>
-                                                Phí vận chuyển ({innerDistricts.some(d => checkoutInfo.district === d) ? 'Nội thành' : 'Ngoại thành'}):
-                                            </span>
-                                            <span style={{ fontWeight: 'bold' }}>
-                                                +{calculateShippingFee().toLocaleString('vi-VN')} đ
-                                            </span>
+                                            <span>Phí vận chuyển:</span>
+                                            <span>+{calculateShippingFee().toLocaleString('vi-VN')} đ</span>
                                         </div>
+
+                                        {/* Bổ sung dòng tiền giảm voucher*/}
+                                        {appliedVoucher && (
+                                            <div className="summary-row" style={{ color: '#2ecc71' }}>
+                                                <span>Giảm giá Voucher:</span>
+                                                <span>-{appliedVoucher.discountValue.toLocaleString()} đ</span>
+                                            </div>
+                                        )}
                                         
                                         <hr />
                                         
                                         <div className="summary-row total">
                                             <span style={{fontWeight:'bold'}}>Tổng thanh toán:</span>
                                             <span className="final-price" style={{color: '#e74c3c', fontSize: '20px', fontWeight: 'bold'}}>
-                                                {/* CỘNG PHÍ SHIP ĐÃ TÍNH VÀO ĐÂY */}
-                                                {(calculateTotal() + calculateShippingFee()).toLocaleString('vi-VN')} đ
+                                                {(calculateTotal() + calculateShippingFee() - (appliedVoucher?.discountValue || 0)).toLocaleString('vi-VN')} đ
                                             </span>
                                         </div>
                                     </div>
@@ -697,13 +717,23 @@ return (
                                             <i className="fas fa-redo"></i> Đặt lại
                                         </button>
                                     </div>
-                                    </div>
+                                </div>
                             ))
                         )}
                     </div>
                 </div>
             )}
                         </main>
+                        <VoucherModal 
+                            isOpen={isVoucherModalOpen} 
+                            onClose={() => setIsVoucherModalOpen(false)} 
+                            cartTotal={calculateTotal()} // Truyền tổng tiền món được chọn vào đây
+                            onApply={(v) => {
+                                setAppliedVoucher(v);
+                                // Thông báo cho Ngân biết đã thành công
+                                alert(`🎉 Ngân ơi, đã áp dụng mã ${v.code}, được giảm ${v.discountValue.toLocaleString()}đ rồi nhé!`);
+                            }}
+                        />
                     </div>
                 );
             };
@@ -840,32 +870,6 @@ trackingBtn: {
         lineHeight: '1.4'
     },
     
-    // Đảm bảo sếp đã có trackingBtn để nút không bị lỗi hiển thị
-    trackingBtn: {
-        flex: 2,
-        background: 'rgba(245, 158, 11, 0.1)',
-        color: '#f59e0b',
-        border: '1px solid #f59e0b',
-        padding: '12px',
-        borderRadius: '14px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        fontSize: '14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px'
-    },
-    reorderBtn: {
-        flex: 1,
-        background: '#2d313d',
-        color: '#fff',
-        border: 'none',
-        padding: '12px',
-        borderRadius: '14px',
-        fontWeight: 'bold',
-        cursor: 'pointer'
-    },
     priceContainer: { padding: '20px 0' },
     priceLine: { display: 'flex', justifyContent: 'space-between', color: '#888', fontSize: '14px', marginBottom: '8px' },
     finalLine: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px', fontWeight: '800', color: '#fff' },

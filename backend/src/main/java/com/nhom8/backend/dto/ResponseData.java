@@ -1,4 +1,4 @@
-package com.nhom8.backend.dto; // Sửa lại cho đúng package của Ngân nhé
+package com.nhom8.backend.dto; // Sửa lại cho đúng package 
 
 public class ResponseData {
     private String status; // Chứa chữ "success" hoặc "error"

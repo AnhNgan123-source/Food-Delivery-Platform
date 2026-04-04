@@ -108,18 +108,9 @@ const OrderTracking = () => {
                     ))}
                 </div>
 
-                {/* <div className="status-illustration">
-                    <img 
-                        src={`/image/status-${status.toLowerCase()}.png`} 
-                        alt={status} 
-                        style={{width: '180px', margin: '20px 0'}}
-                        onError={(e) => e.target.src = ""}
-                    />
-                </div> */}
-
                 <div className="status-message">
                     <h4 style={{color: '#4CAF50', fontSize: '18px'}}>{getStatusMessage(status)}</h4>
-                    <p style={{color: '#a0aec0'}}>Cảm ơn Ngân đã tin tưởng Yummy Hub! 🌸</p>
+                    <p style={{color: '#a0aec0'}}>Cảm ơn bạn đã tin tưởng Yummy Hub! 🌸</p>
                 </div>
             </div>
         </div>
