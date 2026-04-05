@@ -18,4 +18,5 @@ public class Review {
     private String comment;
     @Column(insertable = false, updatable = false)
     private LocalDateTime createdAt;
+    private String itemNameList;
 }

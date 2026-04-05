@@ -13,46 +13,87 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*") // Cho phép tất cả các nguồn để tránh lỗi CORS khi Ngân test
 public class OrderController {
 
     private final OrderService orderService;
-    
 
-    // Constructor tay cho Ngân (không dùng Lombok)
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
-    // 7.5 Tạo đơn hàng: POST /api/v1/orders
+    // 1. Tạo đơn hàng mới
     @PostMapping
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
             Order newOrder = orderService.createOrder(request);
-            
-            // Khởi tạo cấu trúc "success" trực tiếp
             response.put("status", "success");
             response.put("data", newOrder);
-            
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // Khởi tạo cấu trúc "error" trực tiếp
             response.put("status", "error");
-            response.put("message", "Yêu cầu không hợp lệ: " + e.getMessage());
-            
+            response.put("message", "Lỗi tạo đơn: " + e.getMessage());
             return ResponseEntity.status(400).body(response);
         }
     }
 
-        // Trong OrderController.java
+    // 2. Lấy lịch sử đơn hàng của khách hàng
+    @GetMapping("/history")
+    public ResponseEntity<Map<String, Object>> getOrderHistory(@RequestParam Integer customerId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Order> history = orderService.getOrdersByCustomerId(customerId);
+            response.put("status", "success");
+            response.put("data", history);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "Không thể lấy lịch sử: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    // 3. Lấy danh sách đơn hàng cho từng Nhà hàng
+    @GetMapping("/restaurant/{resId}")
+    public ResponseEntity<?> getOrdersByRestaurant(@PathVariable Integer resId) {
+        List<Order> orders = orderService.getOrdersByResId(resId);
+        return ResponseEntity.ok(new ResponseData("success", orders));
+    }
+
+    // // 4. Endpoint quan trọng: Thống kê doanh thu (Để hiện biểu đồ bên React)
+    // @GetMapping("/restaurant/{resId}/stats")
+    // public ResponseEntity<?> getRestaurantStats(@PathVariable Integer resId) {
+    //     try {
+    //         Map<String, Object> stats = orderService.getStatsByRestaurant(resId);
+    //         return ResponseEntity.ok(new ResponseData("success", stats));
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(500).body(new ResponseData("error", e.getMessage()));
+    //     }
+    // }
+
+    // 5. Cập nhật trạng thái đơn hàng (Xác nhận, Đang nấu, Đang giao...)
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer id, @RequestParam String status, @RequestParam(required = false) String reason) {
+        try {
+            orderService.updateOrderStatus(id, status, reason);
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "Đã cập nhật trạng thái đơn hàng thành " + status);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(new ResponseData("error", e.getMessage()));
+        }
+    }
+
+    // 6. Cập nhật trạng thái đã thanh toán (Dùng cho Mock VNPAY)
     @PutMapping("/{id}/pay")
     public ResponseEntity<Map<String, Object>> updatePaymentStatus(@PathVariable Integer id) {
         Map<String, Object> response = new HashMap<>();
         try {
             orderService.markAsPaid(id);
             response.put("status", "success");
-            response.put("message", "Đã cập nhật trạng thái thanh toán thành công");
+            response.put("message", "Thanh toán thành công!");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("status", "error");
@@ -60,63 +101,37 @@ public class OrderController {
             return ResponseEntity.status(400).body(response);
         }
     }
-    @GetMapping("/history")
-    public ResponseEntity<Map<String, Object>> getOrderHistory(@RequestParam Integer customerId) {
-    Map<String, Object> response = new HashMap<>();
-    try {
-        // Gọi Service lấy danh sách đơn hàng
-        List<Order> history = orderService.getOrdersByCustomerId(customerId);
-        
-        response.put("status", "success");
-        response.put("data", history);
-        
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        response.put("status", "error");
-        response.put("message", "Không thể lấy lịch sử đơn hàng: " + e.getMessage());
-        
-        return ResponseEntity.status(500).body(response);
-    }
-    }
-    // Phải có đúng đường dẫn này thì Frontend mới không bị 404 nhé
-    @GetMapping("/restaurant/{resId}")
-    public ResponseEntity<?> getOrdersByRestaurant(@PathVariable Integer resId) {
-    List<Order> orders = orderService.getOrdersByResId(resId);
-    return ResponseEntity.ok(new ResponseData("success", orders));
-    }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer id, @RequestParam String status, @RequestParam(required = false)String reason) {
-    try {
-        // Gọi service để cập nhật trong DB và bắn WebSocket
-        orderService.updateOrderStatus(id, status, reason);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Đã cập nhật trạng thái đơn hàng thành " + status);
-        
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        return ResponseEntity.status(400).body(new ResponseData("error", e.getMessage()));
-    }
-    }
-
+    // 7. Lấy chi tiết một đơn hàng cụ thể
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Integer id) {
-    try {
-        Order order = orderService.getOrderById(id);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("data", order);
-        
-        return ResponseEntity.ok(response);
-    } catch (Exception e) {
-        return ResponseEntity.status(404).body(new HashMap<String, String>() {{
-            put("status", "error");
-            put("message", e.getMessage());
-        }});
+        try {
+            Order order = orderService.getOrderById(id);
+            return ResponseEntity.ok(Map.of("status", "success", "data", order));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("status", "error", "message", e.getMessage()));
+        }
     }
-    }
-}
 
+    // // 8. Điều phối Shipper (Dành cho Admin hoặc Nhà hàng)
+    // @PutMapping("/{orderId}/assign-shipper/{shipperId}")
+    // public ResponseEntity<?> assignShipper(@PathVariable Integer orderId, @PathVariable Integer shipperId) {
+    //     try {
+    //         orderService.assignShipperToOrder(orderId, shipperId);
+    //         return ResponseEntity.ok(Map.of("status", "success", "message", "Đã điều phối shipper thành công!"));
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(400).body(Map.of("status", "error", "message", e.getMessage()));
+    //     }
+    // }
+
+    // // 9. Lấy tất cả đơn hàng (Dành cho Admin quản lý hệ thống)
+    // @GetMapping("/all")
+    // public ResponseEntity<?> getAllOrders() {
+    //     try {
+    //         List<Order> orders = orderService.getAllOrders();
+    //         return ResponseEntity.ok(Map.of("status", "success", "data", orders));
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
+    //     }
+    // }
+}

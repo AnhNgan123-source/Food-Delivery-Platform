@@ -5,8 +5,9 @@ import ManageVoucher from "../components/Admin/ManageVoucher";
 import ShippingConfig from "../components/Admin/ShippingConfig";
 import ApproveRestaurant from "../components/Admin/ApproveRestaurant";
 import ManageRestaurant from "../components/Admin/ManageRestaurant";
+import ManageShipper from "../components/Admin/ManageShipper";
 
-// === COMPONENT MODAL SỬA NHÀ HÀNG (GIỮ NGUYÊN) ===
+// === COMPONENT MODAL SỬA NHÀ HÀNG  ===
 const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
     const [formData, setFormData] = useState({ 
         resId: resData.resId,
@@ -220,7 +221,7 @@ const Admin = () => {
     };
 
     const handleLogout = () => {
-        if (window.confirm("Sếp có chắc chắn muốn đăng xuất?")) {
+        if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
             localStorage.clear();
             navigate('/');
         }
@@ -228,28 +229,30 @@ const Admin = () => {
 
     const renderContent = () => {
         switch (activeTab) {
-case 'approve-res':
-            return (
-                <ApproveRestaurant 
-                    list={restaurants.filter(r => r.isActive === 0)}
-                    onUpdateStatus={handleUpdateStatus}
-                    onRefresh={fetchRestaurants}
-                    actionBtnBase={actionBtnBase}
-                />
-            );
-        case 'manage-res':
-            return (
-                <ManageRestaurant 
-                    list={restaurants.filter(r => r.isActive === 1)}
-                    onUpdateStatus={handleUpdateStatus}
-                    onDelete={handleDeleteRestaurant}
-                    onEdit={(res) => { setSelectedRes(res); setShowEditModal(true); }}
-                    onRefresh={fetchRestaurants}
-                    actionBtnBase={actionBtnBase}
-                />
-            );
+            case 'approve-res':
+                return (
+                    <ApproveRestaurant 
+                        list={restaurants.filter(r => r.isActive === 0)}
+                        onUpdateStatus={handleUpdateStatus}
+                        onRefresh={fetchRestaurants}
+                        actionBtnBase={actionBtnBase}
+                    />
+                );
+            case 'manage-res':
+                return (
+                    <ManageRestaurant 
+                        list={restaurants.filter(r => r.isActive === 1)}
+                        onUpdateStatus={handleUpdateStatus}
+                        onDelete={handleDeleteRestaurant}
+                        onEdit={(res) => { setSelectedRes(res); setShowEditModal(true); }}
+                        onRefresh={fetchRestaurants}
+                        actionBtnBase={actionBtnBase}
+                    />
+                );
             
-            // === CẬU TRÚC PHẦN CẤU HÌNH PHÍ SHIP MỚI TỐI GIẢN ===
+            case 'manage-shipper':
+                return <ManageShipper />;
+
             case 'shipping-fee':
                 return (
                     <ShippingConfig 
@@ -285,7 +288,10 @@ case 'approve-res':
             <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
                 <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 35px', background: '#fff', borderBottom: '1px solid #f1f5f9' }}>
                     <h2 style={{fontSize: '18px', margin: 0, color: '#1e293b', fontWeight: '700'}}>
-                        {activeTab === 'approve-res' ? 'Hồ sơ chờ duyệt' : activeTab === 'shipping-fee' ? 'Cấu hình vận chuyển' : 'Danh sách nhà hàng hệ thống'}
+                        {activeTab === 'approve-res' ? 'Hồ sơ chờ duyệt' : 
+                         activeTab === 'shipping-fee' ? 'Cấu hình vận chuyển' : 
+                         activeTab === 'manage-shipper' ? 'Điều phối & Quản lý Shipper' : 
+                         'Danh sách nhà hàng hệ thống'}
                     </h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <div style={{ textAlign: 'right' }}>

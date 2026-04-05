@@ -24,13 +24,11 @@ public class UserService {
             .orElseThrow(() -> new RuntimeException("Ngân ơi, không tìm thấy người dùng này!"));
 
     // 2. Lấy thông tin MỚI từ client (newData) đắp vào user CŨ (existingUser)
-    // Chỗ này Ngân phải gọi newData.get... thì nó mới lấy dữ liệu mới nhé!
+    // Chỗ này phải gọi newData.get... thì nó mới lấy dữ liệu mới nhé!
     existingUser.setFullName(newData.getFullName());
     existingUser.setEmail(newData.getEmail());
     existingUser.setPhone(newData.getPhone());
-    
-    // Nếu Ngân có dùng địa chỉ thì mở comment dòng dưới ra:
-    // existingUser.setAddress(newData.getAddress());
+ 
 
     // 3. Lưu xuống Database
     return userRepository.save(existingUser);

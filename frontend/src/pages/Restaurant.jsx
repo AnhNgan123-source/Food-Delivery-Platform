@@ -146,7 +146,7 @@ const Restaurant = () => {
         setSearchKeyword(keyword);
         
         const filtered = menuItems.filter(item => {
-            const name = (item.itemName || '').toLowerCase();
+            const name = (item.item_name || '').toLowerCase();
             return name.includes(keyword);
         });
         setFilteredMenu(filtered);
@@ -194,7 +194,7 @@ const Restaurant = () => {
         }
     };
 
-    // === HÀM BẬT/TẮT TRẠNG THÁI MÓN (Dùng ngay tại Card) ===
+    // === HÀM BẬT/TẮT TRẠNG THÁI MÓN ===
     const handleToggleStatus = async (id, isCurrentlyAvailable) => {
         const action = isCurrentlyAvailable ? "ẨN (Hết hàng)" : "HIỆN (Còn hàng)";
         if (!window.confirm(`Bạn có chắc muốn ${action} món này không?`)) return;
@@ -248,9 +248,9 @@ const Restaurant = () => {
                             <button 
                                 className="btn-primary" 
                                 onClick={handleAddFood}
-                                style={{ width: 'auto', padding: '10px 25px' }}
+                                style={{ width: 'auto', padding: '10px 25px', display: 'flex', alignItems: 'center', gap: '8px' }}
                             >
-                                + Thêm món
+                                <i className="fas fa-plus"></i> Thêm món
                             </button>
                         </div>
 
@@ -289,6 +289,18 @@ const Restaurant = () => {
             case 'revenue-stats': 
                 return <RestaurantStats />
             case 'res-info': return <h3>Thông tin cửa hàng</h3>;
+            case 'manage-orders': 
+                return (
+                    <div className="orders-container">
+                        {/* Bỏ cái nút button onClick={fetchOrders} ở đây đi vì nó nằm trong component rồi */}
+                        <RestaurantOrders />
+                    </div>
+                );
+
+            case 'revenue-stats': 
+                return <RestaurantStats />;
+            case 'res-info': 
+                return <RestaurantInfoForm />;
             case 'profile': return <Profile />;
 
             default: return null;
@@ -300,31 +312,13 @@ const Restaurant = () => {
         const titles = {
             'manage-menu': 'Quản lý menu',
             'add-food': editingItem ? 'Cập nhật món ăn' : 'Thêm món mới', 
-            'new-orders': 'Đơn hàng mới',
-            'order-status': 'Trạng thái đơn',
-            'revenue-stats': 'Doanh thu',
-            'res-info': 'Thông tin quán',
+            'manage-orders': 'Quản lý Đơn hàng',
+            'revenue-stats': 'Thống kê Doanh thu',
+            'res-info': 'Thông tin nhà hàng',
             'profile': 'Hồ sơ cá nhân'
         };
         return titles[activeTab] || 'Dashboard';
     };
-
-    // // Hàm để nhà hàng cập nhật trạng thái đơn (Gửi tin cho khách)
-    // const handleUpdateStatus = async (orderId, newStatus, reason = "") => {
-    // const token = localStorage.getItem('token');
-    // try {
-    //     const response = await fetch(`http://localhost:8080/api/v1/orders/${orderId}/status?status=${newStatus}&reason=${encodeURIComponent(reason)}`, {
-    //         method: 'PUT',
-    //         headers: { 'Authorization': 'Bearer ' + token }
-    //     });
-    //     if (response.ok) {
-    //         // Cập nhật lại UI tại chỗ cho nhanh
-    //         setOrders(prev => prev.map(o => o.orderId === orderId ? {...o, orderStatus: newStatus, cancellationReason: reason} : o));
-    //     }
-    // } catch (error) { alert("Lỗi cập nhật rồi Ngân ơi!"); }
-    // };
-
-
 
     return (
     <div className="dashboard-layout">

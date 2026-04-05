@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VoucherModal from '../components/Customer/VoucherModal';
+import ReviewModal from '../components/Customer/ReviewModal';
 const Home = () => {
     const navigate = useNavigate();
 
@@ -21,6 +22,12 @@ const Home = () => {
     //voucher
     const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
     const [appliedVoucher, setAppliedVoucher] = useState(null);
+    //review
+    const [activeMenuTab, setActiveMenuTab] = useState('items'); // 'items' hoặc 'reviews'
+    const [restaurantReviews, setRestaurantReviews] = useState([]);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [selectedOrderReview, setSelectedOrderReview] = useState(null);
+    const [reviewedOrders, setReviewedOrders] = useState([]); // Để ẩn nút sau khi đánh giá xong
 
     // === STATE GIỎ HÀNG ===
     const [cart, setCart] = useState(() => {
@@ -82,6 +89,12 @@ const Home = () => {
             console.error("Lỗi tải nhà hàng:", error);
         }
     };
+    // Hàm lấy review khi chuyển Tab
+    const fetchReviews = async (resId) => {
+        const res = await fetch(`http://localhost:8080/api/v1/reviews/restaurant/${resId}`);
+        const data = await res.json();
+            if (data.status === "success") setRestaurantReviews(data.data);
+        };
 
     // === LOGIC TÌM KIẾM ===
     const handleSearch = (e) => {
@@ -94,18 +107,32 @@ const Home = () => {
         setFilteredRestaurants(filtered);
     };
 
-    // === XEM MENU NHÀ HÀNG ===
+// === XEM MENU NHÀ HÀNG ===
     const viewRestaurantMenu = async (resId) => {
+        console.log("Đang gọi món cho nhà hàng ID:", resId);
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/restaurants/${resId}`, {
+            // Lưu ý: Nếu sếp dùng API chung cho khách xem menu, hãy kiểm tra URL này
+            // Nếu URL đúng là trả về mảng món ăn:
+            const response = await fetch(`http://localhost:8080/api/menu/restaurant/${resId}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             });
-            const result = await response.json();
-            if (result.status === 'success') {
-                setSelectedResInfo(result.data.restaurant);
-                setMenuItems(result.data.menu);
+            
+            const result = await response.json(); 
+
+            // Kiểm tra nếu response OK và result là một mảng
+            if (response.ok && Array.isArray(result)) {
+                // 1. Tìm thông tin nhà hàng từ danh sách allRestaurants để hiển thị tên/ảnh nhà hàng
+                const resInfo = allRestaurants.find(r => (Number(r.resId) === Number(resId) || Number(r.res_id) === Number(resId)));
+                setSelectedResInfo(resInfo);
+
+                // 2. Set thẳng mảng món ăn vào state
+                setMenuItems(result); 
+
+                // 3. Chuyển sang view menu
                 setCurrentView('menu');
+            } else {
+                console.error("Dữ liệu không phải mảng hoặc lỗi API:", result);
             }
         } catch (error) {
             console.error("Lỗi tải menu:", error);
@@ -237,7 +264,7 @@ const Home = () => {
             // QUAN TRỌNG: Phải lấy orderId từ result.data trả về
             const newOrderId = result.data.orderId; 
 
-            alert(`✨ Tuyệt vời! Đơn hàng #${newOrderId} đã được tiếp nhận.`);
+            alert(`Tuyệt vời! Đơn hàng #${newOrderId} đã được tiếp nhận.`);
 
             // Xóa các món đã đặt khỏi giỏ
             const remainingCart = cart.filter(item => !selectedItems.includes(item.itemId));
@@ -245,7 +272,7 @@ const Home = () => {
             localStorage.setItem('cart', JSON.stringify(remainingCart));
             setSelectedItems([]);
 
-            // 🚀 Rẽ nhánh điều hướng
+            //  Rẽ nhánh điều hướng
             if (paymentMethod === 'ONLINE') {
                 navigate(`/payment-vnpay?orderId=${newOrderId}&amount=${finalAmount}`);
             } else {
@@ -253,7 +280,7 @@ const Home = () => {
                 navigate(`/order-tracking/${newOrderId}`);
             }
         } else {
-            alert("❌ Lỗi: " + result.message);
+            alert(" Lỗi: " + result.message);
         }
     } catch (error) {
         console.error("Lỗi đặt hàng:", error);
@@ -326,7 +353,7 @@ return (
                             <h3 className="section-title">Nhà hàng dành cho bạn</h3>
                             <div className="grid-container">
                                 {filteredRestaurants.map(res => (
-                                    <div key={res.resId} className="restaurant-card" onClick={() => viewRestaurantMenu(res.resId)}>
+                                    <div key={res.res_id || res.resId} className="restaurant-card" onClick={() => viewRestaurantMenu(res.res_id || res.resId)}>
                                     <img 
                                         src={res.resImage ? `http://localhost:8080/uploads/${res.resImage}` : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'} 
                                         alt={res.resName} 
@@ -342,89 +369,102 @@ return (
                     </>
                 )}
 
-                {/* --- VIEW 2: MENU NHÀ HÀNG --- */}
-                {currentView === 'menu' && selectedResInfo && (
-                    <div className="restaurant-detail-view">
-                        <button className="btn-back-link" onClick={() => setCurrentView('restaurants')}>
-                            <i className="fas fa-chevron-left"></i> Quay lại
-                        </button>
-                        
-                        <section className="res-hero-banner" style={{  backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)), url(${selectedResInfo.resImage ? `http://localhost:8080/uploads/${selectedResInfo.resImage}` : 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200'})`
-
-                        }}>
-                             <div className="res-hero-content">
-
-                        <div className="res-hero-text">
-
-                        {/* Tên nhà hàng - Nếu không có thì hiện chữ 'Nhà hàng Yummy' */}
-
-                        <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>
-
-                            {selectedResInfo.resName || "Đang cập nhật tên..."}
-
-                        </h1>
-
-                       
-
-                        {/* Địa chỉ - Có icon và chữ đi kèm */}
-
-                        <p style={{ marginBottom: '15px', fontSize: '16px' }}>
-
-                            <i className="fas fa-map-marker-alt" style={{ marginRight: '8px' }}></i>
-
-                            {selectedResInfo.resAddress || "Đang cập nhật địa chỉ..."}
-
-                        </p>
-
-                       
-
-                        {/* Các thông số phụ */}
-
-                        <div className="res-hero-badges">
-
-                            <span className="badge-item"><i className="fas fa-star"></i> 4.8 (500+ đánh giá)</span>
-
-                            <span className="badge-item" style={{ marginLeft: '20px' }}><i className="fas fa-clock"></i> 20-30 phút</span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-                        <section className="menu-section">
-                            <h3 className="section-title">Danh sách món ăn</h3>
-                            <div className="menu-grid">
-                                {menuItems.map(item => {
-                                    console.log("Dữ liệu món ăn từ Server:", item);
-
-                                    return(
-                                    <div key={item.itemId} className="food-item-card">
-                                        <div className="food-img-container">
-                                            <img 
-                                            src={item.itemImage ? `http://localhost:8080/uploads/${item.itemImage}?t=${Date.now()}` : '/image/load.jpg'}                                             
-                                            alt={item.itemName} 
-                                            />
-                                        </div>
-                                        <div className="food-details">
-                                            <h5>{item.itemName}</h5>
-                                            <div className="food-footer">
-                                                <span className="price">{item.price?.toLocaleString('vi-VN')} đ</span>
-                                                <button className="btn-add-small" onClick={() => addToCart(item)}>
-                                                    <i className="fas fa-plus"></i> Thêm
-                                                </button>
-                                            </div>
+               {/* --- VIEW 2: MENU NHÀ HÀNG & ĐÁNH GIÁ --- */}
+                    {currentView === 'menu' && selectedResInfo && (
+                        <div className="restaurant-detail-view">
+                            <button className="btn-back-link" onClick={() => { setCurrentView('restaurants'); setActiveMenuTab('items'); }}>
+                                <i className="fas fa-chevron-left"></i> Quay lại
+                            </button>
+                            
+                            {/* Banner nhà hàng giữ nguyên */}
+                            <section className="res-hero-banner" style={{ 
+                                backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.2)), url(${selectedResInfo.resImage ? `http://localhost:8080/uploads/${selectedResInfo.resImage}` : 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200'})`
+                            }}>
+                                <div className="res-hero-content">
+                                    <div className="res-hero-text">
+                                        <h1 style={{ fontSize: '32px', marginBottom: '10px' }}>{selectedResInfo.resName || "Đang cập nhật tên..."}</h1>
+                                        <p style={{ marginBottom: '15px', fontSize: '16px' }}>
+                                            <i className="fas fa-map-marker-alt" style={{ marginRight: '8px' }}></i>
+                                            {selectedResInfo.resAddress || "Đang cập nhật địa chỉ..."}
+                                        </p>
+                                        <div className="res-hero-badges">
+                                            <span className="badge-item"><i className="fas fa-star"></i> 4.8 (500+ đánh giá)</span>
+                                            <span className="badge-item" style={{ marginLeft: '20px' }}><i className="fas fa-clock"></i> 20-30 phút</span>
                                         </div>
                                     </div>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    </div>
-                )}
+                                </div>
+                            </section>
 
+                            {/* --- PHẦN TAB ĐIỀU HƯỚNG MỚI THÊM --- */}
+                            <div style={styles.tabContainerStyle}>
+                                <div 
+                                    style={activeMenuTab === 'items' ? styles.activeTabStyle : styles.tabItemStyle} 
+                                    onClick={() => setActiveMenuTab('items')}
+                                >
+                                    <i className="fas fa-utensils"></i> Thực đơn
+                                </div>
+                                <div 
+                                    style={activeMenuTab === 'reviews' ? styles.activeTabStyle : styles.tabItemStyle} 
+                                    onClick={() => { setActiveMenuTab('reviews'); fetchReviews(selectedResInfo.resId); }}
+                                >
+                                    <i className="fas fa-comment-alt"></i> Đánh giá ({restaurantReviews.length})
+                                </div>
+                            </div>
+
+                            <section className="menu-section">
+                                {activeMenuTab === 'items' ? (
+                                    <>
+                                        <h3 className="section-title">Danh sách món ăn</h3>
+                                        <div className="menu-grid">
+                                            {menuItems && menuItems.length > 0 ? (
+                                                menuItems.map(item => (
+                                                    <div key={item.itemId} className="food-item-card">
+                                                        <div className="food-img-container">
+                                                            <img src={item.itemImage ? `http://localhost:8080/uploads/${item.itemImage}?t=${Date.now()}` : '/image/load.jpg'} alt={item.itemName} />
+                                                        </div>
+                                                        <div className="food-details">
+                                                            <h5>{item.itemName}</h5>
+                                                            <div className="food-footer">
+                                                                <span className="price">{Number(item.price || 0).toLocaleString('vi-VN')} đ</span>
+                                                                <button className="btn-add-small" onClick={() => addToCart(item)}><i className="fas fa-plus"></i> Thêm</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p style={emptyTextStyle}>Đang tải món ăn hoặc nhà hàng chưa có món nào...</p>
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 className="section-title">Khách hàng nói gì?</h3>
+                                        <div style={styles.reviewListStyle}>
+                                            {restaurantReviews.length === 0 ? (
+                                                <p style={styles.emptyTextStyle}>Chưa có đánh giá nào cho nhà hàng này.</p>
+                                            ) : (
+                                                restaurantReviews.map(r => (
+                                                    <div key={r.reviewId} style={styles.reviewCardStyle}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                                            <div style={{ color: '#f1c40f', fontSize: '14px' }}>
+                                                                {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                                                            </div>
+                                                            <small style={{ color: '#666' }}>{new Date(r.createdAt).toLocaleDateString('vi-VN')}</small>
+                                                        </div>
+                                                        <p style={{ color: '#eee', margin: 0, fontSize: '15px', lineHeight: '1.5' }}>"{r.comment}"</p>
+                                                        <div style={{ marginTop: '10px', fontSize: '12px', color: '#888' }}>
+                                                            <i className="fas fa-check-circle" style={{ color: '#2ecc71' }}></i> Đã mua hàng
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </section>
+                        </div>
+                    )}
+                                    
                 {/* --- VIEW 3: GIỎ HÀNG (THEO WIREFRAME) --- */}
                 {currentView === 'cart' && (
                     <div className="cart-view-container">
@@ -710,8 +750,20 @@ return (
                                         >
                                             <i className="fas fa-search-location" style={{ marginRight: '8px' }}></i>
                                             Theo dõi đơn hàng
+                                        </button>             
+                                        {order.orderStatus === 'COMPLETED' && !reviewedOrders.includes(order.orderId) && (
+                                        //nút xem đánh giá
+                                        <button 
+                                            style={styles.reorderBtn} // Dùng chung style với nút đặt lại cho đẹp
+                                            onClick={() => {
+                                                setSelectedOrderReview(order);
+                                                setIsReviewModalOpen(true);
+                                            }}
+                                        >
+                                            <i className="fas fa-star" style={{color: '#f1c40f', marginRight: '5px'}}></i> 
+                                            Đánh giá ngay
                                         </button>
-                                        
+                                    )}
                                         {/* Nút đặt lại (Option thêm cho chuyên nghiệp) */}
                                         <button style={styles.reorderBtn}>
                                             <i className="fas fa-redo"></i> Đặt lại
@@ -731,7 +783,17 @@ return (
                             onApply={(v) => {
                                 setAppliedVoucher(v);
                                 // Thông báo cho Ngân biết đã thành công
-                                alert(`🎉 Ngân ơi, đã áp dụng mã ${v.code}, được giảm ${v.discountValue.toLocaleString()}đ rồi nhé!`);
+                                alert(` Bạn ơi, đã áp dụng mã ${v.code}, được giảm ${v.discountValue.toLocaleString()}đ rồi nhé!`);
+                            }}
+                        />
+                        {/* Modal Đánh giá */}
+                        <ReviewModal 
+                            isOpen={isReviewModalOpen}
+                            onClose={() => setIsReviewModalOpen(false)}
+                            order={selectedOrderReview}
+                            onSuccess={(orderId) => {
+                                // Lưu lại ID đơn đã đánh giá để ẩn nút đi
+                                setReviewedOrders(prev => [...prev, orderId]);
                             }}
                         />
                     </div>
@@ -875,6 +937,13 @@ trackingBtn: {
     finalLine: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '15px', fontWeight: '800', color: '#fff' },
     deliveryBox: { background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '16px', marginTop: '10px' },
     infoLine: { fontSize: '13px', color: '#aaa', marginBottom: '8px', display: 'flex', gap: '10px', alignItems: 'center' },
-    backHomeBtn: { background: '#2ecc71', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }
+    backHomeBtn: { background: '#2ecc71', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' },
+
+    tabContainerStyle: { display: 'flex', gap: '30px', padding: '0 40px', marginTop: '20px', borderBottom: '1px solid #2d323e' },
+    tabItemStyle: { padding: '15px 5px', color: '#888', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', transition: '0.3s' },
+    activeTabStyle: { padding: '15px 5px', color: '#2ecc71', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', transition: '0.3s', borderBottom: '3px solid #2ecc71' },
+    reviewListStyle: { display: 'flex', flexDirection: 'column', gap: '15px', padding: '10px 0' },
+    reviewCardStyle: { background: '#1c1e26', padding: '20px', borderRadius: '16px', border: '1px solid #2d313d' },
+    emptyTextStyle: { textAlign: 'center', padding: '40px', color: '#666', gridColumn: '1/-1' }
 };
 export default Home;
