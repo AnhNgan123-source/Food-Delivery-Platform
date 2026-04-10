@@ -6,8 +6,10 @@ import ShippingConfig from "../components/Admin/ShippingConfig";
 import ApproveRestaurant from "../components/Admin/ApproveRestaurant";
 import ManageRestaurant from "../components/Admin/ManageRestaurant";
 import ManageShipper from "../components/Admin/ManageShipper";
+// === IMPORT COMPONENT BÁO CÁO ===
+import AdminAnalytics from "../components/Admin/AdminAnalytics";
 
-// === COMPONENT MODAL SỬA NHÀ HÀNG  ===
+// === COMPONENT MODAL SỬA NHÀ HÀNG ===
 const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
     const [formData, setFormData] = useState({ 
         resId: resData.resId,
@@ -98,19 +100,8 @@ const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
                 </div>
 
                 <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                    <button 
-                        style={{ background: '#f1f5f9', color: '#64748b', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: '600', cursor: 'pointer' }} 
-                        onClick={onClose}
-                    >
-                        Hủy bỏ
-                    </button>
-                    <button 
-                        className="wf-btn-primary" 
-                        style={{ padding: '12px 30px', borderRadius: '12px', boxShadow: '0 4px 14px 0 rgba(0, 118, 255, 0.19)' }} 
-                        onClick={handleSave}
-                    >
-                        Lưu dữ liệu
-                    </button>
+                    <button style={{ background: '#f1f5f9', color: '#64748b', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: '600', cursor: 'pointer' }} onClick={onClose}>Hủy bỏ</button>
+                    <button className="wf-btn-primary" style={{ padding: '12px 30px', borderRadius: '12px', boxShadow: '0 4px 14px 0 rgba(0, 118, 255, 0.19)' }} onClick={handleSave}>Lưu dữ liệu</button>
                 </div>
             </div>
         </div>
@@ -125,31 +116,19 @@ const Admin = () => {
     const [selectedRes, setSelectedRes] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
-    // === STATE CHO CẤU HÌNH PHÍ SHIP MỚI ===
     const [shippingFees, setShippingFees] = useState([
         { areaName: 'Nội thành', price: 20000 },
         { areaName: 'Ngoại thành', price: 35000 }
     ]);
 
     const actionBtnBase = {
-        padding: '8px 16px',
-        borderRadius: '10px',
-        fontSize: '13px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        border: 'none',
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '8px',
-        transition: 'transform 0.1s, opacity 0.2s',
+        padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px', transition: 'transform 0.1s, opacity 0.2s',
     };
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
-        if (!token || role !== 'ADMIN') {
-            navigate('/'); 
-        }
+        if (!token || role !== 'ADMIN') { navigate('/'); }
     }, [navigate]);
 
     const fetchRestaurants = async () => {
@@ -164,7 +143,6 @@ const Admin = () => {
         finally { setIsLoading(false); }
     };
 
-    // === HÀM LẤY PHÍ SHIP TỪ DB ===
     const fetchShippingFees = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config");
@@ -177,7 +155,7 @@ const Admin = () => {
 
     useEffect(() => {
         if (activeTab === 'approve-res' || activeTab === 'manage-res') fetchRestaurants();
-        if (activeTab === 'shipping-fee') fetchShippingFees(); // Load phí ship khi mở tab
+        if (activeTab === 'shipping-fee') fetchShippingFees();
     }, [activeTab]);
 
     const handleUpdateStatus = async (res, newStatus) => {
@@ -187,32 +165,25 @@ const Admin = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...res, isActive: newStatus })
             });
-            if (response.ok) {
-                fetchRestaurants(); 
-            }
+            if (response.ok) fetchRestaurants(); 
         } catch (error) { alert("Lỗi!"); }
     };
 
     const handleDeleteRestaurant = async (resId) => {
         if (!window.confirm("Sếp có chắc chắn muốn XÓA VĨNH VIỄN nhà hàng này không?")) return;
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/admin/restaurants/${resId}`, {
-                method: 'DELETE'
-            });
+            const response = await fetch(`http://localhost:8080/api/v1/admin/restaurants/${resId}`, { method: 'DELETE' });
             if (response.ok) {
                 alert("Đã xóa nhà hàng thành công!");
                 fetchRestaurants();
-            } else {
-                alert("Lỗi khi xóa nhà hàng!");
-            }
+            } else { alert("Lỗi khi xóa nhà hàng!"); }
         } catch (error) { console.error("Lỗi:", error); }
     };
 
-    // === HÀM LƯU PHÍ SHIP MỚI ===
     const handleSaveShippingFees = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/v1/admin/shipping-config", {
-                method: 'POST', // Hoặc PUT tùy sếp thiết kế API
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(shippingFees)
             });
@@ -229,6 +200,8 @@ const Admin = () => {
 
     const renderContent = () => {
         switch (activeTab) {
+            case 'reports':
+                return <AdminAnalytics />; // === GHI ĐÈ COMPONENT BÁO CÁO TẠI ĐÂY ===
             case 'approve-res':
                 return (
                     <ApproveRestaurant 
@@ -249,18 +222,10 @@ const Admin = () => {
                         actionBtnBase={actionBtnBase}
                     />
                 );
-            
             case 'manage-shipper':
                 return <ManageShipper />;
-
             case 'shipping-fee':
-                return (
-                    <ShippingConfig 
-                        shippingFees={shippingFees} 
-                        setShippingFees={setShippingFees} 
-                        handleSaveShippingFees={handleSaveShippingFees} 
-                    />
-                );
+                return <ShippingConfig shippingFees={shippingFees} setShippingFees={setShippingFees} handleSaveShippingFees={handleSaveShippingFees} />;
             case 'manage-voucher':
                 return <ManageVoucher />;            
             case 'profile': return <Profile />;
@@ -273,12 +238,12 @@ const Admin = () => {
             <aside className="sidebar">
                 <h3 style={{padding: '0 20px'}}><i className="fas fa-tools"></i> Admin Panel</h3>
                 <ul>
+                    <li className={activeTab === 'reports' ? 'active' : ''} onClick={() => setActiveTab('reports')}><i className="fas fa-file-invoice-dollar"></i> Báo cáo hệ thống</li>
                     <li className={activeTab === 'approve-res' ? 'active' : ''} onClick={() => setActiveTab('approve-res')}><i className="fas fa-check-circle"></i> Duyệt nhà hàng</li>
                     <li className={activeTab === 'manage-res' ? 'active' : ''} onClick={() => setActiveTab('manage-res')}><i className="fas fa-utensils"></i> Quản lý nhà hàng</li>
                     <li className={activeTab === 'manage-shipper' ? 'active' : ''} onClick={() => setActiveTab('manage-shipper')}><i className="fas fa-user-tie"></i> Quản lý shipper</li>
                     <li className={activeTab === 'manage-voucher' ? 'active' : ''} onClick={() => setActiveTab('manage-voucher')}><i className="fas fa-tags"></i> Quản lý voucher</li>
                     <li className={activeTab === 'shipping-fee' ? 'active' : ''} onClick={() => setActiveTab('shipping-fee')}><i className="fas fa-shuttle-van"></i> Cấu hình phí ship</li>
-                    <li className={activeTab === 'reports' ? 'active' : ''} onClick={() => setActiveTab('reports')}><i className="fas fa-file-invoice-dollar"></i> Báo cáo hệ thống</li>
                     <hr style={{margin: '10px 20px', opacity: '0.1'}} />
                     <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}><i className="fas fa-id-card"></i> Hồ sơ cá nhân</li>
                 </ul>
@@ -288,7 +253,8 @@ const Admin = () => {
             <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
                 <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 35px', background: '#fff', borderBottom: '1px solid #f1f5f9' }}>
                     <h2 style={{fontSize: '18px', margin: 0, color: '#1e293b', fontWeight: '700'}}>
-                        {activeTab === 'approve-res' ? 'Hồ sơ chờ duyệt' : 
+                        {activeTab === 'reports' ? 'Dashboard Tổng quan' : 
+                         activeTab === 'approve-res' ? 'Hồ sơ chờ duyệt' : 
                          activeTab === 'shipping-fee' ? 'Cấu hình vận chuyển' : 
                          activeTab === 'manage-shipper' ? 'Điều phối & Quản lý Shipper' : 
                          'Danh sách nhà hàng hệ thống'}

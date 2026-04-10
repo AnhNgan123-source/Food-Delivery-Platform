@@ -15,14 +15,15 @@
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Tự cập nhật khi sửa thông tin
     ) ENGINE=InnoDB;
 
-## -- 2. Bảng Shipper: Do Admin quản lý 
 CREATE TABLE Shipper (
     shipper_id   INT PRIMARY KEY AUTO_INCREMENT,
+    res_id       INT NOT NULL,           -- Thuộc quyền quản lý của quán nào
     shipper_name VARCHAR(100) NOT NULL,
     phone        VARCHAR(15)  NOT NULL,
     vehicle_no   VARCHAR(20),
-    status       ENUM('IDLE', 'BUSY') DEFAULT 'IDLE'
-    -- Không còn res_id, không còn fk_shipper_res
+    status       ENUM('IDLE', 'BUSY') DEFAULT 'IDLE',
+    -- Khóa ngoại kết nối với nhà hàng
+    CONSTRAINT fk_shipper_res FOREIGN KEY (res_id) REFERENCES Restaurant(res_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 ## -- 3. Bảng Restaurant: Thông tin cửa hàng
