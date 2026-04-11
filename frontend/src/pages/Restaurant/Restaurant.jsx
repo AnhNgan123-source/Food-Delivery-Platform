@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Profile from './Profile';
-import AddMenuItemForm from '../components/Restaurant/AddMenuItemForm';
-import RestaurantOrders from '../components/Restaurant/RestaurantOrders';
-import RestaurantStats from '../components/Restaurant/RestaurantStats';
-import MenuList from '../components/Restaurant/MenuList';
+import Profile from '../../components/Common/Profile';
+import AddMenuItemForm from '../../components/Restaurant/AddMenuItemForm';
+import RestaurantOrders from '../../components/Restaurant/RestaurantOrders';
+import RestaurantStats from '../../components/Restaurant/RestaurantStats';
+import MenuList from '../../components/Restaurant/MenuList';
 import SockJS from 'sockjs-client'; 
 import Stomp from 'stompjs';
 
@@ -288,7 +288,6 @@ const Restaurant = () => {
                 return <RestaurantOrders key={newOrderCount} />;
             case 'revenue-stats': 
                 return <RestaurantStats />
-            case 'res-info': return <h3>Thông tin cửa hàng</h3>;
             case 'manage-orders': 
                 return (
                     <div className="orders-container">
@@ -296,9 +295,6 @@ const Restaurant = () => {
                         <RestaurantOrders />
                     </div>
                 );
-
-            case 'revenue-stats': 
-                return <RestaurantStats />;
             case 'res-info': 
                 return <RestaurantInfoForm />;
             case 'profile': return <Profile />;
@@ -336,7 +332,7 @@ const Restaurant = () => {
                     <i className="fas fa-utensils"></i> Quản lý menu
                 </li>
 
-                {/*Tab Đơn hàng mới - ĐÃ BỔ SUNG ĐỐM ĐỎ REAL-TIME */}
+                {/*Tab Đơn hàng mới - Có đốm đỏ REALTIME */}
                 <li className={activeTab === 'new-orders' ? 'active' : ''} 
                     onClick={() => {
                         setActiveTab('new-orders');

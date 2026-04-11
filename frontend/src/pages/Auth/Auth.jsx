@@ -91,7 +91,7 @@ const Auth = () => {
                 const resId = result.data.resId;
                 if (resId) {
                     localStorage.setItem('resId', resId);
-                    console.log("✅ Đã lưu resId cho chủ quán:", resId);
+                    console.log("Đã lưu resId cho chủ quán:", resId);
                 }
             }
 
@@ -116,12 +116,12 @@ const Auth = () => {
         // Validation cơ bản
         if (!regData.userName || !regData.passWord || !regData.email || !regData.fullName || 
             !regData.phone || !regData.address_detail || !selectedProv.name || !selectedDist.name || !selectedWard.name) {
-            setRegMsg("❌ Ngân ơi, vui lòng điền đầy đủ thông tin!");
+            setRegMsg("Bạn ơi, vui lòng điền đầy đủ thông tin!");
             return;
         }
 
         if (!regData.email.includes('@')) {
-            setRegMsg("❌ Email không đúng định dạng!");
+            setRegMsg("Email không đúng định dạng!");
             return;
         }
 

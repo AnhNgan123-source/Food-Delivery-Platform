@@ -45,7 +45,7 @@ const ManageVoucher = () => {
                 body: JSON.stringify(payload)
             });
             if (res.ok) {
-                alert("Kích hoạt chiến dịch thành công! 🚀");
+                alert("Kích hoạt chiến dịch thành công!");
                 setShowModal(false);
                 fetchVouchers();
                 setNewVoucher({ code: '', description: '', discountType: 'fixed_amount', discountValue: 0, maxDiscountAmount: 0, minOrderValue: 0, usageLimit: 100, endDate: '', isActive: 1 });

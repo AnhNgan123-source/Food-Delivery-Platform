@@ -65,7 +65,7 @@ const ManageShipper = () => {
             <div style={layoutGrid}>
                 {/* 1. BẢNG ĐƠN HÀNG CHỜ */}
                 <div style={card}>
-                    <div style={cardHead}>📦 ĐƠN HÀNG CHỜ GIAO</div>
+                    <div style={cardHead}>ĐƠN HÀNG CHỜ GIAO</div>
                     <div style={listScroll}>
                         {pendingOrders.map(order => (
                             <div key={order.orderId} style={orderRow}>
@@ -90,7 +90,7 @@ const ManageShipper = () => {
 
                 {/* 2. BẢNG TÀI XẾ */}
                 <div style={card}>
-                    <div style={cardHead}>🚚 TRẠNG THÁI TÀI XẾ</div>
+                    <div style={cardHead}>TRẠNG THÁI TÀI XẾ</div>
                     <div style={listScroll}>
                         <table style={dataTab}>
                             <thead>
@@ -128,7 +128,7 @@ const ManageShipper = () => {
 
             {/* 3. BẢNG GIÁM SÁT ĐƠN ĐANG CHẠY */}
             <div style={{...card, marginTop:'25px'}}>
-                <div style={{...cardHead, background:'#10b981'}}>🚀 ĐƠN HÀNG ĐANG TRÊN ĐƯỜNG</div>
+                <div style={{...cardHead, background:'#10b981'}}>ĐƠN HÀNG ĐANG TRÊN ĐƯỜNG</div>
                 <table style={dataTab}>
                     <thead>
                         <tr style={thStyle}>

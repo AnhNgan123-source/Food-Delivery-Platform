@@ -48,7 +48,7 @@ const ShippingConfig = ({ shippingFees, setShippingFees, handleSaveShippingFees 
             <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '30px', textAlign: 'right' }}>
                 <button 
                     className="wf-btn-primary" 
-                    onClick={handleSaveShippingFees}
+                    onClick={() => handleSaveShippingFees(shippingFees)}// nhận vào mảng tiền phí mới 
                     style={{ padding: '15px 40px', borderRadius: '12px', fontWeight: '700', fontSize: '15px', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.3)' }}
                 >
                     <i className="fas fa-save" style={{ marginRight: '8px' }}></i> Lưu thay đổi
