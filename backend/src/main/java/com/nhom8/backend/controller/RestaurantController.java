@@ -1,16 +1,22 @@
 package com.nhom8.backend.controller;
 
 import com.nhom8.backend.model.Restaurant;
+import com.nhom8.backend.model.Shipper;
 import com.nhom8.backend.service.RestaurantService;
+//import com.nhom8.backend.repository.RestaurantRepository;
+import com.nhom8.backend.repository.ShipperRepository; // Thêm mới
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile; // Thêm mới
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List; // Thêm mới
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
@@ -21,7 +27,13 @@ import java.util.UUID;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
-  
+
+    // @Autowired
+    // private RestaurantRepository restaurantRepository;
+
+    @Autowired
+    private ShipperRepository shipperRepository; // Inject để quán quản lý shipper
+
     public RestaurantController(RestaurantService restaurantService) {
         this.restaurantService = restaurantService;
     }
@@ -50,12 +62,6 @@ public class RestaurantController {
         }
     }
 
-    // --- PHẦN THÊM MỚI: XỬ LÝ UPLOAD HÌNH ẢNH ---
-
-    /**
-     * API Upload hình ảnh vào thư mục backend/uploads/
-     * Path: POST /api/v1/restaurant/upload
-     */
     @PostMapping("/restaurant/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -63,27 +69,51 @@ public class RestaurantController {
         }
 
         try {
-            // Định nghĩa đường dẫn lưu file (thư mục 'uploads' ở gốc project backend)
             String uploadDir = "uploads/";
             Path uploadPath = Paths.get(uploadDir);
 
-            // Tự động tạo thư mục nếu chưa có
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Tạo tên file ngẫu nhiên để không bị ghi đè (UUID)
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = uploadPath.resolve(fileName);
 
-            // Copy file vào thư mục đích
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Trả về tên file để React lưu vào Database (resImage)
             return ResponseEntity.ok(fileName);
 
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Không thể lưu file: " + e.getMessage());
         }
+    }
+
+    // --- PHẦN QUẢN LÝ SHIPPER DÀNH CHO NHÀ HÀNG ---
+
+    /**
+     * Lấy danh sách shipper thuộc quyền quản lý của quán
+     */
+    @GetMapping("/restaurant/{resId}/shippers")
+    public ResponseEntity<?> getShippersByRestaurant(@PathVariable Integer resId) {
+        List<Shipper> shippers = shipperRepository.findByRestaurantResId(resId);
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("status", "success");
+            put("data", shippers);
+        }});
+    }
+
+    /**
+     * Cập nhật trạng thái shipper (Ví dụ: Quán tự set Shipper nghỉ hoặc đi giao)
+     */
+    @PutMapping("/restaurant/shipper/{shipperId}/status")
+    public ResponseEntity<?> updateShipperStatus(@PathVariable Integer shipperId, @RequestParam Shipper.ShipperStatus status) {
+        return shipperRepository.findById(shipperId).map(shipper -> {
+            shipper.setStatus(status);
+            shipperRepository.save(shipper);
+            return ResponseEntity.ok(new HashMap<String, Object>() {{
+                put("status", "success");
+                put("message", "Trạng thái shipper đã cập nhật");
+            }});
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

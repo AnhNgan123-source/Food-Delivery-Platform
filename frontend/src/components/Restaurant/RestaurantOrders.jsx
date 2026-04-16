@@ -14,6 +14,12 @@ const RestaurantOrders = () => {
     }, []);
 
     const fetchOrders = async () => {
+        // CHẶN LỖI TẠI ĐÂY: Nếu không có resId thì không làm gì cả
+        if (!resId || resId === "null") {
+        console.error("Không tìm thấy resId trong localStorage!");
+        setLoading(false);
+        return;
+    }
         setLoading(true);
         try {
             const response = await fetch(`http://localhost:8080/api/v1/orders/restaurant/${resId}`, {

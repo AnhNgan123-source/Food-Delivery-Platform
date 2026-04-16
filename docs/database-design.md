@@ -15,16 +15,16 @@
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Tự cập nhật khi sửa thông tin
     ) ENGINE=InnoDB;
 
-## -- 2. Bảng Shipper: Do Nhà hàng quản lý 
-    CREATE TABLE Shipper (
-    shipper_id  INT PRIMARY KEY AUTO_INCREMENT,
-    res_id      INT NOT NULL,          -- Shipper này thuộc nhà hàng nào
-    shipper_name VARCHAR(100) NOT NULL, -- Tên tài xế
-    phone       VARCHAR(15) NOT NULL,  -- Số điện thoại để khách gọi
-    vehicle_no  VARCHAR(20),           -- Biển số xe
-    status      ENUM('IDLE', 'BUSY') DEFAULT 'IDLE', -- Trạng thái đang rảnh hay đang giao
+CREATE TABLE Shipper (
+    shipper_id   INT PRIMARY KEY AUTO_INCREMENT,
+    res_id       INT NOT NULL,           -- Thuộc quyền quản lý của quán nào
+    shipper_name VARCHAR(100) NOT NULL,
+    phone        VARCHAR(15)  NOT NULL,
+    vehicle_no   VARCHAR(20),
+    status       ENUM('IDLE', 'BUSY') DEFAULT 'IDLE',
+    -- Khóa ngoại kết nối với nhà hàng
     CONSTRAINT fk_shipper_res FOREIGN KEY (res_id) REFERENCES Restaurant(res_id) ON DELETE CASCADE
-    ) ENGINE=InnoDB;
+) ENGINE=InnoDB;
 
 ## -- 3. Bảng Restaurant: Thông tin cửa hàng
     CREATE TABLE Restaurant (
@@ -131,7 +131,16 @@
     CONSTRAINT fk_rev_user FOREIGN KEY (customer_id) REFERENCES User(user_id),
     CONSTRAINT fk_rev_res FOREIGN KEY (res_id) REFERENCES Restaurant(res_id)
     ) ENGINE=InnoDB;
+
+    -- -- 11. Bảng Shipping_Config: Cấu hình phí ship đơn giản
+    CREATE TABLE Shipping_Config (
+    config_id    INT PRIMARY KEY AUTO_INCREMENT,
+    area_name    VARCHAR(50) NOT NULL, -- 'Nội thành', 'Ngoại thành'
+    price        DECIMAL(10, 2) NOT NULL, -- Giá tiền cố định
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
+    
 # SƠ ĐỒ ERD DIAGRAM
-<img width="738" height="1246" alt="ERD Diagram" src="https://github.com/user-attachments/assets/035a5e74-97bd-40b5-a506-8b7f1ddea0de" />
+<img width="696" height="1223" alt="ERD_DIAGRAM_UPDATE2" src="https://github.com/user-attachments/assets/49c56a41-6666-4747-8d5a-e236769ec9ac" />
 
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/v1/admin/shipping-config") // Đường dẫn này khớp 100% với React sếp nhé
+@RequestMapping("/api/v1/admin/shipping-config") 
 public class AdminShippingController {
 
     @Autowired

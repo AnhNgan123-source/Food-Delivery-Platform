@@ -64,6 +64,9 @@ public class MenuItemService {
         item.setDescription(newItem.getDescription());
         item.setCatId(newItem.getCatId());
 
+        if (newItem.getResId() != null) {
+        item.setResId(newItem.getResId());
+    }
         return menuItemRepository.save(item);
     }
 

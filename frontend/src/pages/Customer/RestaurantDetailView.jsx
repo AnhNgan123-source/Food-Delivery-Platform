@@ -1,6 +1,7 @@
 import React from 'react';
 //import { styles } from './CustomerStyles';
 
+
 const RestaurantDetailView = ({ 
     currentView, filteredRestaurants, viewRestaurantMenu, selectedResInfo, 
     activeMenuTab, setActiveMenuTab, menuItems, restaurantReviews, fetchReviews, addToCart, searchKeyword, handleSearch 

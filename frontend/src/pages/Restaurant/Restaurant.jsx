@@ -77,7 +77,7 @@ const Restaurant = () => {
             if (message.body.startsWith("NEW_ORDER")) {
                 setNewOrderCount(prev => prev + 1);
                 // Alert này sẽ nhắc có đơn mới dù đang ở bất kỳ đâu
-                alert("Ngân ơi! Có đơn hàng mới nổ kìa!");
+                alert("Bạn ơi! Có đơn hàng mới nổ kìa!");
             }
         });
     }, (err) => {
@@ -283,11 +283,6 @@ const Restaurant = () => {
                     />
                 );
 
-            case 'new-orders':
-            case 'order-status': // HIỆN CÁC ĐƠN SAU KHI DUYỆT 
-                return <RestaurantOrders key={newOrderCount} />;
-            case 'revenue-stats': 
-                return <RestaurantStats />
             case 'manage-orders': 
                 return (
                     <div className="orders-container">
@@ -295,6 +290,9 @@ const Restaurant = () => {
                         <RestaurantOrders />
                     </div>
                 );
+
+            case 'revenue-stats': 
+                return <RestaurantStats />;
             case 'res-info': 
                 return <RestaurantInfoForm />;
             case 'profile': return <Profile />;
@@ -317,78 +315,76 @@ const Restaurant = () => {
     };
 
     return (
-    <div className="dashboard-layout">
-        {/* --- 1. SIDEBAR (THANH ĐIỀU HƯỚNG BÊN TRÁI) --- */}
-        <aside className="sidebar">
-            <div className="brand">
-                <h3>Yummy Hub</h3>
-                <p style={{ fontSize: '12px', color: '#28a745', fontWeight: 'bold' }}>Nhà hàng của bạn</p>
-            </div>
-
-            <ul>
-                {/* Tab Quản lý Menu */}
-                <li className={(activeTab === 'manage-menu' || activeTab === 'add-food') ? 'active' : ''} 
-                    onClick={() => setActiveTab('manage-menu')}> 
-                    <i className="fas fa-utensils"></i> Quản lý menu
-                </li>
-
-                {/*Tab Đơn hàng mới - Có đốm đỏ REALTIME */}
-                <li className={activeTab === 'new-orders' ? 'active' : ''} 
-                    onClick={() => {
-                        setActiveTab('new-orders');
-                        setNewOrderCount(0); // Bấm vào xem thì xóa số thông báo đi
-                    }}
-                    style={{ position: 'relative' }} // Để đốm đỏ nằm đè lên
-                >
-                    <i className="fas fa-shopping-bag"></i> Đơn hàng mới
-                    
-                    {/* Nếu có đơn mới (từ WebSocket bắn về) thì hiện số lượng ở đây */}
-                    {newOrderCount > 0 && (
-                        <span className="order-badge-notify">{newOrderCount}</span>
-                    )}
-                </li>
-
-                <li className={activeTab === 'order-status' ? 'active' : ''} onClick={() => setActiveTab('order-status')}>
-                    <i className="fas fa-truck"></i> Trạng thái đơn
-                </li>
-                
-                <li className={activeTab === 'revenue-stats' ? 'active' : ''} onClick={() => setActiveTab('revenue-stats')}>
-                    <i className="fas fa-chart-line"></i> Doanh thu
-                </li>
-
-                <li className={activeTab === 'res-info' ? 'active' : ''} onClick={() => setActiveTab('res-info')}>
-                    <i className="fas fa-store"></i> Thông tin quán
-                </li>
-
-                <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
-                    <i className="fas fa-user-circle"></i> Hồ sơ cá nhân
-                </li>
-            </ul>
-
-            <button onClick={handleLogout} className="btn-logout">
-                <i className="fas fa-sign-out-alt"></i> Đăng xuất
-            </button>
-        </aside>
-
-        {/* --- 2. MAIN CONTENT (NỘI DUNG CHÍNH BÊN PHẢI) --- */}
-        <main className="main-content">
-            <header className="main-header">
-                <div>
-                    {/* Tiêu đề tự động đổi theo Tab */}
-                    <h2>{getPageTitle()}</h2>
+        <div className="dashboard-layout">
+            <aside className="sidebar">
+                <div className="brand" style={{ padding: '0 10px 20px' }}>
+                    <h3 style={{ color: '#28a745', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <i className="fas fa-utensils"></i> Yummy Hub
+                    </h3>
+                    <p style={{ fontSize: '12px', color: '#666', fontWeight: 'bold', marginTop: '5px' }}>Nhà hàng của bạn</p>
                 </div>
-                <div className="user-profile-mini">
-                    <span>{fullName}</span>
-                    <div className="avatar-mini">{avatarChar}</div>
-                </div>
-            </header>
 
-            {/* Nơi hiển thị nội dung chi tiết của từng chức năng */}
-            <div id="content-area" style={{ padding: '20px' }}>
-                {renderContent()}
+                <ul>
+                    <li className={(activeTab === 'manage-menu' || activeTab === 'add-food') ? 'active' : ''} onClick={() => setActiveTab('manage-menu')}> 
+                        <i className="fas fa-list-alt"></i> Quản lý menu
+                    </li>
+                    <li className={activeTab === 'manage-orders' ? 'active' : ''} onClick={() => setActiveTab('manage-orders')}>
+                        <i className="fas fa-shopping-bag"></i> Đơn hàng
+                    </li>
+                    <li className={activeTab === 'revenue-stats' ? 'active' : ''} onClick={() => setActiveTab('revenue-stats')}>
+                        <i className="fas fa-chart-pie"></i> Doanh thu
+                    </li>
+                    <li className={activeTab === 'res-info' ? 'active' : ''} onClick={() => setActiveTab('res-info')}>
+                        <i className="fas fa-store-alt"></i> Thông tin quán
+                    </li>
+                    <hr style={{ margin: '15px 0', opacity: '0.1' }} />
+                    <li className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
+                        <i className="fas fa-user-cog"></i> Hồ sơ cá nhân
+                    </li>
+                </ul>
+
+                <button onClick={handleLogout} className="btn-logout">
+                    <i className="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </aside>
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <header className="main-header" style={{
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    padding: '15px 35px',
+                    background: '#fff',
+                    borderBottom: '1px solid #eee'
+                }}>
+                    <h2 style={{ fontSize: '20px', margin: 0, color: '#333' }}>{getPageTitle()}</h2>
+                    <div className="user-profile-mini" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ textAlign: 'right' }}>
+                            <span style={{ display: 'block', fontWeight: 'bold', fontSize: '14px' }}>{fullName}</span>
+                            <span style={{ fontSize: '12px', color: '#28a745' }}>Chủ cửa hàng</span>
+                        </div>
+                        <div className="avatar-mini" style={{
+                            width: '35px', 
+                            height: '35px', 
+                            background: '#28a745', 
+                            color: '#fff', 
+                            borderRadius: '50%', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            fontWeight: 'bold'
+                        }}>{avatarChar}</div>
+                    </div>
+                </header>
+
+                <main className="main-content" style={{ flex: 1, padding: '30px 35px' }}>
+                    <div id="content-area">
+                        {renderContent()}
+                    </div>
+                </main>
             </div>
-        </main>
-    </div>
-);
-}
+        </div>
+    );
+};
+
 export default Restaurant;
