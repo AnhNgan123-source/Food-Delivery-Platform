@@ -123,7 +123,7 @@ const Auth = () => {
             const result = await response.json();
 
             if (result.status === "success") {
-                alert("✨ Tuyệt vời! Bạn đã đăng ký thành công.");
+                alert("Tuyệt vời! Bạn đã đăng ký thành công.");
                 setIsLoginView(true);
             } else {
                 setRegMsg("❌ " + result.message);

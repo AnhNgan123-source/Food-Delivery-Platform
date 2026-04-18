@@ -1,42 +1,50 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// === IMPORT CÁC TRANG GIAO DIỆN (PAGES) ===
+// === 1. IMPORT LAYOUTS (KHUNG GIAO DIỆN) ===
+import AdminLayout from './components/layouts/AdminLayout/AdminLayout';
+import CustomerLayout from './components/layouts/CustomerLayout/CustomerLayout';
+import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLayout';
 
-// 1. Trang xác thực (Login/Register)
+// === 2. IMPORT PAGES (TRANG ĐÍCH) ===
 import Auth from './pages/Auth/Auth';
-
-// 2. Trang chủ dành cho Khách hàng (Đã đổi tên từ Home thành Customer)
-import Customer from './pages/Customer/Home'; 
-
-// 3. Các trang tính năng của Khách hàng
-import PaymentVNPay from './pages/Customer/PaymentVNPay';
+import Home from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
+import Restaurant from './pages/Restaurant/Restaurant'; // Trang chính của quán
+import Admin from './pages/Admin/Admin'; // Trang chính của admin
 
-// 4. Trang dành cho Nhà hàng
-import Restaurant from './pages/Restaurant/Restaurant';
-
-// 5. Trang dành cho Admin
-import Admin from './pages/Admin/Admin';
-
+// === 3. IMPORT CÁC COMPONENT CON (Để gắn vào Outlet) ===
+import AdminAnalytics from './components/Admin/Analytics/AdminAnalytics';
+import ApproveRestaurant from './components/Admin/RestaurantMgmt/ApproveRestaurant';
+import PaymentVNPay from './components/Customer/Payment/PaymentVNPay';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Trang mặc định: Đăng nhập / Đăng ký */}
+        {/* LOGIN / REGISTER */}
         <Route path="/" element={<Auth />} />
         
-        {/* Điều hướng dành cho Khách hàng */}
-        <Route path="/home" element={<Customer />} /> {/* Đổi Home thành Customer */}
-        <Route path="/payment-vnpay" element={<PaymentVNPay />} />
-        <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
-        
-        {/* Điều hướng dành cho Nhà hàng và Admin */}
-        <Route path="/restaurant" element={<Restaurant />} />
-        <Route path="/admin" element={<Admin />} />
+        {/* PHẦN KHÁCH HÀNG */}
+        <Route element={<CustomerLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
+        </Route>
 
-        {/* Xử lý đường dẫn không tồn tại: Đẩy về trang Auth */}
+        {/* PHẦN NHÀ HÀNG (Dùng Restaurant.jsx làm trang mặc định) */}
+        <Route path="/restaurant" element={<RestaurantLayout />}>
+          <Route index element={<Restaurant />} /> 
+          {/* Khi vào /restaurant, nội dung file Restaurant.jsx sẽ hiện ở Outlet */}
+        </Route>
+
+        {/* PHẦN ADMIN (Dùng Admin.jsx làm trang mặc định) */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Admin />} /> 
+          {/* Khi vào /admin, nội dung file Admin.jsx sẽ hiện ở Outlet */}
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="approve" element={<ApproveRestaurant />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" />} />  
       </Routes>
     </Router>

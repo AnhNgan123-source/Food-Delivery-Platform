@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Profile from '../../components/Common/Profile';
-import AddMenuItemForm from '../../components/Restaurant/AddMenuItemForm';
-import RestaurantOrders from '../../components/Restaurant/RestaurantOrders';
-import RestaurantStats from '../../components/Restaurant/RestaurantStats';
-import MenuList from '../../components/Restaurant/MenuList';
+import Profile from '../../components/Common/Profile/Profile';
+import AddMenuItemForm from '../../components/Restaurant/Menu/AddMenuItemForm';
+import RestaurantOrders from '../../components/Restaurant/Order/RestaurantOrders';
+import RestaurantStats from '../../components/Restaurant/Stats/RestaurantStats';
+import MenuList from '../../components/Restaurant/Menu/MenuList';
 import SockJS from 'sockjs-client'; 
 import Stomp from 'stompjs';
 

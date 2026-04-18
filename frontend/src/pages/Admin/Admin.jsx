@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Import các Component con
-import Profile from '../../components/Common/Profile';
-import ManageVoucher from '../../components/Admin/ManageVoucher';
-import ShippingConfig from '../../components/Admin/ShippingConfig';
-import ApproveRestaurant from '../../components/Admin/ApproveRestaurant';
-import ManageRestaurant from '../../components/Admin/ManageRestaurant';
-import ManageShipper from '../../components/Admin/ManageShipper';
+import Profile from '../../components/Common/Profile/Profile';
+import ManageVoucher from '../../components/Admin/Voucher/ManageVoucher';
+import ShippingConfig from '../../components/Admin/Shipping/ShippingConfig';
+import ApproveRestaurant from '../../components/Admin/RestaurantMgmt/ApproveRestaurant';
+import ManageRestaurant from '../../components/Admin/RestaurantMgmt/ManageRestaurant';
+import ManageShipper from '../../components/Admin/Shipper/ManageShipper';
 import styles from './Admin.module.css';
 
 const sidebarMenuItems = [

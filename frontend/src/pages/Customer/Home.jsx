@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import VoucherModal from '../../components/Customer/VoucherModal';
-import ReviewModal from '../../components/Customer/ReviewModal';
+import VoucherModal from '../../components/Customer/Modal/VoucherModal';
+import ReviewModal from '../../components/Customer/Feedback/ReviewModal';
 import RestaurantDetailView from './RestaurantDetailView';
 import CartCheckoutView from './CartCheckoutView';
 import OrderHistoryView from './OrderHistoryView';
