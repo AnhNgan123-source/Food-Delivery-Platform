@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // Import styles từ file Admin.module.css để dùng chung theme
 import styles from './Profile.module.css'; 
+import userApi from '../../api/userApi'; // GIỮ NGUYÊN cấu trúc import nhưng thêm userApi
 
 const Profile = () => {
     const [user, setUser] = useState({
@@ -18,32 +19,48 @@ const Profile = () => {
         phone: ''
     });
 
-    const token = localStorage.getItem('token');
+    // AxiosClient đã tự động lấy token từ localStorage, không cần khai báo biến token ở đây nữa
 
     useEffect(() => {
         fetchProfileData();
     }, []);
 
+    // --- PHẦN THAY ĐỔI: SỬ DỤNG AXIOS QUA USERAPI ---
     const fetchProfileData = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/user/profile', {
-                headers: { 'Authorization': 'Bearer ' + token }
+            // Thay thế fetch bằng userApi
+            const data = await userApi.getProfile();
+            
+            // Vì axiosClient đã bóc tách (unwrap) res.data, data ở đây là object User
+            setUser(data);
+            setEditData({
+                fullName: data.fullName || '',
+                email: data.email || '',
+                phone: data.phone || ''
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                setUser(data);
-                setEditData({
-                    fullName: data.fullName || '',
-                    email: data.email || '',
-                    phone: data.phone || ''
-                });
-            }
         } catch (error) {
             console.error("Lỗi lấy dữ liệu:", error);
+            // Nếu lỗi 401, axiosClient sẽ tự động đưa về trang login nhờ Interceptor
         }
     };
 
+    // --- PHẦN THAY ĐỔI: SỬ DỤNG AXIOS QUA USERAPI ---
+    const saveProfile = async () => {
+        try {
+            // Thay thế fetch PUT bằng userApi
+            await userApi.updateProfile(editData);
+
+            alert("Cập nhật thành công!!!");
+            setUser({ ...user, ...editData });
+            setIsEditing(false);
+        } catch (err) {
+            console.error("Lỗi kết nối:", err);
+            const msg = err.response?.data?.message || "Có lỗi xảy ra khi lưu!";
+            alert(msg);
+        }
+    };
+
+    // --- PHẦN GIỮ NGUYÊN HOÀN TOÀN ---
     const toggleEdit = () => {
         if (!isEditing) {
             setEditData({
@@ -60,29 +77,6 @@ const Profile = () => {
             ...editData,
             [e.target.name]: e.target.value
         });
-    };
-
-    const saveProfile = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/api/user/profile/update', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(editData)
-            });
-
-            if (response.ok) {
-                alert("Cập nhật thành công!!!");
-                setUser({ ...user, ...editData });
-                setIsEditing(false);
-            } else {
-                alert("Có lỗi xảy ra khi lưu!");
-            }
-        } catch (err) {
-            console.error("Lỗi kết nối:", err);
-        }
     };
 
     return (

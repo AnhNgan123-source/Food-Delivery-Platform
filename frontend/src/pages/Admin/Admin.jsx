@@ -113,8 +113,8 @@ const EditRestaurantModal = ({ resData, onClose, onSaveSuccess }) => {
                 </div>
 
                 <div className={styles['edit-mode-buttons']}>
-                    <button onClick={onClose} className={styles['btn-cancel']}>Hủy</button>
-                    <button onClick={handleSave} className={styles['btn-save']}>Lưu thay đổi</button>
+                    <button onClick={onClose} className={styles['btn-modal-cancel']}>Hủy</button>
+                    <button onClick={handleSave} className={styles['btn--modal-save']}>Lưu thay đổi</button>
                 </div>
             </div>
         </div>

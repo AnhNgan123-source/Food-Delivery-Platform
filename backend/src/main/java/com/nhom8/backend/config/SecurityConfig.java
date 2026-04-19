@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/restaurant/upload").permitAll()
 
                         // SỬA 1: Mở rộng đường dẫn cho Auth
-                        .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/v1/auth/**").permitAll()
                         .requestMatchers("/ws-delivery/**").permitAll()
 
                         // SỬA 2: Cho phép các API liên quan đến Menu và Category

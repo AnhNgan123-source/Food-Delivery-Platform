@@ -1,19 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authApi from '../../components/api/authApi' // Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
 
 const Auth = () => {
     const navigate = useNavigate();
 
+    // === STATE QUẢN LÝ GIAO DIỆN ===
     const [isLoginView, setIsLoginView] = useState(true);
+
+    // === STATE ĐĂNG NHẬP ===
     const [loginUser, setLoginUser] = useState('');
     const [loginPass, setLoginPass] = useState('');
     const [loginMsg, setLoginMsg] = useState('');
 
+    // === STATE ĐĂNG KÝ ===
     const [regData, setRegData] = useState({
-        username: '', password: '', email: '', full_name: '', phone: '', address_detail: '', role: 'CUSTOMER'
+        userName: '', 
+        passWord: '', 
+        email: '', 
+        fullName: '', 
+        phone: '', 
+        address_detail: '', 
+        role: 'CUSTOMER'
     });
     const [regMsg, setRegMsg] = useState('');
     
+    // === STATE ĐỊA CHỈ (PROVINCES API) ===
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -22,9 +34,7 @@ const Auth = () => {
     const [selectedDist, setSelectedDist] = useState({ code: '', name: '' });
     const [selectedWard, setSelectedWard] = useState({ code: '', name: '' });
 
-    const BASE_URL = "http://localhost:8080/auth";
-
-    // === EFFECTS (Giữ nguyên logic của bạn) ===
+    // === 1. EFFECT: TẢI DANH SÁCH TỈNH/THÀNH ===
     useEffect(() => {
         if (!isLoginView && provinces.length === 0) {
             fetch('https://provinces.open-api.vn/api/?depth=1')
@@ -32,8 +42,9 @@ const Auth = () => {
                 .then(data => setProvinces(data))
                 .catch(err => console.error("Lỗi tải Tỉnh/Thành", err));
         }
-    }, [isLoginView]);
+    }, [isLoginView, provinces.length]);
 
+    // === 2. EFFECT: TẢI QUẬN/HUYỆN KHI CHỌN TỈNH ===
     useEffect(() => {
         if (selectedProv.code) {
             fetch(`https://provinces.open-api.vn/api/p/${selectedProv.code}?depth=2`)
@@ -47,6 +58,7 @@ const Auth = () => {
         }
     }, [selectedProv.code]);
 
+    // === 3. EFFECT: TẢI PHƯỜNG/XÃ KHI CHỌN QUẬN ===
     useEffect(() => {
         if (selectedDist.code) {
             fetch(`https://provinces.open-api.vn/api/d/${selectedDist.code}?depth=2`)
@@ -55,81 +67,76 @@ const Auth = () => {
         }
     }, [selectedDist.code]);
 
-    // === HÀM XỬ LÝ ĐĂNG NHẬP (ĐÃ SỬA LOGIC) ===
+    // === HÀM XỬ LÝ ĐĂNG NHẬP ===
     const handleLogin = async (e) => {
         if (e) e.preventDefault(); 
         setLoginMsg('');
+        
         try {
-            const response = await fetch(`${BASE_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: loginUser, password: loginPass })
+            // Sử dụng authApi (đã qua axiosClient bóc tách dữ liệu)
+            const data = await authApi.login({ 
+                username: loginUser, 
+                password: loginPass 
             });
-            const result = await response.json();
 
-            if (result.status === "success") {
-                localStorage.setItem('token', result.data.token);
-                localStorage.setItem('role', result.data.role);
-                localStorage.setItem('userId', result.data.id); 
+            // Lưu thông tin vào LocalStorage
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('role', data.role);
+            localStorage.setItem('userId', data.id); 
 
-                // Nếu là Nhà hàng, lưu thêm resId
-                if (result.data.role === 'RESTAURANT') {
-                    if (result.data.resId) {
-                        localStorage.setItem('resId', result.data.resId);
-                    }
-                }
-
-                // ĐIỀU HƯỚNG RA NGOÀI KHỐI IF RESTAURANT
-                if (result.data.role === 'RESTAURANT') navigate("/restaurant");
-                else if (result.data.role === 'ADMIN') navigate("/admin");
-                else navigate("/home");
-
-            } else {
-                setLoginMsg("❌ " + result.message);
+            // Khớp với key "restaurantId" từ Backend trả về
+            if (data.role === 'RESTAURANT' && data.restaurantId) {
+                localStorage.setItem('restaurantId', data.restaurantId);
             }
+
+            // Điều hướng người dùng
+            if (data.role === 'RESTAURANT') navigate("/restaurant");
+            else if (data.role === 'ADMIN') navigate("/admin");
+            else navigate("/home");
+
         } catch (error) { 
-            setLoginMsg("❗ Lỗi kết nối Server!"); 
+            const errorMsg = error.response?.data?.message || "Sai tài khoản hoặc mật khẩu!";
+            setLoginMsg("❌ " + errorMsg); 
         }
     };
 
+    // === HÀM XỬ LÝ ĐĂNG KÝ ===
     const handleRegister = async (e) => {
         if (e) e.preventDefault(); 
         setRegMsg('');
         
-        if (!regData.username || !regData.password || !regData.email || !regData.full_name || 
+        // Kiểm tra validation cơ bản
+        if (!regData.userName || !regData.passWord || !regData.email || !regData.fullName || 
             !regData.phone || !regData.address_detail || !selectedProv.name || !selectedDist.name || !selectedWard.name) {
-            setRegMsg("Bạn ơi, vui lòng điền đầy đủ thông tin!");
+            setRegMsg("Vui lòng điền đầy đủ thông tin bắt buộc!");
             return;
         }
 
         const fullAddress = `${regData.address_detail.trim()}, ${selectedWard.name}, ${selectedDist.name}, ${selectedProv.name}`;
 
+        // Payload phải khớp với Entity User.java ở Backend (userName, passWord, fullName)
         const payload = {
-            username: regData.username.trim(),
-            password: regData.password,
+            userName: regData.userName.trim(),
+            passWord: regData.passWord,
             email: regData.email.trim(),
-            full_name: regData.full_name.trim(),
+            fullName: regData.fullName.trim(),
             phone: regData.phone.trim(),
             address: fullAddress,
             role: regData.role
         };
 
         try {
-            const response = await fetch(`${BASE_URL}/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
+            const result = await authApi.register(payload);
 
             if (result.status === "success") {
-                alert("Tuyệt vời! Bạn đã đăng ký thành công.");
+                alert("Đăng ký thành công! Hãy đăng nhập nhé.");
                 setIsLoginView(true);
             } else {
                 setRegMsg("❌ " + result.message);
             }
         } catch (error) {
-            setRegMsg("❗ Lỗi kết nối Server!");
+            const errorMsg = error.response?.data?.message || "Lỗi đăng ký, vui lòng thử lại!";
+            setRegMsg("❗ " + errorMsg);
         }
     };
 
@@ -138,37 +145,95 @@ const Auth = () => {
     };
 
     return (
-        // ... (Phần UI return của bạn giữ nguyên, nó đã ổn rồi) ...
         <div id="screen-auth" className="auth-screen">
-             {/* Nội dung UI cũ của bạn */}
-             <div className="container">
-                <div className="left-side"></div>
+            <div className="container">
+                <div className="left-side">
+                    {/* Bạn có thể thêm hình ảnh hoặc slogan ở đây */}
+                </div>
+                
                 <div className="right-side">
                     {isLoginView ? (
+                        /* VIEW: ĐĂNG NHẬP */
                         <div id="view-login">
                             <h2>Welcome Back!</h2>
-                            <input type="text" placeholder="Username" value={loginUser} onChange={(e) => setLoginUser(e.target.value)} />
-                            <input type="password" placeholder="Password" value={loginPass} onChange={(e) => setLoginPass(e.target.value)} />
+                            <input 
+                                type="text" 
+                                placeholder="Username" 
+                                value={loginUser} 
+                                onChange={(e) => setLoginUser(e.target.value)} 
+                            />
+                            <input 
+                                type="password" 
+                                placeholder="Password" 
+                                value={loginPass} 
+                                onChange={(e) => setLoginPass(e.target.value)} 
+                            />
                             <button type="button" className="btn-primary" onClick={handleLogin}>Sign In</button>
-                            <div className="error-msg">{loginMsg}</div>
+                            <div className="error-msg" style={{color: 'red', marginTop: '10px'}}>{loginMsg}</div>
                             <p style={{ textAlign: "center", marginTop: "15px" }}>
-                                Chưa có tài khoản? <a href="#!" onClick={(e) => { e.preventDefault(); setIsLoginView(false); }}>Đăng ký</a>
+                                Chưa có tài khoản? <a href="#!" onClick={(e) => { e.preventDefault(); setIsLoginView(false); }}>Đăng ký ngay</a>
                             </p>
                         </div>
                     ) : (
+                        /* VIEW: ĐĂNG KÝ */
                         <div id="view-register">
-                            {/* Form Đăng ký */}
                             <h2>Join Us!</h2>
                             <div className="form-row">
-                                <input type="text" name="username" placeholder="Tên đăng nhập *" value={regData.username} onChange={handleRegChange} />
-                                <input type="password" name="password" placeholder="Mật khẩu *" value={regData.password} onChange={handleRegChange} />
+                                <input type="text" name="userName" placeholder="Tên đăng nhập *" value={regData.username} onChange={handleRegChange} />
+                                <input type="password" name="passWord" placeholder="Mật khẩu *" value={regData.password} onChange={handleRegChange} />
                             </div>
-                            {/* ... Các ô input khác của bạn ... */}
+                            <div className="form-row">
+                                <input type="text" name="fullName" placeholder="Họ và tên *" value={regData.fullName} onChange={handleRegChange} />
+                                <input type="email" name="email" placeholder="Email *" value={regData.email} onChange={handleRegChange} />
+                            </div>
+                            <div className="form-row">
+                                <input type="text" name="phone" placeholder="Số điện thoại *" value={regData.phone} onChange={handleRegChange} />
+                                <select name="role" value={regData.role} onChange={handleRegChange}>
+                                    <option value="CUSTOMER">Khách hàng</option>
+                                    <option value="RESTAURANT">Chủ nhà hàng</option>
+                                    <option value="SHIPPER">Shipper</option>
+                                </select>
+                            </div>
+
+                            {/* CHỌN ĐỊA CHỈ */}
+                            <div className="form-row">
+                                <select onChange={(e) => {
+                                    const opt = e.target.options[e.target.selectedIndex];
+                                    setSelectedProv({ code: e.target.value, name: opt.text });
+                                }}>
+                                    <option value="">Chọn Tỉnh/Thành *</option>
+                                    {provinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+                                </select>
+                                <select onChange={(e) => {
+                                    const opt = e.target.options[e.target.selectedIndex];
+                                    setSelectedDist({ code: e.target.value, name: opt.text });
+                                }}>
+                                    <option value="">Chọn Quận/Huyện *</option>
+                                    {districts.map(d => <option key={d.code} value={d.code}>{d.name}</option>)}
+                                </select>
+                            </div>
+                            <div className="form-row">
+                                <select onChange={(e) => {
+                                    const opt = e.target.options[e.target.selectedIndex];
+                                    setSelectedWard({ code: e.target.value, name: opt.text });
+                                }}>
+                                    <option value="">Chọn Phường/Xã *</option>
+                                    {wards.map(w => <option key={w.code} value={w.code}>{w.name}</option>)}
+                                </select>
+                                <input 
+                                    type="text" 
+                                    name="address_detail" 
+                                    placeholder="Số nhà, tên đường *" 
+                                    value={regData.address_detail} 
+                                    onChange={handleRegChange} 
+                                />
+                            </div>
+
                             <button className="btn-primary" style={{ background: "#007bff" }} onClick={handleRegister}>Tạo tài khoản</button>
                             <p style={{ textAlign: "center", marginTop: "15px" }}>
                                 Đã có tài khoản? <a href="#!" onClick={(e) => { e.preventDefault(); setIsLoginView(true); }} style={{ color: "#28a745", fontWeight: "bold" }}>Quay lại Đăng nhập</a>
                             </p>
-                            <div className="error-msg">{regMsg}</div>
+                            <div className="error-msg" style={{color: 'red', marginTop: '10px'}}>{regMsg}</div>
                         </div>
                     )}
                 </div>

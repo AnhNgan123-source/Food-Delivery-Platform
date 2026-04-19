@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/v1/user")
 //@CrossOrigin(origins = "*") // Cho phép Frontend gọi API
 public class UserController {
 

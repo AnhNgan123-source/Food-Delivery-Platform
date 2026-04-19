@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/api/menu")
+@RequestMapping("/api/v1/menu")
 public class MenuItemController {
 
     private final MenuItemService menuItemService;
