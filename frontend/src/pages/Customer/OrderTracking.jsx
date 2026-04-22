@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-import axiosClient from '../../components/api/axiosConfig'; 
+import axiosClient from '../../api/axiosConfig'; 
 import '../../style.css'; 
 
 const OrderTracking = () => {

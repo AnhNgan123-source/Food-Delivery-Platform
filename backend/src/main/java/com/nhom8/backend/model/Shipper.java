@@ -2,9 +2,10 @@ package com.nhom8.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "Shipper")
+@Table(name = "shipper") 
 @Getter 
 @Setter 
 @NoArgsConstructor 
@@ -13,22 +14,26 @@ public class Shipper {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shipper_id") // Khớp với cột shipper_id trong DB
     private Integer shipperId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "res_id", nullable = false)
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "shippers"})
     private Restaurant restaurant;
 
-    @Column(nullable = false)
+    @Column(name = "shipper_name", nullable = false) 
     private String shipperName;
 
-    @Column(nullable = false, length = 15)
+    @Column(name = "phone", nullable = false, length = 15)
     private String phone;
 
-    @Column(length = 20)
+    @Column(name = "vehicle_no", length = 20) 
     private String vehicleNo;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private ShipperStatus status = ShipperStatus.IDLE;
 
     public enum ShipperStatus {

@@ -15,6 +15,7 @@
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Tự cập nhật khi sửa thông tin
     ) ENGINE=InnoDB;
 
+## -- 2. Bảng Shipper: Thông tin shipper
 CREATE TABLE Shipper (
     shipper_id   INT PRIMARY KEY AUTO_INCREMENT,
     res_id       INT NOT NULL,           -- Thuộc quyền quản lý của quán nào

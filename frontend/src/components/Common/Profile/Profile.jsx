@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // Import styles từ file Admin.module.css để dùng chung theme
-import styles from './Profile.module.css'; 
-import userApi from '../../api/userApi'; // GIỮ NGUYÊN cấu trúc import nhưng thêm userApi
+import styles from "./Profile.module.css";
+import userApi from "../../../api/userApi"; 
 
 const Profile = () => {
     const [user, setUser] = useState({

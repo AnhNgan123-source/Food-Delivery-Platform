@@ -31,9 +31,28 @@ public class AdminRestaurantController {
     public List<Restaurant> getAllRestaurants() {
         return restaurantService.getAllRestaurants();
     }
-
     /*
      * API 2
+     * Lấy danh sách nhà hàng chờ duyệt
+     * DELETE /api/v1/admin/restaurants/pending
+     */
+    @GetMapping("/pending")
+    public List<Restaurant> getPendingRestaurants() {
+    return restaurantService.getPendingRestaurants();
+    }
+
+    /*
+     * API 3
+     * Lấy danh sách nhà hàng đang hoạt động
+     * DELETE /api/v1/admin/restaurants/active
+     */ 
+    @GetMapping("/active")
+    public List<Restaurant> getActiveRestaurants() {
+        return restaurantService.getActiveRestaurants();
+    }
+
+    /*
+     * API 4
      * Lấy chi tiết 1 nhà hàng
      * GET /api/v1/admin/restaurants/{id}
      */
@@ -43,7 +62,7 @@ public class AdminRestaurantController {
     }
 
     /*
-     * API 3
+     * API 5
      * Tạo nhà hàng mới
      * POST /api/v1/admin/restaurants
      */
@@ -53,7 +72,7 @@ public class AdminRestaurantController {
     }
 
     /*
-     * API 4
+     * API 6
      * Cập nhật nhà hàng (Dùng để sửa thông tin hoặc Duyệt/Khóa qua isActive)
      * PUT /api/v1/admin/restaurants/{id}
      */
@@ -66,7 +85,7 @@ public class AdminRestaurantController {
     }
 
     /*
-     * API 5
+     * API 7
      * Xóa nhà hàng
      * DELETE /api/v1/admin/restaurants/{id}
      */
@@ -75,4 +94,5 @@ public class AdminRestaurantController {
         restaurantService.deleteRestaurant(id);
         return "Xóa nhà hàng thành công";
     }
+
 }

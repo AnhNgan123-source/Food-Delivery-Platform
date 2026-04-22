@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import customerApi from '../../components/api/customerApi'; // Đường dẫn đến file API đã viết
+import customerApi from '../../api/customerApi'; // Đường dẫn đến file API đã viết
 import styles from './Home.module.css'; // File CSS bạn cung cấp
 
 const Home = () => {

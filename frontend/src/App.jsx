@@ -1,50 +1,58 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// === 1. IMPORT LAYOUTS (KHUNG GIAO DIỆN) ===
+// Layouts
 import AdminLayout from './components/layouts/AdminLayout/AdminLayout';
 import CustomerLayout from './components/layouts/CustomerLayout/CustomerLayout';
 import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLayout';
 
-// === 2. IMPORT PAGES (TRANG ĐÍCH) ===
+// Pages
 import Auth from './pages/Auth/Auth';
-import Home from './pages/Customer/Home'; 
+import CustomerHome from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
-import Restaurant from './pages/Restaurant/Restaurant'; // Trang chính của quán
-import Admin from './pages/Admin/Admin'; // Trang chính của admin
+import RestaurantDashboard from './pages/Restaurant/Restaurant'; 
+import AdminHome from './pages/Admin/HomePage'; 
+import ApproveResPage from './pages/Admin/ApproveResPage'; 
+import ManageResPage from './pages/Admin/ManageResPage';
+import ManageShipperPage from './pages/Admin/ManageShipperPage';
+import ManageVoucherPage from './pages/Admin/ManageVoucherPage';
+import ShippingConfigPage from './pages/Admin/ShippingConfigPage'; 
+import ManageAnalyticsPage from './pages/Admin/ManageAnalyticsPage'; 
 
-// === 3. IMPORT CÁC COMPONENT CON (Để gắn vào Outlet) ===
-import AdminAnalytics from './components/Admin/Analytics/AdminAnalytics';
-import ApproveRestaurant from './components/Admin/RestaurantMgmt/ApproveRestaurant';
-import PaymentVNPay from './components/Customer/Payment/PaymentVNPay';
+// Components
+import Profile from './components/Common/Profile/Profile';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* LOGIN / REGISTER */}
+        {/* AUTHENTICATION */}
         <Route path="/" element={<Auth />} />
         
-        {/* PHẦN KHÁCH HÀNG */}
+        {/* CUSTOMER SECTION */}
         <Route element={<CustomerLayout />}>
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<CustomerHome />} />
           <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
         </Route>
 
-        {/* PHẦN NHÀ HÀNG (Dùng Restaurant.jsx làm trang mặc định) */}
+        {/* RESTAURANT SECTION */}
         <Route path="/restaurant" element={<RestaurantLayout />}>
-          <Route index element={<Restaurant />} /> 
-          {/* Khi vào /restaurant, nội dung file Restaurant.jsx sẽ hiện ở Outlet */}
+          <Route index element={<RestaurantDashboard />} /> 
         </Route>
 
-        {/* PHẦN ADMIN (Dùng Admin.jsx làm trang mặc định) */}
+        {/* ADMIN SECTION */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Admin />} /> 
-          {/* Khi vào /admin, nội dung file Admin.jsx sẽ hiện ở Outlet */}
-          <Route path="analytics" element={<AdminAnalytics />} />
-          <Route path="approve" element={<ApproveRestaurant />} />
+          <Route index element={<AdminHome />} /> 
+          <Route path="reports" element={<ManageAnalyticsPage />} />
+          <Route path="approve-res" element={<ApproveResPage />} />    
+          <Route path="manage-res" element={<ManageResPage />} />
+          <Route path="manage-shippers" element={<ManageShipperPage />} />
+          <Route path="manage-vouchers" element={<ManageVoucherPage />} />
+          <Route path="shipping-config" element={<ShippingConfigPage />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" />} />  
       </Routes>
     </Router>

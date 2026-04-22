@@ -13,4 +13,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Integer>
     
     @Query(value = "SELECT * FROM Restaurant WHERE is_active = 1", nativeQuery = true)
     List<Restaurant> getActiveRestaurants();
+
+    @Query(value = "SELECT * FROM Restaurant WHERE is_active = 0", nativeQuery = true)
+    List<Restaurant> getPendingRestaurants();
 }
