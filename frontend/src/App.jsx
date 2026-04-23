@@ -1,17 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// === 1. IMPORT LAYOUTS (KHUNG GIAO DIỆN) ===
-import AdminLayout from './layouts/AdminLayout/AdminLayout';
-import CustomerLayout from './layouts/CustomerLayout/CustomerLayout';
-import RestaurantLayout from './layouts/RestaurantLayout/RestaurantLayout';
+// Layouts
+import AdminLayout from './components/layouts/AdminLayout/AdminLayout';
+import CustomerLayout from './components/layouts/CustomerLayout/CustomerLayout';
+import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLayout';
 
 // === 2. IMPORT PAGES (TRANG ĐÍCH) ===
 import Auth from './pages/Auth/Auth';
 import Home from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
-import Restaurant from './pages/Restaurant/Restaurant'; // Trang chính của quán
-import Admin from './pages/Admin/Admin'; // Trang chính của admin
 import RestaurantDetailView from './pages/Customer/RestaurantDetailView';
 import CartView from './pages/Customer/CartView';
 import OrderHistoryView from './pages/Customer/OrderHistoryView';
@@ -20,8 +18,6 @@ import CartCheckoutView from './pages/Customer/CartCheckoutView';
 
 
 // === 3. IMPORT CÁC COMPONENT CON (Để gắn vào Outlet) ===
-import AdminAnalytics from './components/Admin/Analytics/AdminAnalytics';
-import ApproveRestaurant from './components/Admin/RestaurantMgmt/ApproveRestaurant';
 import PaymentVNPay from './components/Customer/Checkout/PaymentVNPay';
 import Profile from './components/Common/Profile/Profile';
 import ReviewModal from './components/Customer/Modal/ReviewModal';
