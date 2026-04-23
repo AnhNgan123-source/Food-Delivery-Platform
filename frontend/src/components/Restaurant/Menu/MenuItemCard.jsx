@@ -1,142 +1,78 @@
 import React from 'react';
-
-// Khai báo styles ở ngoài để component gọi lúc nào cũng thấy
-const styles = {
-    card: { 
-        position: 'relative', display: 'flex', flexDirection: 'column', height: '100%',
-        borderRadius: '16px', overflow: 'hidden', transition: 'all 0.3s',
-        backgroundColor: '#1c1e26', border: '1px solid #2d313d', boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
-    },
-    cardBody: { flex: 1, display: 'flex', flexDirection: 'column', padding: '18px' },
-    actionRow: { marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-    toggleBtn: { 
-        border: 'none', borderRadius: '10px', padding: '6px 12px', fontSize: '12px', 
-        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600' 
-    },
-    editBtn: { 
-        padding: '8px 12px', backgroundColor: 'rgba(243, 156, 18, 0.15)', 
-        color: '#f39c12', border: 'none', borderRadius: '10px', cursor: 'pointer' 
-    },
-    deleteBtn: { 
-        padding: '8px 12px', backgroundColor: 'rgba(231, 76, 60, 0.15)', 
-        color: '#e74c3c', border: 'none', borderRadius: '10px', cursor: 'pointer' 
-    }
-};
+import styles from '../Menu/MenuManagement.module.css';
 
 const MenuItemCard = ({ food, onEdit, onDelete, onToggleStatus }) => {
-    const isAvailable = food.is_available === 1 || food.isAvailable === 1;
-    const foodId = food.itemId || food.item_id; 
-    const imageName = food.item_image || food.itemImage;
+    // 1. Kiểm tra dữ liệu (Nếu không có food, không render để tránh lỗi)
+    if (!food) return null;
 
-    // Ảnh mặc định bằng Base64 (Cực nhẹ, 100% hiện)
-    const fallbackImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+    // 2. ÉP KIỂU DỮ LIỆU: Thử mọi trường hợp Backend có thể trả về
+    const foodName = food.item_name || food.itemName || food.ItemName || "Món chưa đặt tên";
+    const foodPrice = food.price || food.item_price || 0;
+    const imageName = food.item_image || food.itemImage || food.image;
+    const isAvailable = food.is_available === 1 || food.isAvailable === 1 || food.status === 1;
+    const foodId = food.itemId || food.item_id || food.id;
+
+    // 3. ẢNH MẶC ĐỊNH (Base64 - Không bao giờ lỗi kết nối)
+    const localPlaceholder = "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22150%22%20height%3D%22150%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23eeeeee%22%3E%3C%2Frect%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2212%22%20fill%3D%22%23999999%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E";
+
+    // 4. Xử lý đường dẫn ảnh
+    const imageSrc = imageName 
+        ? `http://localhost:8080/uploads/${imageName}` 
+        : localPlaceholder;
 
     return (
-        <div className="card" style={{ 
-            position: 'relative', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            height: '100%',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            transition: 'transform 0.2s',
-            backgroundColor: '#fff',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-        }}>
-            <div className="card-img" style={{ backgroundColor: '#f0f0f0' }}>
+        <div className={`${styles.card} ${!isAvailable ? styles.unavailable : ''}`}>
+            {/* HÌNH ẢNH */}
+            <div className={styles.imageContainer}>
                 <img 
-                    // ✅ THÊM: Timestamp ?t= để trình duyệt luôn tải ảnh mới nhất nếu cùng tên file
-                    src={imageName ? `http://localhost:8080/uploads/${imageName}?t=${Date.now()}` : fallbackImage} 
-                    alt={food.item_name || food.itemName}
-                    style={{ 
-                        width: '100%', 
-                        height: '160px', 
-                        objectFit: 'cover',
-                        filter: isAvailable ? 'none' : 'grayscale(100%) opacity(0.7)'
-                    }}
+                    src={imageSrc} 
+                    alt={foodName}
+                    style={{ backgroundColor: '#f8f9fa' }}
                     onError={(e) => { 
                         e.target.onerror = null; 
-                        e.target.src = fallbackImage; 
+                        e.target.src = localPlaceholder; 
                     }}
                 />
+                {!isAvailable && <div className={styles.overlayText}>Tạm ẩn</div>}
             </div>
 
-            <div className="card-body" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '15px' }}>
-                <div className="card-title" style={{ 
-                    fontWeight: '600', 
-                    fontSize: '16px',
-                    marginBottom: '5px',
-                    color: isAvailable ? '#333' : '#999'
-                }}>
-                    {food.item_name || food.itemName}
+            {/* NỘI DUNG */}
+            <div className={styles.cardContent}>
+                <div className={styles.foodName}>
+                    {foodName}
                 </div>
 
-                <div className="card-price" style={{ 
-                    color: isAvailable ? '#28a745' : '#ccc', 
-                    fontWeight: 'bold', 
-                    fontSize: '15px',
-                    marginBottom: '20px' 
-                }}>
-                    {Number(food.price).toLocaleString()} đ
+                <div className={styles.foodPrice}>
+                    {Number(foodPrice).toLocaleString()} đ
                 </div>
 
-                <div style={{ 
-                    marginTop: 'auto', 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center' 
-                }}>
+                <div className={styles.actions}>
                     <button 
+                        className={`${styles.btnIcon} ${styles.btnToggle}`}
                         onClick={(e) => {
                             e.stopPropagation();
-                            onToggleStatus(foodId, isAvailable);
-                        }}
-                        style={{
-                            backgroundColor: isAvailable ? 'rgba(40, 167, 69, 0.1)' : 'rgba(108, 117, 125, 0.1)',
-                            color: isAvailable ? '#28a745' : '#6c757d',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '6px 10px',
-                            fontSize: '12px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            fontWeight: '500'
+                            if (onToggleStatus) onToggleStatus(foodId, isAvailable);
                         }}
                     >
                         <i className={`fas ${isAvailable ? 'fa-eye' : 'fa-eye-slash'}`}></i>
-                        {isAvailable ? 'Hiện' : 'Ẩn'}
+                        <span style={{ fontSize: '10px', marginLeft: '4px' }}>
+                            {isAvailable ? 'Hiện' : 'Ẩn'}
+                        </span>
                     </button>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ display: 'flex', gap: '5px' }}>
                         <button 
-                            onClick={() => onEdit(food)} 
-                            title="Sửa"
-                            style={{ 
-                                padding: '8px 10px', 
-                                backgroundColor: 'rgba(255, 193, 7, 0.15)', 
-                                color: '#d39e00',
-                                border: 'none', 
-                                borderRadius: '8px', 
-                                cursor: 'pointer' 
-                            }}
+                            className={`${styles.btnIcon} ${styles.btnEdit}`}
+                            onClick={() => onEdit && onEdit(food)} 
                         >
-                            <i className="fas fa-edit"></i>
+                            <i className="fas fa-edit" style={{ color: '#f59e0b' }}></i>
                         </button>
+                        
                         <button 
-                            onClick={() => onDelete(foodId)} 
-                            title="Xóa"
-                            style={{ 
-                                padding: '8px 10px', 
-                                backgroundColor: 'rgba(220, 53, 69, 0.1)', 
-                                color: '#dc3545',
-                                border: 'none', 
-                                borderRadius: '8px', 
-                                cursor: 'pointer' 
-                            }}
+                            className={`${styles.btnIcon} ${styles.btnDelete}`}
+                            onClick={() => onDelete && onDelete(foodId)} 
                         >
-                            <i className="fas fa-trash"></i>
+                            <i className="fas fa-trash" style={{ color: '#ef4444' }}></i>
                         </button>
                     </div>
                 </div>

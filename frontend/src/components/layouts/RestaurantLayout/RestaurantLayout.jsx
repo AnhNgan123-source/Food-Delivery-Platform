@@ -6,7 +6,7 @@ import styles from './RestaurantLayout.module.css';
 const restaurantMenuItems = [
     { path: 'menu-management', label: 'Quản lý thực đơn', icon: 'fas fa-utensils' },
     { path: 'orders', label: 'Đơn hàng', icon: 'fas fa-clipboard-list' },
-    { path: 'analytics', label: 'Thống kê doanh thu', icon: 'fas fa-chart-line' },
+    { path: 'stats', label: 'Thống kê doanh thu', icon: 'fas fa-chart-line' },
     { path: 'info', label: 'Thông tin nhà hàng', icon: 'fas fa-store' },
     { path: 'profile', label: 'Hồ sơ cá nhân', icon: 'fas fa-user-circle' },
 ];

@@ -1,0 +1,74 @@
+.container {
+    padding: 30px;
+    background-color: #f4f7fe;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    margin-bottom: 30px;
+}
+
+.header h2 {
+    margin: 0;
+    font-weight: 800;
+    color: #333;
+}
+
+.header p {
+    color: #666;
+    margin-top: 5px;
+}
+
+.summaryRow {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    flex: 1;
+    text-align: center;
+}
+
+.cardTitle {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.cardValue {
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.chartsRow {
+    display: flex;
+    gap: 25px;
+}
+
+.chartBox {
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.revenueChart { flex: 2; }
+.topItemsChart { flex: 1; }
+
+.chartTitle {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.loaderContainer {
+    padding: 50px;
+    text-align: center;
+}

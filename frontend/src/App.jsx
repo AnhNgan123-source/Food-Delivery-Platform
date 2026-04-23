@@ -10,7 +10,16 @@ import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLa
 import Auth from './pages/Auth/Auth';
 import CustomerHome from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
-import RestaurantDashboard from './pages/Restaurant/Restaurant'; 
+
+// --- RESTAURANT PAGES ---
+import RestaurantHome from './pages/Restaurant/HomePage'; 
+import ManageMenuPage from './pages/Restaurant/ManageMenuPage'; 
+import AddMenuItemForm from './components/Restaurant/Menu/AddMenuItemForm'; 
+import RestaurantOrdersPage from './pages/Restaurant/RestaurantOrdersPage'; 
+import ResInfoPage from './pages/Restaurant/ResInfoPage'; 
+import RestaurantStatsPage from './pages/Restaurant/RestaurantStatsPage';
+
+// ADMIN PAGES
 import AdminHome from './pages/Admin/HomePage'; 
 import ApproveResPage from './pages/Admin/ApproveResPage'; 
 import ManageResPage from './pages/Admin/ManageResPage';
@@ -37,7 +46,15 @@ function App() {
 
         {/* RESTAURANT SECTION */}
         <Route path="/restaurant" element={<RestaurantLayout />}>
-          <Route index element={<RestaurantDashboard />} /> 
+          <Route index element={<RestaurantHome />} /> 
+          <Route path="info" element={<ResInfoPage />} />
+          <Route path="orders" element={<RestaurantOrdersPage />} />
+          <Route path="stats" element={<RestaurantStatsPage />} />
+          <Route path="menu-management" element={<ManageMenuPage />} />
+          <Route path="add-food" element={<AddMenuItemForm />} />
+          <Route path="edit-food/:id" element={<AddMenuItemForm />} />
+          
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* ADMIN SECTION */}

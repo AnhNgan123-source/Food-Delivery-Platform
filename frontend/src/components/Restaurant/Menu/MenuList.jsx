@@ -1,23 +1,21 @@
-// MenuList.jsx
 import React from 'react';
 import MenuItemCard from './MenuItemCard';
+import styles from './MenuManagement.module.css';
 
-const MenuList = ({ foods, onEdit, onDelete, onToggleStatus }) => {
+const MenuList = ({ foods, onToggleStatus, onDelete, onEdit }) => {
+    if (!foods || foods.length === 0) {
+        return <div style={{ textAlign: 'center', padding: '50px' }}>Chưa có món ăn nào trong thực đơn.</div>;
+    }
+
     return (
-        <div className="menu-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-            gap: '20px',
-            padding: '10px'
-        }}>
-            {foods.map(food => (
+        <div className={styles.menuGrid}>
+            {foods.map((item) => (
                 <MenuItemCard 
-                    // SỬA: Dùng toán tử || để lấy đúng ID dù là itemId hay item_id
-                    key={food.itemId || food.item_id} 
-                    food={food} 
-                    onEdit={onEdit} 
-                    onDelete={onDelete} 
-                    onToggleStatus={onToggleStatus} 
+                    key={item.id || item.item_id || item.itemId} 
+                    food={item} 
+                    onToggleStatus={onToggleStatus}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
                 />
             ))}
         </div>

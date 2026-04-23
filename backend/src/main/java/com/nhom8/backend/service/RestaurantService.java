@@ -1,8 +1,11 @@
 package com.nhom8.backend.service;
 
 import com.nhom8.backend.model.Restaurant;
+import com.nhom8.backend.model.User;
 import com.nhom8.backend.repository.RestaurantRepository;
+import com.nhom8.backend.repository.UserRepository; // Đảm bảo đúng tên file repository của ông
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -10,9 +13,11 @@ import java.util.List;
 public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository; 
 
-    public RestaurantService(RestaurantRepository restaurantRepository) {
+    public RestaurantService(RestaurantRepository restaurantRepository, UserRepository userRepository) {
         this.restaurantRepository = restaurantRepository;
+        this.userRepository = userRepository;
     }
 
     // ===============================
@@ -25,72 +30,60 @@ public class RestaurantService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhà hàng"));
     }
 
-    // UPDATE THÔNG TIN QUÁN (Chủ quán tự sửa)
+    // UPDATE THÔNG TIN QUÁN VÀ ĐỒNG BỘ BẢNG USER
+    @Transactional 
     public Restaurant updateRestaurant(Integer resId, Restaurant newData) {
 
+        // 1. Cập nhật bảng Restaurant
         Restaurant res = restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
-        // Cập nhật các trường cho phép
         res.setResName(newData.getResName());
         res.setResAddress(newData.getResAddress());
 
-        // CHỈ cập nhật ảnh nếu newData có chứa đường dẫn ảnh mới (không null/rỗng)
-        // Điều này giúp giữ lại ảnh cũ nếu chủ quán chỉ muốn sửa tên/địa chỉ
         if (newData.getResImage() != null && !newData.getResImage().trim().isEmpty()) {
             res.setResImage(newData.getResImage());
         }
 
-        return restaurantRepository.save(res);
+        Restaurant updatedRes = restaurantRepository.save(res);
+
+        // 2. Cập nhật bảng User (Đồng bộ tên quán vào fullName và địa chỉ vào address)
+        userRepository.findById(res.getOwnerId()).ifPresent(user -> {
+            user.setFullName(newData.getResName());
+            user.setAddress(newData.getResAddress());
+            userRepository.save(user);
+        });
+
+        return updatedRes;
     }
 
     // ===============================
     // ADMIN - chức năng 14
     // ===============================
 
-    /*
-     * ADMIN: Lấy danh sách tất cả nhà hàng
-     */
     public List<Restaurant> getAllRestaurants() {
         return restaurantRepository.findAll();
     }
 
-    /*
-     * ADMIN: Lấy danh sách tất cả nhà hàng đang hoạt động
-     */
     public List<Restaurant> getActiveRestaurants() {
         return restaurantRepository.getActiveRestaurants();
     }
 
-    /*
-     * ADMIN: Lấy danh sách tất cả nhà hàng cần duyệt
-     */
     public List<Restaurant> getPendingRestaurants() {
         return restaurantRepository.getPendingRestaurants();
     }
 
-    /*
-     * ADMIN: Lấy chi tiết 1 nhà hàng
-     */
     public Restaurant getRestaurantById(Integer resId) {
-
         return restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
     }
 
-    /*
-     * ADMIN: Tạo nhà hàng mới
-     */
     public Restaurant createRestaurant(Restaurant restaurant) {
-
         return restaurantRepository.save(restaurant);
     }
 
-    /*
-     * ADMIN: Cập nhật nhà hàng
-     */
+    @Transactional
     public Restaurant adminUpdateRestaurant(Integer resId, Restaurant newData) {
-
         Restaurant res = restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
@@ -100,18 +93,19 @@ public class RestaurantService {
         res.setOwnerId(newData.getOwnerId());
         res.setIsActive(newData.getIsActive());
 
+        // Admin update cũng nên đồng bộ qua User nếu cần
+        userRepository.findById(res.getOwnerId()).ifPresent(user -> {
+            user.setFullName(newData.getResName());
+            user.setAddress(newData.getResAddress());
+            userRepository.save(user);
+        });
+
         return restaurantRepository.save(res);
     }
 
-    /*
-     * ADMIN: Xóa nhà hàng
-     */
     public void deleteRestaurant(Integer resId) {
-
         Restaurant res = restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-
         restaurantRepository.delete(res);
     }
-
 }

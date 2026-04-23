@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MenuItemService {
@@ -68,6 +69,10 @@ public class MenuItemService {
         item.setResId(newItem.getResId());
     }
         return menuItemRepository.save(item);
+    }
+
+    public Optional<MenuItem> getMenuItemById(Integer id) {
+        return menuItemRepository.findById(id);
     }
 
     // Xóa món
