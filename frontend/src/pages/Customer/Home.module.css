@@ -1,0 +1,78 @@
+/* Home.module.css */
+
+.promoBanner {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    border-radius: 24px;
+    padding: 50px 40px;
+    margin-bottom: 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(46, 204, 113, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+/* Hiệu ứng vòng tròn trang trí cho banner */
+.promoBanner::after {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.promoContent h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    letter-spacing: -1px;
+}
+
+.promoContent p {
+    font-size: 18px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.sectionTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2d3436;
+    margin: 40px 0 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Container cho lưới nhà hàng */
+.restaurantGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding-bottom: 50px;
+}
+
+/* Responsive cho điện thoại */
+@media (max-width: 768px) {
+    .promoBanner {
+        padding: 30px 20px;
+        border-radius: 16px;
+    }
+
+    .promoContent h1 {
+        font-size: 24px;
+    }
+
+    .promoContent p {
+        font-size: 14px;
+    }
+
+    .restaurantGrid {
+        grid-template-columns: 1fr; /* Mobile hiện 1 cột cho rõ */
+        gap: 20px;
+    }
+}

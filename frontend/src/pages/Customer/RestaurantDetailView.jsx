@@ -1,94 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
+import customerApi from '../../api/customerApi';
+import styles from './RestaurantDetailView.module.css';
 
-// Định nghĩa styles trực tiếp để tránh lỗi "styles is not defined"
-const inlineStyles = {
-    tabContainer: { display: 'flex', borderBottom: '1px solid #323644', marginBottom: '20px' },
-    tabItem: { padding: '10px 20px', cursor: 'pointer', color: '#94a3b8' },
-    activeTab: { padding: '10px 20px', cursor: 'pointer', color: '#fff', borderBottom: '2px solid #2ecc71', fontWeight: 'bold' },
-    reviewCard: { background: '#1e2129', padding: '15px', borderRadius: '12px', marginBottom: '10px' }
-};
+import RestaurantHero from '../../components/Customer/Restaurant/RestaurantHero';
+import FoodItemCard from '../../components/Customer/Menu/FoodItemCard';
 
-const RestaurantDetailView = ({ 
-    currentView, filteredRestaurants, viewRestaurantMenu, selectedResInfo, 
-    activeMenuTab, setActiveMenuTab, menuItems, restaurantReviews, fetchReviews, addToCart 
-}) => {
-    if (currentView === 'restaurants') {
-        return (
-            <>
-                <section className="promo-banner">
-                    <h1>Giảm ngay 50% cho đơn hàng đầu tiên!</h1>
-                    <p>Đặt ngay những món ăn nóng hổi từ Yummy Hub</p>
-                </section>
-                <section className="food-section">
-                    <h3 className="section-title">Nhà hàng dành cho bạn</h3>
-                    <div className="grid-container">
-                        {filteredRestaurants.map(res => (
-                            <div key={res.resId} className="restaurant-card" onClick={() => viewRestaurantMenu(res.resId)}>
-                                <img src={res.resImage ? `http://localhost:8080/uploads/${res.resImage}` : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'} alt={res.resName} />
-                                <div className="card-body">
-                                    <div className="res-name">{res.resName}</div>
-                                    <p className="res-address">{res.resAddress}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            </>
-        );
-    }
+const RestaurantDetailView = () => {
+    const { resId } = useParams();
+    const navigate = useNavigate();
+    const { updateCartCount } = useOutletContext(); // Nhận hàm từ Layout để báo nhảy số giỏ hàng
+    const [restaurant, setRestaurant] = useState(null);
+    const [menu, setMenu] = useState([]);
 
-    if (currentView === 'menu' && selectedResInfo) {
-        return (
-            <div className="restaurant-detail-view">
-                <button className="btn-back-link" onClick={() => window.location.reload()}>
-                    <i className="fas fa-chevron-left"></i> Quay lại
-                </button>
-                <section className="res-hero-banner" style={{ backgroundImage: `url(http://localhost:8080/uploads/${selectedResInfo.resImage})` }}>
-                    <div className="res-hero-content"><h1>{selectedResInfo.resName}</h1></div>
-                </section>
-                
-                <div style={inlineStyles.tabContainer}>
-                    <div 
-                        style={activeMenuTab === 'items' ? inlineStyles.activeTab : inlineStyles.tabItem} 
-                        onClick={() => setActiveMenuTab('items')}
-                    >Thực đơn</div>
-                    <div 
-                        style={activeMenuTab === 'reviews' ? inlineStyles.activeTab : inlineStyles.tabItem} 
-                        onClick={() => { setActiveMenuTab('reviews'); fetchReviews(selectedResInfo.resId); }}
-                    >Đánh giá</div>
-                </div>
+    useEffect(() => {
+        const fetchMenu = async () => {
+            try {
+                const res = await customerApi.getRestaurantMenu(resId);
+                const actualData = res?.data || res;
+                if (actualData) {
+                    setRestaurant(actualData.restaurant);
+                    setMenu(actualData.menu || []);
+                }
+            } catch (error) {
+                console.error("Lỗi lấy thực đơn:", error);
+            }
+        };
+        if (resId) fetchMenu();
+    }, [resId]);
 
-                <section className="menu-section">
-                    {activeMenuTab === 'items' ? (
-                        <div className="menu-grid">
-                            {menuItems.map(item => (
-                                <div key={item.itemId} className="food-item-card">
-                                    <div className="item-info">
-                                        <h5>{item.itemName}</h5>
-                                        <p>{item.price?.toLocaleString()}đ</p>
-                                    </div>
-                                    <button className="btn-add-cart" onClick={() => addToCart(item)}>
-                                        <i className="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="review-list">
-                            {restaurantReviews.length > 0 ? restaurantReviews.map(r => (
-                                <div key={r.reviewId} style={inlineStyles.reviewCard}>
-                                    <div style={{color: '#f1c40f'}}>{"★".repeat(r.rating)}</div>
-                                    <p style={{margin: '10px 0'}}>{r.comment}</p>
-                                    <small style={{color: '#64748b'}}>Đã đặt: {r.itemNameList}</small>
-                                </div>
-                            )) : <p>Chưa có đánh giá nào cho quán này.</p>}
-                        </div>
-                    )}
-                </section>
+    const handleAddToCart = (food) => {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const exist = cart.find(item => item.itemId === food.itemId);
+        
+        if (exist) {
+            exist.quantity += 1;
+        } else {
+            cart.push({ ...food, quantity: 1 });
+        }
+        
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount(); // Báo cho Header cập nhật số lượng ngay lập tức
+        alert(`Đã thêm ${food.itemName} vào giỏ hàng nha! `);
+    };
+
+    if (!restaurant) return <div className={styles.loading}>Đang chuẩn bị thực đơn cho bạn...</div>;
+
+    return (
+        <div style={{ paddingBottom: '50px' }}>
+            <div 
+                onClick={() => navigate('/home')} 
+                style={{ cursor:'pointer', color:'#2ecc71', fontWeight:'bold', padding: '15px 5%' }}
+            >
+                ← QUAY LẠI TRANG CHỦ
             </div>
-        );
-    }
-    return null;
+
+            {/* Banner riêng của quán */}
+            <RestaurantHero restaurant={restaurant} />
+
+            <main style={{ padding: '0 5%' }}>
+                <h3 className={styles.sectionTitle}>Thực đơn hôm nay</h3>
+                <div className={styles.menuGrid}>
+                    {menu.length > 0 ? (
+                        menu.map(item => (
+                            <FoodItemCard 
+                                key={item.itemId} 
+                                item={item} 
+                                onAdd={handleAddToCart} 
+                            />
+                        ))
+                    ) : (
+                        <p style={{color: '#888', textAlign: 'center'}}>Quán hiện chưa cập nhật món ăn!</p>
+                    )}
+                </div>
+            </main>
+        </div>
+    );
 };
 
 export default RestaurantDetailView;

@@ -1,0 +1,73 @@
+/* RestaurantDetailView.module.css */
+
+.container {
+    padding-bottom: 50px;
+    background-color: #121418; /* Nền tối sâu cho trang chi tiết */
+    min-height: 100vh;
+}
+
+/* Nút quay lại tinh tế */
+.backButton {
+    cursor: pointer;
+    color: #2ecc71;
+    font-weight: 700;
+    padding: 20px 5%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.backButton:hover {
+    color: #27ae60;
+    transform: translateX(-5px);
+}
+
+.sectionTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 40px 0 20px 0;
+    letter-spacing: -0.5px;
+}
+
+/* KHUNG LƯỚI QUAN TRỌNG: Sửa lỗi thẻ bị dãn */
+.menuGrid {
+    display: grid;
+    /* Mỗi món rộng tối thiểu 260px, tối đa chia đều màn hình */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+    padding-bottom: 40px;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    color: #2ecc71;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+.emptyText {
+    grid-column: 1 / -1; /* Trải dài hết hàng nếu không có món */
+    text-align: center;
+    color: #636e72;
+    padding: 50px 0;
+    font-style: italic;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .menuGrid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .sectionTitle {
+        font-size: 18px;
+    }
+}

@@ -56,6 +56,20 @@ public class RestaurantService {
     }
 
     /*
+     * ADMIN: Lấy danh sách tất cả nhà hàng đang hoạt động
+     */
+    public List<Restaurant> getActiveRestaurants() {
+        return restaurantRepository.getActiveRestaurants();
+    }
+
+    /*
+     * ADMIN: Lấy danh sách tất cả nhà hàng cần duyệt
+     */
+    public List<Restaurant> getPendingRestaurants() {
+        return restaurantRepository.getPendingRestaurants();
+    }
+
+    /*
      * ADMIN: Lấy chi tiết 1 nhà hàng
      */
     public Restaurant getRestaurantById(Integer resId) {

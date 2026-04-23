@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-@CrossOrigin(origins = "*") // Cho phép tất cả các nguồn để tránh lỗi CORS khi Ngân test
+@CrossOrigin(origins = "*") // Cho phép tất cả các nguồn để tránh lỗi CORS khi test
 public class OrderController {
 
     private final OrderService orderService;

@@ -1,0 +1,91 @@
+/* CartView.module.css */
+
+/* Bao quanh toàn bộ trang giỏ hàng */
+.cartContainer {
+    min-height: 80vh;
+    padding: 30px 5%;
+}
+
+/* Thẻ bao ngoài giỏ hàng (thay cho whiteCard nhưng phong cách Dark) */
+.whiteCard {
+    background: #1a1e26 !important; /* Đè lại inline style nếu cần */
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Nút quay lại hoặc các nút phụ */
+.btnPrimary {
+    background-color: transparent;
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.btnPrimary:hover {
+    background-color: rgba(46, 204, 113, 0.1);
+    transform: translateX(-5px);
+}
+
+/* Nút ĐẶT HÀNG NGAY (Nút quan trọng nhất) */
+.btnConfirm {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    border: none;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btnConfirm:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 25px rgba(46, 204, 113, 0.4);
+}
+
+.btnConfirm:active {
+    transform: scale(0.98);
+}
+
+/* Trạng thái giỏ hàng trống */
+.emptyState {
+    text-align: center;
+    padding: 100px 20px;
+    color: #718096;
+}
+
+.emptyState p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Các tùy chỉnh bổ sung cho chữ trong giỏ hàng */
+.cartCard h3 {
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+/* Tối ưu cho scrollbar nếu giỏ hàng quá dài */
+.whiteCard::-webkit-scrollbar {
+    width: 6px;
+}
+
+.whiteCard::-webkit-scrollbar-thumb {
+    background: #2d313d;
+    border-radius: 10px;
+}

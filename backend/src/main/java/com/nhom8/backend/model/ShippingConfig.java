@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "Shipping_Config")
+@Table(name = "shipping_config")
 public class ShippingConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "config_id")
     private Integer configId;
 
     @Column(name = "area_name")
@@ -15,6 +16,8 @@ public class ShippingConfig {
 
     @Column(name = "price")
     private BigDecimal price;
+
+    public ShippingConfig() { }
 
     // Getters và Setters
     public Integer getConfigId() {

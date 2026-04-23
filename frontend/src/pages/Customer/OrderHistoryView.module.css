@@ -1,0 +1,108 @@
+/* OrderHistoryView.module.css */
+
+.historyContainer {
+    padding: 30px 5%;
+    min-height: 80vh;
+    background-color: #121418; /* Nền tối sâu đồng bộ */
+    animation: fadeIn 0.6s ease-out;
+}
+
+.backBtn {
+    cursor: pointer;
+    color: #2ecc71;
+    margin-bottom: 25px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.backBtn:hover {
+    color: #27ae60;
+    transform: translateX(-5px);
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.sectionTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.refreshBtn {
+    background: transparent;
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    padding: 8px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.refreshBtn:hover {
+    background: rgba(46, 204, 113, 0.1);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+}
+
+.refreshBtn i {
+    font-size: 12px;
+}
+
+/* Hiệu ứng xoay khi loading */
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.loadingState {
+    text-align: center;
+    color: #718096;
+    margin-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.loadingIcon {
+    font-size: 40px;
+    color: #2ecc71;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .headerRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .refreshBtn {
+        width: 100%;
+        justify-content: center;
+    }
+}

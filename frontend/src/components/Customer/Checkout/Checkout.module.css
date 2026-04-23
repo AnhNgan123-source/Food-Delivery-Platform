@@ -1,0 +1,233 @@
+/* Checkout.module.css */
+
+.checkoutView {
+    padding: 40px 5%;
+    background-color: #0f1117; /* Nền tối sâu */
+    min-height: 100vh;
+    color: #fff;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.backLink {
+    background: none;
+    border: none;
+    color: #2ecc71;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s;
+}
+
+.backLink:hover {
+    transform: translateX(-5px);
+}
+
+/* Bố cục 2 cột */
+.layout {
+    display: grid;
+    grid-template-columns: 1fr 360px; /* Cột trái to, cột phải cố định */
+    gap: 30px;
+    align-items: start;
+}
+
+/* Card chung cho các phần */
+.sectionCard {
+    background: #1a1d26;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #2d313d;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+/* Form Inputs */
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    display: block;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.inputGroup input, 
+.inputGroup select, 
+.inputGroup textarea {
+    width: 100%;
+    padding: 14px;
+    background: #252833;
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.inputGroup input:focus, 
+.inputGroup select:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.1);
+}
+
+/* Voucher Section */
+.voucherPlaceholder {
+    background: rgba(46, 204, 113, 0.05);
+    border: 1px dashed #2ecc71;
+    padding: 15px 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.voucherCode {
+    color: #2ecc71;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* Payment Selector */
+.paymentTitle {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.paymentGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.paymentItem {
+    position: relative;
+    padding: 20px;
+    background: #252833;
+    border: 1px solid #333;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.activePayment {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.08);
+}
+
+.checkDot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #333;
+}
+
+.activePayment .checkDot {
+    background-color: #2ecc71;
+    border-color: #2ecc71;
+}
+
+/* Summary Card (Cột phải) */
+.summaryCard {
+    background: #1a1d26;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #2d313d;
+    position: sticky; /* Giữ bảng tính tiền khi cuộn trang */
+    top: 30px;
+}
+
+.summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #888;
+}
+
+.discountText {
+    color: #2ecc71;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 20px 0;
+}
+
+.totalRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.totalRow span:first-child {
+    font-weight: bold;
+    color: #fff;
+}
+
+.finalPrice {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ff4757;
+}
+
+/* Nút xác nhận */
+.btnConfirm {
+    width: 100%;
+    padding: 16px;
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    transition: all 0.3s;
+}
+
+.btnConfirm:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+}
+
+/* Responsive cho điện thoại */
+@media (max-width: 768px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .summaryCard {
+        position: static;
+    }
+}

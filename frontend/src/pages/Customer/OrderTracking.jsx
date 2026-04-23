@@ -2,120 +2,115 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
-import axiosClient from '../../components/api/axiosConfig'; 
-import '../../style.css'; 
+import customerApi from '../../api/customerApi';
+import styles from './OrderTracking.module.css'; 
 
 const OrderTracking = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
     
-    // === STATE ===
     const [status, setStatus] = useState("PENDING");
-    const [cancellationReason, setCancellationReason] = useState(""); // Thêm state này để không bị lỗi undefined
-    
-    const isConnected = useRef(false);
+    const [cancellationReason, setCancellationReason] = useState("");
     const stompClientRef = useRef(null);
 
-    const steps = ["PENDING", "CONFIRMED", "PREPARING", "SHIPPING", "COMPLETED"];
-    const currentStepIndex = Math.max(0, steps.indexOf(status));
+    const steps = [
+        { key: "PENDING", label: "Tiếp nhận", icon: "fas fa-file-invoice" },
+        { key: "CONFIRMED", label: "Xác nhận", icon: "fas fa-check-circle" },
+        { key: "PREPARING", label: "Chế biến", icon: "fas fa-utensils" },
+        { key: "SHIPPING", label: "Đang giao", icon: "fas fa-motorcycle" },
+        { key: "COMPLETED", label: "Đã giao", icon: "fas fa-box-open" }
+    ];
+
+    const currentStepIndex = steps.findIndex(s => s.key === status);
 
     useEffect(() => {
-        // Kiểm tra quyền nhanh
-        const token = localStorage.getItem('token');
-        if (!token) { navigate('/'); return; }
-
-        // BƯỚC 1: Lấy trạng thái thực tế từ DB dùng axiosClient
-        const fetchCurrentStatus = async () => {
+        const initData = async () => {
             try {
-                // baseURL đã là /api/v1 nên chỉ cần gọi /orders/ID
-                const result = await axiosClient.get(`/orders/${orderId}`);
-                
-                // AxiosClient mình sửa lúc nãy đã trả về thẳng data sạch
-                if (result) {
-                    setStatus(result.orderStatus);
-                    if (result.cancellationReason) setCancellationReason(result.cancellationReason);
+                const data = await customerApi.getOrderDetail(orderId);
+                if (data) {
+                    setStatus(data.orderStatus);
+                    if (data.cancellationReason) setCancellationReason(data.cancellationReason);
                 }
-            } catch (error) {
-                console.error("Lỗi lấy trạng thái ban đầu:", error);
-            }
+            } catch (error) { console.error(error); }
         };
+        initData();
 
-        fetchCurrentStatus();
-
-        // BƯỚC 2: WebSocket (Giữ nguyên logic gốc của bạn)
         const socket = new SockJS('http://localhost:8080/ws-delivery');
         const client = Stomp.over(socket);
         client.debug = null;
-
         client.connect({}, () => {
-            console.log(">>> [Tracking] WebSocket Đã thông!");
-            isConnected.current = true;
             stompClientRef.current = client;
-
             client.subscribe(`/topic/order/${orderId}`, (message) => {
                 if (message.body) {
-                    // Tách chữ để lấy đúng trạng thái (Logic của bạn rất hay)
                     const [newStatus, reason] = message.body.split(':');
                     setStatus(newStatus);
                     if (reason) setCancellationReason(reason);
                 }
             });
-        }, (err) => {
-            console.error("Lỗi kết nối WebSocket:", err);
         });
+        return () => { if (stompClientRef.current) stompClientRef.current.disconnect(); };
+    }, [orderId]);
 
-        return () => {
-            if (isConnected.current && stompClientRef.current) {
-                stompClientRef.current.disconnect();
-                isConnected.current = false;
-            }
+    const getStatusInfo = (s) => {
+        const info = {
+            "PENDING": { title: "Đang chờ xác nhận", desc: "Hệ thống đã nhận đơn của bạn." },
+            "CONFIRMED": { title: "Đã xác nhận", desc: "Nhà hàng đang xem thực đơn." },
+            "PREPARING": { title: "Đang chế biến", desc: "Món ăn đang được chuẩn bị tâm huyết!" },
+            "SHIPPING": { title: "Đang giao hàng", desc: "Tài xế đang tăng tốc đến chỗ bạn." },
+            "COMPLETED": { title: "Giao thành công", desc: "Chúc bạn ngon miệng nhé!" },
+            "CANCELLED": { title: "Đã hủy đơn", desc: `Lý do: ${cancellationReason}` }
         };
-    }, [orderId, navigate]);
-
-    const getStatusMessage = (s) => {
-        const m = {
-            "PENDING": "Hệ thống đang tiếp nhận đơn hàng...",
-            "CONFIRMED": "Nhà hàng đã xác nhận đơn rồi nè!",
-            "PREPARING": "Đầu bếp đang chuẩn bị món ăn cho bạn...",
-            "SHIPPING": "Shipper đang trên đường giao đến bạn rồi nha!",
-            "COMPLETED": "Đơn hàng đã được giao thành công. Chúc bạn ngon miệng!",
-            "CANCELLED": "Hic, đơn hàng này đã bị hủy mất rồi..."
-        };
-        return m[s] || "Đang cập nhật...";
+        return info[s] || { title: "Đang cập nhật", desc: "Vui lòng chờ..." };
     };
 
     return (
-        <div className="tracking-container">
-            <div className="tracking-card">
-                <button onClick={() => navigate('/home')} className="secondaryBtn" 
-                        style={{marginBottom: '20px', padding: '8px 15px', cursor: 'pointer', borderRadius: '8px', border: 'none', background: '#323644', color: '#fff'}}>
-                    ← Quay lại trang chủ
-                </button>
-                
-                <h3>Trạng thái đơn hàng #{orderId}</h3>
-                
-                {/* Stepper giữ nguyên style cũ của bạn */}
-                <div className="stepper-wrapper">
-                    {steps.map((step, index) => (
-                        <div key={step} className={`step-item ${index <= currentStepIndex ? 'active' : ''}`}>
-                            <div className="step-dot"></div>
-                            <div className="step-label" style={{fontSize: '10px'}}>{step}</div>
-                            {index < steps.length - 1 && <div className="step-line"></div>}
-                        </div>
-                    ))}
-                </div>
+        <div className={styles.newTrackingPage}>
+            <div className={styles.trackingBlob}></div>
+            <div className={styles.trackingBlob2}></div>
+            
+            <div className={styles.trackingWrapper}>
+                <header className={styles.trackingHeader}>
+                    <button onClick={() => navigate('/home')} className={styles.btnBack}>
+                        <i className="fas fa-arrow-left"></i>
+                    </button>
+                    <div className={styles.headerInfo}>
+                        <h2>Đơn hàng #{orderId}</h2>
+                        <span className={styles.liveBadge}>● LIVE TRACKING</span>
+                    </div>
+                </header>
 
-                <div className="status-message">
-                    <h4 style={{color: status === 'CANCELLED' ? '#e74c3c' : '#4CAF50', fontSize: '18px'}}>
-                        {getStatusMessage(status)}
-                    </h4>
-                    
-                    {/* Hiển thị lý do nếu bị hủy */}
-                    {status === 'CANCELLED' && cancellationReason && (
-                        <p style={{color: '#e74c3c', fontStyle: 'italic'}}>Lý do: {cancellationReason}</p>
+                <div className={styles.mainCard}>
+                    <div className={styles.statusHero}>
+                        <div className={`${styles.statusIconMain} ${status === 'CANCELLED' ? styles.cancelled : ''}`}>
+                            <i className={status === 'CANCELLED' ? 'fas fa-times' : steps[Math.max(0, currentStepIndex)]?.icon}></i>
+                        </div>
+                        <h1 className={status === 'CANCELLED' ? styles.textRed : ''}>{getStatusInfo(status).title}</h1>
+                        <p>{getStatusInfo(status).desc}</p>
+                    </div>
+
+                    {status !== 'CANCELLED' && (
+                        <div className={styles.modernStepper}>
+                            {steps.map((step, index) => (
+                                <div key={step.key} className={`${styles.modernStep} ${index <= currentStepIndex ? styles.active : ''} ${index === currentStepIndex ? styles.pulse : ''}`}>
+                                    <div className={styles.iconWrap}>
+                                        <i className={step.icon}></i>
+                                    </div>
+                                    <span>{step.label}</span>
+                                    {index < steps.length - 1 && <div className={styles.lineConnector}></div>}
+                                </div>
+                            ))}
+                        </div>
                     )}
 
-                    <p style={{color: '#a0aec0'}}>Cảm ơn bạn đã tin tưởng Yummy Hub! 🌸</p>
+                    <div className={styles.cardFooter}>
+                        <div className={styles.helpBox}>
+                            <i className="fas fa-headset"></i>
+                            <span>Cần hỗ trợ? Gọi 1900 1234</span>
+                        </div>
+                        <button className={styles.btnDetail} onClick={() => navigate('/orders')}>
+                            Xem chi tiết hóa đơn
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

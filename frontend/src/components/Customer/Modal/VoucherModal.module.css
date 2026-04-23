@@ -1,0 +1,185 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+.modal {
+    background: #f8f9fa;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+
+.header {
+    background: white;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.headerTitle h3 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 1.25rem;
+}
+
+.headerTitle p {
+    margin: 4px 0 0;
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+.closeBtn {
+    background: #edf2f7;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #4a5568;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    background: #e2e8f0;
+    color: #e53e3e;
+}
+
+.promoInputGroup {
+    padding: 0 24px 20px;
+    background: white;
+    display: flex;
+    gap: 10px;
+}
+
+.promoInputGroup input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1.5px solid #edf2f7;
+    border-radius: 12px;
+    outline: none;
+    font-size: 0.9rem;
+}
+
+.promoInputGroup button {
+    padding: 0 16px;
+    border-radius: 12px;
+    border: none;
+    background: #2ecc71;
+    color: white;
+    font-weight: 600;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.list {
+    padding: 20px 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Thiết kế thẻ Voucher kiểu "Ticket" */
+.card {
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    border: 1px solid #edf2f7;
+    min-height: 100px;
+}
+
+.cardLeft {
+    width: 80px;
+    background: #2ecc71;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.cardRight {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info .code {
+    background: #f0fff4;
+    color: #2f855a;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.info .discount {
+    margin: 8px 0 4px;
+    font-size: 1.1rem;
+    color: #2d3748;
+}
+
+.info .condition {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #718096;
+}
+
+.applyBtn {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+/* Các lỗ tròn tạo kiểu vé xem phim */
+.halfCircleLeft, .halfCircleRight {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #f8f9fa;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.halfCircleLeft { left: -8px; border-right: 1px solid #edf2f7; }
+.halfCircleRight { right: -8px; border-left: 1px solid #edf2f7; }
+
+.emptyState {
+    text-align: center;
+    padding: 40px 0;
+}
+
+.emptyState img { width: 100px; opacity: 0.5; margin-bottom: 16px; }
+.emptyState p { margin: 0; color: #4a5568; font-weight: 600; }
+.emptyState span { font-size: 0.8rem; color: #a0aec0; }
+
+.loadingState {
+    text-align: center;
+    padding: 40px 0;
+    color: #2ecc71;
+}

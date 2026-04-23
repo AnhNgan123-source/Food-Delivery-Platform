@@ -31,6 +31,8 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        System.out.println("---------- DATA INITIALIZER STARTING ----------");
+
         // ===== 1. INIT ADMIN =====
         if (userRepository.findByUserName("admin").isEmpty()) {
             User admin = new User();
@@ -42,28 +44,22 @@ public class DataInitializer implements CommandLineRunner {
             admin.setPhone("0912345678");
             admin.setAddress("TP. Hồ Chí Minh, Việt Nam");
             admin.setIsActive(1);
-
             userRepository.save(admin);
-            System.out.println(">>>>> Đã khởi tạo tài khoản Admin: Nguyễn Như Vy (admin/123456) <<<<<");
+            System.out.println(">>>>> Khởi tạo Admin: Thành công! <<<<<");
         }
 
-        // ===== 2. INIT CATEGORY =====
+        // ===== 2. INIT CATEGORY (Tách riêng) =====
         if (categoryRepository.count() == 0) {
-            String[] names = {
-                    "Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên",
-                    "Đồ nướng", "Lẩu", "Hải sản", "Ăn vặt",
-                    "Tráng miệng", "Đồ uống", "Cơm tấm", "Bánh mì",
-                    "Bánh xèo", "Gỏi / Salad"
-            };
-
+            String[] names = {"Cơm", "Bún", "Phở", "Mì", "Cháo", "Đồ chiên", "Đồ nướng", "Lẩu", "Hải sản", "Ăn vặt", "Tráng miệng", "Đồ uống", "Cơm tấm", "Bánh mì", "Gỏi / Salad"};
             for (String n : names) {
                 Category cat = new Category();
                 cat.setCatName(n);
                 categoryRepository.save(cat);
             }
-            System.out.println(">>>>> Kiem tra xong danh sach CATEGORY! <<<<<");
-        
-            // ===== 3. INIT SHIPPING CONFIG (NỘI THÀNH/NGOẠI THÀNH) =====
+            System.out.println(">>>>> Khởi tạo Category: Thành công! <<<<<");
+        }
+
+        // ===== 3. INIT SHIPPING CONFIG (Nằm ngoài hoàn toàn) =====
         if (shippingConfigRepository.count() == 0) {
             // Tạo dòng Nội thành
             ShippingConfig noiThanh = new ShippingConfig();
@@ -77,8 +73,9 @@ public class DataInitializer implements CommandLineRunner {
             ngoaiThanh.setPrice(new BigDecimal("35000"));
             shippingConfigRepository.save(ngoaiThanh);
 
-            System.out.println(">>>>> Đa khoi tao phi ship: Noi thanh (20k) & Ngoai thanh (35k) <<<<<");
+            System.out.println(">>>>> Khởi tạo Phí Ship: Thành công (20k/35k)! <<<<<");
         }
+        
+        System.out.println("---------- DATA INITIALIZER FINISHED ----------");
     }
-  }
 }
