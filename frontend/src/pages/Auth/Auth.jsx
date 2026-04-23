@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import authApi from '../../api/authApi'; // Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
+=======
+import authApi from '../../api/authApi' // Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
+>>>>>>> origin/main
 
 const Auth = () => {
     const navigate = useNavigate();

@@ -1,0 +1,207 @@
+/* Ghi đè file CSS hiện tại của sếp */
+
+.container {
+    background: #fff;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.04); /* Làm bóng đổ mềm hơn tí */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.title {
+    margin: 0;
+    color: #0f172a; 
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.subtitle {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.countHighlight {
+    color: #0ea5e9;
+    font-weight: 700;
+}
+
+.refreshBtn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px; /* Đổi sang bo góc vuông cho đồng bộ icon hành động */
+    border: none;
+    background: #f8fafc;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.refreshBtn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: rotate(180deg); /* Xoay nhẹ khi hover nhìn cho chuyên nghiệp */
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+}
+
+.theadTr {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.th {
+    padding: 0 20px;
+}
+
+.trBody {
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.trBody:hover {
+    transform: scale(1.005); /* Hiệu ứng nổi lên nhẹ khi di chuột vào dòng */
+}
+
+.tdName {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: 1px solid #f1f5f9;
+    border-radius: 16px 0 0 16px;
+}
+
+.resInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.resLogo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.resName {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.tdAddress {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.addressText {
+    color: #64748b;
+    font-size: 13px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tdStatus {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+/* Badge trạng thái nhìn hiện đại hơn */
+.statusBadge {
+    color: #059669;
+    font-size: 11px;
+    font-weight: 700;
+    background: #ecfdf5;
+    padding: 5px 12px;
+    border-radius: 20px; /* Bo tròn hẳn nhìn cho mướt */
+    border: 1px solid #d1fae5;
+}
+
+.statusBadgeInactive {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+}
+
+.tdActions {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+    border-radius: 0 16px 16px 0;
+    text-align: right;
+}
+
+.actionGroup {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.actionBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 14px;
+}
+
+/* Tinh chỉnh bảng màu Icon */
+.editBtn { 
+    background: #eff6ff; 
+    color: #2563eb; 
+}
+.editBtn:hover { background: #2563eb; color: #fff; }
+
+.lockBtn { 
+    background: #fffbeb; 
+    color: #d97706; 
+}
+.lockBtn:hover { background: #d97706; color: #fff; }
+
+.deleteBtn { 
+    background: #fff1f2; 
+    color: #e11d48; 
+}
+.deleteBtn:hover { background: #e11d48; color: #fff; }
+
+.actionBtn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.emptyTd {
+    text-align: center;
+    padding: 50px;
+    color: #94a3b8;
+}

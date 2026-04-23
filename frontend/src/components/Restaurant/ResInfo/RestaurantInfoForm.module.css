@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+.container {
+    background: #ffffff;
+    border-radius: 30px;
+    padding: 50px;
+    margin: 20px auto;
+    max-width: 1000px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #1B2559;
+}
+
+.profileLayout {
+    display: flex;
+    gap: 80px;
+}
+
+/* AVATAR MODERN */
+.avatarSection {
+    flex: 0 0 240px;
+    display: flex;
+    flex-direction: column;
+}
+
+.imageWrapper {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    border-radius: 40px; /* Bo góc hiện đại */
+    overflow: hidden;
+    background: #f4f7fe;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+}
+
+.imageWrapper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(67, 24, 255, 0.1);
+}
+
+.resImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cameraBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4318FF;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(67, 24, 255, 0.1);
+}
+
+.cameraBtn:hover {
+    background: #4318FF;
+    color: #fff;
+}
+
+.statusBadge {
+    margin-top: 25px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+}
+
+/* INFO SECTION */
+.infoSection {
+    flex: 1;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1B2559;
+    letter-spacing: -0.5px;
+}
+
+.fieldGroup {
+    margin-bottom: 35px;
+}
+
+.label {
+    display: block;
+    color: #A3AED0;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.inputField {
+    width: 100%;
+    padding: 14px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #E0E5F2;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1B2559;
+    transition: all 0.3s;
+}
+
+.inputField:focus {
+    border-color: #4318FF;
+    outline: none;
+}
+
+.displayRow {
+    padding: 8px 0;
+}
+
+.valueText {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1B2559;
+}
+
+/* BUTTONS */
+.actionBtn {
+    background: #F4F7FE;
+    color: #4318FF;
+    width: 45px;
+    height: 45px;
+    border-radius: 14px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+}
+
+.actionBtn:hover {
+    background: #4318FF;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.saveBtn {
+    background: #4318FF;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cancelBtn {
+    background: transparent;
+    color: #A3AED0;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid #E0E5F2;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.ratingBox {
+    background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid #F4F7FE;
+    margin-bottom: 30px;
+}

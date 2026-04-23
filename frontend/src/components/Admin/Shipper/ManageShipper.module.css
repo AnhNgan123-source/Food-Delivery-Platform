@@ -1,0 +1,281 @@
+/* ManageShipper.module.css - ĐỒNG BỘ 100% STYLE MỚI */
+
+.container {
+    background: #fff;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+    font-family: 'Inter', sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.title {
+    margin: 0;
+    color: #0f172a; 
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.subtitle {
+    margin: 5px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.countHighlight {
+    color: #0ea5e9;
+    font-weight: 700;
+}
+
+/* Nút thêm mới - Style giống nút "Lưu vào hệ thống" nhưng nằm ở top */
+.btnAddPrimary {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btnAddPrimary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.tableWrapper {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px; /* Khoảng cách giữa các dòng để tạo hiệu ứng Card */
+}
+
+.theadTr {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.th {
+    padding: 0 20px;
+}
+
+.trBody {
+    background: #fff;
+    transition: transform 0.2s;
+}
+
+.trBody:hover {
+    transform: scale(1.005);
+}
+
+/* Các ô dữ liệu - Bo góc và viền giống trang Nhà hàng */
+.tdLeft {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: 1px solid #f1f5f9;
+    border-radius: 16px 0 0 16px;
+}
+
+.tdMid {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.tdCenter {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.tdRight {
+    padding: 15px 20px;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+    border-radius: 0 16px 16px 0;
+    text-align: right;
+}
+
+/* Thông tin tài xế */
+.shipperInfo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    border: 1px solid #dbeafe;
+}
+
+.sName {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.sPhone {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.resNameTxt {
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 13px;
+    background: #eff6ff;
+    padding: 4px 10px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.plateStyle {
+    color: #1e293b;
+    font-size: 13px;
+    font-family: 'Roboto Mono', monospace;
+    fontWeight: 700;
+    letter-spacing: 1px;
+}
+
+/* Badge trạng thái - Pill style giống trang Nhà hàng */
+.statusBadge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: capitalize;
+}
+
+.dotIdle {
+    color: #059669;
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+}
+
+.dotBusy {
+    color: #ea580c;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+/* Thao tác icon */
+.actionGroup {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.actionBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.actionBtn:hover {
+    transform: translateY(-3px);
+}
+
+.deleteBtn { 
+    background: #fff1f2; 
+    color: #e11d48; 
+}
+.deleteBtn:hover { 
+    background: #e11d48; 
+    color: #fff; 
+    box-shadow: 0 4px 12px rgba(224, 29, 72, 0.3);
+}
+
+/* MODAL - Style đồng bộ */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5); /* Làm mờ nền mềm hơn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    zIndex: 1000;
+    backdrop-filter: blur(4px); /* Thêm hiệu ứng blur nền */
+}
+
+.modalBody {
+    background: #fff;
+    padding: 30px;
+    border-radius: 24px;
+    width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+    border: 1px solid #f1f5f9;
+}
+
+.mInput {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.mInput:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btnCancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    flex: 1;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btnCancel:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.emptyTd {
+    text-align: center;
+    padding: 60px;
+    color: #cbd5e1;
+}

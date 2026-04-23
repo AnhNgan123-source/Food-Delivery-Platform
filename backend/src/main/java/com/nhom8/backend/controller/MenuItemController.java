@@ -108,6 +108,13 @@ public class MenuItemController {
         return menuItemService.getAllMenuByRestaurant(resId);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<MenuItem> getMenuItemById(@PathVariable Integer id) {
+        return menuItemService.getMenuItemById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
     @DeleteMapping("/{id}")
     public void deleteMenuItem(@PathVariable Integer id) {
         menuItemService.deleteMenuItem(id);

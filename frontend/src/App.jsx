@@ -6,10 +6,11 @@ import AdminLayout from './components/layouts/AdminLayout/AdminLayout';
 import CustomerLayout from './components/layouts/CustomerLayout/CustomerLayout';
 import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLayout';
 
-// === 2. IMPORT PAGES (TRANG ĐÍCH) ===
+// Pages
 import Auth from './pages/Auth/Auth';
-import Home from './pages/Customer/Home'; 
+import CustomerHome from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
+<<<<<<< HEAD
 import RestaurantDetailView from './pages/Customer/RestaurantDetailView';
 import CartView from './pages/Customer/CartView';
 import OrderHistoryView from './pages/Customer/OrderHistoryView';
@@ -22,17 +23,39 @@ import PaymentVNPay from './components/Customer/Checkout/PaymentVNPay';
 import Profile from './components/Common/Profile/Profile';
 import ReviewModal from './components/Customer/Modal/ReviewModal';
 
+=======
+
+// --- RESTAURANT PAGES ---
+import RestaurantHome from './pages/Restaurant/HomePage'; 
+import ManageMenuPage from './pages/Restaurant/ManageMenuPage'; 
+import AddMenuItemForm from './components/Restaurant/Menu/AddMenuItemForm'; 
+import RestaurantOrdersPage from './pages/Restaurant/RestaurantOrdersPage'; 
+import ResInfoPage from './pages/Restaurant/ResInfoPage'; 
+import RestaurantStatsPage from './pages/Restaurant/RestaurantStatsPage';
+
+// ADMIN PAGES
+import AdminHome from './pages/Admin/HomePage'; 
+import ApproveResPage from './pages/Admin/ApproveResPage'; 
+import ManageResPage from './pages/Admin/ManageResPage';
+import ManageShipperPage from './pages/Admin/ManageShipperPage';
+import ManageVoucherPage from './pages/Admin/ManageVoucherPage';
+import ShippingConfigPage from './pages/Admin/ShippingConfigPage'; 
+import ManageAnalyticsPage from './pages/Admin/ManageAnalyticsPage'; 
+
+// Components
+import Profile from './components/Common/Profile/Profile';
+>>>>>>> origin/main
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* LOGIN / REGISTER */}
+        {/* AUTHENTICATION */}
         <Route path="/" element={<Auth />} />
         
-        {/* PHẦN KHÁCH HÀNG */}
+        {/* CUSTOMER SECTION */}
         <Route element={<CustomerLayout />}>
-          <Route path="/home" element={<Home />} />
+          <Route path="/home" element={<CustomerHome />} />
           <Route path="/order-tracking/:orderId" element={<OrderTracking />} />
           <Route path="/restaurant/:resId" element={<RestaurantDetailView />} />
           <Route path="/cart" element={<CartView />} />
@@ -46,21 +69,40 @@ function App() {
 
         </Route>
 
-        {/* PHẦN NHÀ HÀNG (Dùng Restaurant.jsx làm trang mặc định) */}
+        {/* RESTAURANT SECTION */}
         <Route path="/restaurant" element={<RestaurantLayout />}>
-          <Route index element={<Restaurant />} /> 
-          {/* Khi vào /restaurant, nội dung file Restaurant.jsx sẽ hiện ở Outlet */}
+          <Route index element={<RestaurantHome />} /> 
+          <Route path="info" element={<ResInfoPage />} />
+          <Route path="orders" element={<RestaurantOrdersPage />} />
+          <Route path="stats" element={<RestaurantStatsPage />} />
+          <Route path="menu-management" element={<ManageMenuPage />} />
+          <Route path="add-food" element={<AddMenuItemForm />} />
+          <Route path="edit-food/:id" element={<AddMenuItemForm />} />
+          
+          <Route path="profile" element={<Profile />} />
         </Route>
 
-        {/* PHẦN ADMIN (Dùng Admin.jsx làm trang mặc định) */}
+        {/* ADMIN SECTION */}
         <Route path="/admin" element={<AdminLayout />}>
+<<<<<<< HEAD
           <Route index element={<Admin />} /> 
           {/* Khi vào /admin, nội dung file Admin.jsx sẽ hiện ở Outlet */}
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="approve" element={<ApproveRestaurant />} />
 
+=======
+          <Route index element={<AdminHome />} /> 
+          <Route path="reports" element={<ManageAnalyticsPage />} />
+          <Route path="approve-res" element={<ApproveResPage />} />    
+          <Route path="manage-res" element={<ManageResPage />} />
+          <Route path="manage-shippers" element={<ManageShipperPage />} />
+          <Route path="manage-vouchers" element={<ManageVoucherPage />} />
+          <Route path="shipping-config" element={<ShippingConfigPage />} />
+          <Route path="profile" element={<Profile />} />
+>>>>>>> origin/main
         </Route>
 
+        {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/" />} />  
       </Routes>
     </Router>

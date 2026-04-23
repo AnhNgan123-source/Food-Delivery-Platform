@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
 import customerApi from '../../api/customerApi';
 import styles from './Home.module.css';
 import RestaurantCard from '../../components/Customer/Restaurant/RestaurantCard';
+=======
+import customerApi from '../../api/customerApi'; // Đường dẫn đến file API đã viết
+import styles from './Home.module.css'; // File CSS bạn cung cấp
+>>>>>>> origin/main
 
 const Home = () => {
     const navigate = useNavigate();

@@ -3,9 +3,9 @@ import axiosClient from './axiosConfig';
 const adminApi = {
     // === QUẢN LÝ NHÀ HÀNG (AdminRestaurantController) ===
     getAllRestaurants: () => axiosClient.get('/admin/restaurants'),
-    
     getRestaurantById: (id) => axiosClient.get(`/admin/restaurants/${id}`),
-    
+    getPendingRestaurants: () => axiosClient.get('/admin/restaurants/pending'),
+    getActiveRestaurants: () => axiosClient.get('/admin/restaurants/active'),
     createRestaurant: (data) => axiosClient.post('/admin/restaurants', data),
     
     // Dùng cho cả sửa thông tin và Duyệt/Khóa (isActive)

@@ -2,8 +2,13 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 import Stomp from 'stompjs';
+<<<<<<< HEAD
 import customerApi from '../../api/customerApi';
 import styles from './OrderTracking.module.css'; 
+=======
+import axiosClient from '../../api/axiosConfig'; 
+import '../../style.css'; 
+>>>>>>> origin/main
 
 const OrderTracking = () => {
     const { orderId } = useParams();

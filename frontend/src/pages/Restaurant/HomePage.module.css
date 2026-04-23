@@ -1,0 +1,59 @@
+.welcomeContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60vh;
+    width: 100%;
+}
+
+.welcomeContent {
+    text-align: center;
+}
+
+.animatedText {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(120deg, #1e293b 20%, #10b981 50%, #1e293b 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.underline {
+    height: 4px;
+    width: 60px;
+    background: #10b981;
+    margin: 15px auto 0;
+    border-radius: 10px;
+    opacity: 0.6;
+}
+
+.wave {
+    display: inline-block;
+    animation: wave-animation 2.5s infinite;
+    transform-origin: 70% 70%;
+    -webkit-text-fill-color: initial; /* Để emoji hiện màu gốc */
+}
+
+/* Hiệu ứng chữ lấp lánh */
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+/* Hiệu ứng vẫy tay */
+@keyframes wave-animation {
+    0% { transform: rotate( 0.0deg) }
+   10% { transform: rotate(14.0deg) }
+   20% { transform: rotate(-8.0deg) }
+   30% { transform: rotate(14.0deg) }
+   40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
