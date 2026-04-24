@@ -22,7 +22,7 @@ const ShippingConfigPage = () => {
     const handleSave = async () => {
         try {
             await adminApi.updateShippingConfigs(shippingFees); 
-            alert("Đã cập nhật biểu phí vận chuyển mới sếp ơi! 🚚");
+            alert("Đã cập nhật biểu phí vận chuyển mới! ");
             fetchFees();
         } catch (err) {
             alert("Lỗi lưu biểu phí rồi sếp!");
@@ -38,7 +38,7 @@ const ShippingConfigPage = () => {
             <ShippingConfig 
                 shippingFees={shippingFees} 
                 setShippingFees={setShippingFees} 
-                onSave={handleSave}
+                handleSaveShippingFees={handleSave}
                 loading={loading}
             />
         </div>

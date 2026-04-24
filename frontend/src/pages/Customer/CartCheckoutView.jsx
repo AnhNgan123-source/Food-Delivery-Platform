@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo} from 'react';
+import { useNavigate, useLocation, useOutletContext } from 'react-router-dom';
 import customerApi from '../../api/customerApi';
 import CheckoutForm from '../../components/Customer/Checkout/CheckoutForm';
 import PaymentSelector from '../../components/Customer/Checkout/PaymentSelector';
@@ -15,6 +15,8 @@ const CartCheckoutView = () => {
     
     const selectedItems = state?.selectedItems || [];
     const subtotal = state?.total || 0;
+
+    const { updateCartCount } = useOutletContext();// reset cart
 
     // --- STATES ---
     const [info, setInfo] = useState({ 
@@ -88,8 +90,21 @@ const CartCheckoutView = () => {
             const newOrderId = response?.data?.orderId || response?.orderId;
 
             if (newOrderId) {
+
+                // 1. Lấy toàn bộ giỏ hàng hiện tại trong máy
+                const currentCart = JSON.parse(localStorage.getItem('cart')) || [];               
+                // 2. Lọc bỏ những món vừa mới đặt thành công (nằm trong selectedItems)
+                // Những món nào KHÔNG nằm trong danh sách vừa đặt thì giữ lại
+                const updatedCart = currentCart.filter(cartItem => 
+                    !selectedItems.some(selected => selected.itemId === cartItem.itemId)
+                );
+                // 3. Lưu lại giỏ hàng mới vào localStorage
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
+                // 4. update cart
+                if (updateCartCount) {
+                updateCartCount();
+                }
                 alert("Đặt món thành công!");
-                // Clear cart logic...
                 if (paymentMethod === 'ONLINE') {
                     navigate(`/payment-vnpay?orderId=${newOrderId}&amount=${finalAmount}`);
                 } else {

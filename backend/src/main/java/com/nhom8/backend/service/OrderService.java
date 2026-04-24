@@ -84,11 +84,12 @@ public class OrderService {
         }).collect(Collectors.toList());
 
         orderItemRepository.saveAll(orderItems);
-
+        savedOrder.setItems(orderItems);
         if ("CASH".equalsIgnoreCase(savedOrder.getPaymentMethod())) {
-            String restaurantTopic = "/topic/restaurant/" + savedOrder.getResId();
-            messagingTemplate.convertAndSend(restaurantTopic, "NEW_ORDER:" + savedOrder.getOrderId());
-        }
+        String restaurantTopic = "/topic/restaurant/" + savedOrder.getResId();
+        // SỬA: Gửi nguyên object savedOrder thay vì String
+        messagingTemplate.convertAndSend(restaurantTopic, savedOrder); 
+    }
 
         return savedOrder;
     }
@@ -104,8 +105,7 @@ public class OrderService {
         orderRepository.save(order);
 
         messagingTemplate.convertAndSend("/topic/order/" + orderId, "CONFIRMED");
-        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), "NEW_ORDER:" + orderId);
-    }
+        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), order);    }
 
     @Transactional
     public void markAsCompleted(Integer orderId) {
@@ -135,7 +135,7 @@ public class OrderService {
 
     public List<Order> getOrdersByCustomerId(Integer customerId) {
         if (customerId == null) {
-            throw new RuntimeException("Ngân ơi, ID khách hàng không được để trống!");
+            throw new RuntimeException("Bạn ơi, ID khách hàng không được để trống!");
         }
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
     }

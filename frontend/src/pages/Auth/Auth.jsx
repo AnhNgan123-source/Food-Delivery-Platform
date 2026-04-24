@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
 import authApi from '../../api/authApi'; // Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
-=======
-import authApi from '../../api/authApi' // Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
->>>>>>> origin/main
 
 const Auth = () => {
     const navigate = useNavigate();
@@ -88,10 +84,18 @@ const Auth = () => {
             localStorage.setItem('role', data.role);
             localStorage.setItem('userId', data.id); 
 
-            // Khớp với key "restaurantId" từ Backend trả về
-            if (data.role === 'RESTAURANT' && data.restaurantId) {
-                localStorage.setItem('restaurantId', data.restaurantId);
+            if (data.role === 'RESTAURANT') {
+            // Thử hết các kiểu đặt tên phổ biến
+            const id = data.restaurantId || data.resId;
+            
+            if (id) {
+                // Luôn lưu vào 'resId' để trang Menu lấy ra đúng 
+                localStorage.setItem('resId', id); 
+                console.log("Đã lưu ID thành công:", id);
+            } else {
+                console.error("Backend không trả về bất kỳ ID nào cho nhà hàng!");
             }
+        }
 
             // Điều hướng người dùng
             if (data.role === 'RESTAURANT') navigate("/restaurant");

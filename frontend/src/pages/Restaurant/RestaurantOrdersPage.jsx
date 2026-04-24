@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import restaurantApi from '../../api/restaurantApi';
 import RestaurantOrders from '../../components/Restaurant/Orders/RestaurantOrders';
+
+// 1. IMPORT THƯ VIỆN WEBSOCKET
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const RestaurantOrdersPage = () => {
     const [orders, setOrders] = useState([]);
@@ -12,14 +16,12 @@ const RestaurantOrdersPage = () => {
 
     const resId = localStorage.getItem('resId');
 
-    const fetchOrders = async () => {
+    // 1. Bọc fetchOrders vào useCallback để không render nhiều lần
+    const fetchOrders = useCallback(async () => {
         setLoading(true);
         try {
             const result = await restaurantApi.getOrdersByResId(resId);
-            // axiosClient thường trả về trực tiếp response.data, 
-            // check lại cấu trúc object backend của ông (result.status hoặc result trực tiếp)
             const data = result.status === "success" ? (result.data || []) : (result || []);
-            
             const sortedData = [...data].sort((a, b) => b.orderId - a.orderId);
             setOrders(sortedData);
             
@@ -31,7 +33,46 @@ const RestaurantOrdersPage = () => {
         } finally {
             setLoading(false);
         }
+    }, [resId, selectedOrder]); // Chỉ tạo lại khi resId hoặc selectedOrder đổi
+
+   useEffect(() => {
+    if (!resId) return;
+
+    const socket = new SockJS('http://localhost:8080/ws-delivery');
+    // FIX LỖI FACTORY: Dùng () => socket
+    const stompClient = Stomp.over(() => socket);
+
+    // Tắt mấy cái log linh tinh của thư viện cho đỡ rối mắt
+    stompClient.debug = () => {}; 
+
+    stompClient.connect({}, (frame) => {
+        // Chỉ in log khi thực sự kết nối thành công
+        console.log("=== KẾT NỐI WEBSOCKET THÀNH CÔNG ===");
+
+        stompClient.subscribe(`/topic/restaurant/${resId}`, (message) => {
+            // 1. Phát tiếng chuông ngay lập tức
+            const audio = new Audio('/sounds/ting.mp3');
+            audio.play().catch(e => console.log("Âm thanh bị chặn"));
+            // 2. Hiện thông báo
+            const newOrder = JSON.parse(message.body); 
+            alert(`CÓ ĐƠN HÀNG MỚI: #${newOrder.orderId}`);
+            // 3. Load lại danh sách
+            fetchOrders();
+        });
+    }, (error) => {
+        console.error("Lỗi kết nối WebSocket rồi", error);
+    });
+
+    // QUAN TRỌNG: Hàm dọn dẹp khi rời trang để không bị lỗi kết nối rác
+    return () => {
+        if (stompClient && stompClient.connected) {
+            stompClient.disconnect(() => {
+                console.log("Đã ngắt kết nối WebSocket");
+            });
+        }
     };
+}, [resId]); // Chỉ chạy lại khi resId thay đổi
+
 
     const fetchShippers = async () => {
         try {

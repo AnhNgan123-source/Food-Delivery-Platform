@@ -46,18 +46,38 @@ const ManageVoucherPage = () => {
             // Dùng adminApi thay vì fetch
             const res = await adminApi.createVoucher(payload);
             if (res) {
-                alert("Kích hoạt chiến dịch thành công! 🚀");
+                alert("Kích hoạt chiến dịch thành công!");
                 setShowModal(false);
                 fetchVouchers();
                 // Reset form
                 setNewVoucher({ code: '', description: '', discountType: 'fixed_amount', discountValue: 0, maxDiscountAmount: 0, minOrderValue: 0, usageLimit: 100, endDate: '', isActive: 1 });
             }
         } catch (error) {
-            alert("Lỗi khi tạo Voucher sếp ơi!");
+            alert("Lỗi khi tạo Voucher rồi!");
         } finally {
             setIsLoading(false);
         }
     };
+
+    const handleStopVoucher = async (id) => {
+    if (!window.confirm("Xác nhận tạm dừng chiến dịch Voucher này?")) return;
+
+    setIsLoading(true);
+    try {
+        // Gọi API dừng (Update isActive = 0)
+        await adminApi.stopVoucher(id); 
+        
+        alert("Đã dừng chiến dịch thành công! ");
+        
+        // Load lại danh sách để thấy trạng thái mới 
+        fetchVouchers(); 
+    } catch (error) {
+        console.error("Lỗi dừng voucher:", error);
+        alert("Không dừng được rồi!");
+    } finally {
+        setIsLoading(false);
+    }
+};
 
     return (
         <div style={{ padding: '20px' }}>
@@ -66,6 +86,7 @@ const ManageVoucherPage = () => {
                 showModal={showModal}
                 setShowModal={setShowModal}
                 isLoading={isLoading}
+                onStop={handleStopVoucher} // Truyền hàm ở đây
                 newVoucher={newVoucher}
                 setNewVoucher={setNewVoucher}
                 onCreate={handleCreate}

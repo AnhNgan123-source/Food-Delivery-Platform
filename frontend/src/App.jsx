@@ -6,24 +6,17 @@ import AdminLayout from './components/layouts/AdminLayout/AdminLayout';
 import CustomerLayout from './components/layouts/CustomerLayout/CustomerLayout';
 import RestaurantLayout from './components/layouts/RestaurantLayout/RestaurantLayout';
 
-// Pages
+// --- CUSTOMER PAGES ---
 import Auth from './pages/Auth/Auth';
 import CustomerHome from './pages/Customer/Home'; 
 import OrderTracking from './pages/Customer/OrderTracking';
-<<<<<<< HEAD
 import RestaurantDetailView from './pages/Customer/RestaurantDetailView';
 import CartView from './pages/Customer/CartView';
 import OrderHistoryView from './pages/Customer/OrderHistoryView';
 import CartCheckoutView from './pages/Customer/CartCheckoutView';
-
-
-
-// === 3. IMPORT CÁC COMPONENT CON (Để gắn vào Outlet) ===
 import PaymentVNPay from './components/Customer/Checkout/PaymentVNPay';
-import Profile from './components/Common/Profile/Profile';
 import ReviewModal from './components/Customer/Modal/ReviewModal';
 
-=======
 
 // --- RESTAURANT PAGES ---
 import RestaurantHome from './pages/Restaurant/HomePage'; 
@@ -44,7 +37,6 @@ import ManageAnalyticsPage from './pages/Admin/ManageAnalyticsPage';
 
 // Components
 import Profile from './components/Common/Profile/Profile';
->>>>>>> origin/main
 
 function App() {
   return (
@@ -84,13 +76,6 @@ function App() {
 
         {/* ADMIN SECTION */}
         <Route path="/admin" element={<AdminLayout />}>
-<<<<<<< HEAD
-          <Route index element={<Admin />} /> 
-          {/* Khi vào /admin, nội dung file Admin.jsx sẽ hiện ở Outlet */}
-          <Route path="analytics" element={<AdminAnalytics />} />
-          <Route path="approve" element={<ApproveRestaurant />} />
-
-=======
           <Route index element={<AdminHome />} /> 
           <Route path="reports" element={<ManageAnalyticsPage />} />
           <Route path="approve-res" element={<ApproveResPage />} />    
@@ -99,7 +84,6 @@ function App() {
           <Route path="manage-vouchers" element={<ManageVoucherPage />} />
           <Route path="shipping-config" element={<ShippingConfigPage />} />
           <Route path="profile" element={<Profile />} />
->>>>>>> origin/main
         </Route>
 
         {/* Catch-all route */}

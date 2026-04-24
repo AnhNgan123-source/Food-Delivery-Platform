@@ -3,7 +3,7 @@ import styles from './ManageVoucher.module.css';
 
 const ManageVoucher = ({ 
     vouchers = [], showModal, setShowModal, isLoading, 
-    newVoucher, setNewVoucher, onCreate, onRefresh 
+    newVoucher, setNewVoucher, onCreate, onRefresh, onStop
 }) => {
     const getProgress = (used, limit) => Math.min(((used || 0) / (limit || 1)) * 100, 100);
 
@@ -97,9 +97,19 @@ const ManageVoucher = ({
                                         {formatDate(v.endDate)}
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
-                                        <button className={styles.deleteBtnIcon} title="Dừng chiến dịch">
-                                            <i className="fas fa-stop-circle"></i>
-                                        </button>
+                                        {v.isActive === 1 ? (
+                                            <button 
+                                                className={styles.deleteBtnIcon} 
+                                                onClick={() => onStop(v.voucherId)}
+                                                title="Dừng chiến dịch"
+                                            >
+                                                <i className="fas fa-stop-circle"></i>
+                                            </button>
+                                        ) : (
+                                            <span style={{ fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>
+                                                Đã kết thúc
+                                            </span>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -108,7 +118,7 @@ const ManageVoucher = ({
                 </div>
             </div>
 
-            {/* 3. MODAL - Giữ nguyên logic sếp đã làm */}
+            {/* 3. MODAL */}
             {showModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>

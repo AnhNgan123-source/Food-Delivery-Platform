@@ -47,5 +47,19 @@ public class VoucherController {
     @GetMapping("/available")
     public ResponseEntity<?> getAvailableVouchers(@RequestParam BigDecimal cartValue) {
     return ResponseEntity.ok(Map.of("status", "success", "data", voucherRepository.findAvailableVouchers(cartValue)));
-}
+    }
+    
+    // Đổi từ xóa hẳn sang dừng (cập nhật isActive = 0)
+    @PutMapping("/{id}/stop")
+    public ResponseEntity<?> stopVoucher(@PathVariable Integer id) {
+        try {
+            if (!voucherRepository.existsById(id)) {
+                return ResponseEntity.status(404).body(Map.of("message", "Không tìm thấy voucher"));
+            }
+            voucherRepository.stopVoucher(id);
+            return ResponseEntity.ok(Map.of("status", "success", "message", "Đã dừng chiến dịch!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+        }
+    }
 }

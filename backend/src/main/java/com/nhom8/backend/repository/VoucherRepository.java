@@ -1,6 +1,10 @@
 package com.nhom8.backend.repository;
 import com.nhom8.backend.model.Voucher;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +21,14 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
            "AND (v.endDate IS NULL OR v.endDate > CURRENT_TIMESTAMP) " +
            "AND v.minOrderValue <= :cartValue")
     List<Voucher> findAvailableVouchers(BigDecimal cartValue);
+
+    /**
+     * "Dừng" chiến dịch (vẫn giữ dữ liệu trong DB nhưng không cho dùng nữa)
+     * thì dùng hàm Soft Delete này thay vì xóa hẳn.
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE Voucher v SET v.isActive = 0 WHERE v.voucherId = :id")
+    void stopVoucher(Integer id);
 }
+

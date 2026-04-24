@@ -1,7 +1,6 @@
 package com.nhom8.backend.service;
 
 import com.nhom8.backend.model.Restaurant;
-import com.nhom8.backend.model.User;
 import com.nhom8.backend.repository.RestaurantRepository;
 import com.nhom8.backend.repository.UserRepository; // Đảm bảo đúng tên file repository của ông
 import org.springframework.stereotype.Service;
@@ -65,7 +64,6 @@ public class RestaurantService {
         return restaurantRepository.findAll();
     }
 
-<<<<<<< HEAD
     /*
      * ADMIN: Lấy danh sách tất cả nhà hàng đang hoạt động
      */
@@ -84,17 +82,7 @@ public class RestaurantService {
      * ADMIN: Lấy chi tiết 1 nhà hàng
      */
     public Restaurant getRestaurantById(Integer resId) {
-=======
-    public List<Restaurant> getActiveRestaurants() {
-        return restaurantRepository.getActiveRestaurants();
-    }
->>>>>>> origin/main
 
-    public List<Restaurant> getPendingRestaurants() {
-        return restaurantRepository.getPendingRestaurants();
-    }
-
-    public Restaurant getRestaurantById(Integer resId) {
         return restaurantRepository.findById(resId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
     }

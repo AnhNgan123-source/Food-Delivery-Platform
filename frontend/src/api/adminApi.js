@@ -36,6 +36,8 @@ const adminApi = {
     getAllVouchers: () => axiosClient.get('/admin/vouchers'),
     
     createVoucher: (data) => axiosClient.post('/admin/vouchers', data),
+
+    stopVoucher: (id) => axiosClient.put(`/admin/vouchers/${id}/stop`),
 };
 
 export default adminApi;
