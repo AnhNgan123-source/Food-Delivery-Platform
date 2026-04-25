@@ -9,7 +9,12 @@ const VoucherModal = ({ isOpen, onClose, cartTotal, onApply }) => {
     useEffect(() => {
         if (isOpen) {
             setLoading(true);
-            customerApi.getVouchers(cartTotal)
+            
+            // Lấy userId từ localStorage
+            const userId = localStorage.getItem('userId');
+            
+            // Cập nhật API: Truyền cả cartTotal và userId
+            customerApi.getVouchers(cartTotal, userId) 
                 .then(res => {
                     const result = res.data || res;
                     const data = result.status === 'success' ? result.data : (Array.isArray(result) ? result : []);
@@ -66,8 +71,12 @@ const VoucherModal = ({ isOpen, onClose, cartTotal, onApply }) => {
                                 <div className={styles.cardRight}>
                                     <div className={styles.info}>
                                         <span className={styles.code}>{v.code}</span>
+                                    
                                         <h4 className={styles.discount}>
-                                            Giảm {Number(v.discountValue).toLocaleString()}đ
+                                            {v.discountType === 'percentage' 
+                                                ? `Giảm ${v.discountValue}%` 
+                                                : `Giảm ${Number(v.discountValue).toLocaleString()}đ`
+                                            }
                                         </h4>
                                         <p className={styles.condition}>
                                             Đơn tối thiểu {Number(v.minOrderValue).toLocaleString()}đ

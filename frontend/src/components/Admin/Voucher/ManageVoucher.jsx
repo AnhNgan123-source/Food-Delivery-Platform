@@ -145,10 +145,40 @@ const ManageVoucher = ({
                                 </div>
                             </div>
 
+     
+                            <div className={styles.inputGrid}>
+                                <div>
+                                    <label className={styles.labelTitle}>Đơn tối thiểu (VNĐ)</label>
+                                    <input type="number" className={styles.inputField} value={newVoucher.minOrderValue} onChange={e => setNewVoucher({...newVoucher, minOrderValue: e.target.value})} />
+                                </div>
+                                <div>
+                                    <label className={styles.labelTitle}>Giảm tối đa (VNĐ)</label>
+                                    <input 
+                                        type="number" 
+                                        className={styles.inputField} 
+                                        //disabled={newVoucher.discountType === 'fixed_amount'}
+                                        placeholder={newVoucher.discountType === 'fixed_amount' ? "Không áp dụng" : "VD: 50000"}
+                                        value={newVoucher.maxDiscountAmount} 
+                                        onChange={e => setNewVoucher({...newVoucher, maxDiscountAmount: e.target.value})} 
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={styles.inputGrid}>
                             <div>
-                                <label className={styles.labelTitle}>Ngày kết thúc chiến dịch</label>
+                                <label className={styles.labelTitle}>Ngày bắt đầu</label>
+                                <input type="date" className={styles.inputField} value={newVoucher.startDate} onChange={e => setNewVoucher({...newVoucher, startDate: e.target.value})} required />
+                            </div>
+                            <div>
+                                <label className={styles.labelTitle}>Ngày kết thúc</label>
                                 <input type="date" className={styles.inputField} value={newVoucher.endDate} onChange={e => setNewVoucher({...newVoucher, endDate: e.target.value})} required />
                             </div>
+                        </div>
+
+                        <div style={{ width: '50%' }}>
+                            <label className={styles.labelTitle}>Tổng lượt sử dụng</label>
+                            <input type="number" className={styles.inputField} value={newVoucher.usageLimit} onChange={e => setNewVoucher({...newVoucher, usageLimit: e.target.value})} required />
+                        </div>
 
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={() => setShowModal(false)} className={styles.btnCancel}>Hủy bỏ</button>

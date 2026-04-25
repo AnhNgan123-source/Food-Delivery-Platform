@@ -1,6 +1,7 @@
 package com.nhom8.backend.controller;
 
 import com.nhom8.backend.model.Voucher;
+import com.nhom8.backend.repository.OrderRepository;
 import com.nhom8.backend.repository.VoucherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,9 @@ public class VoucherController {
 
     @Autowired
     private VoucherRepository voucherRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     // GET: Lấy danh sách voucher
     @GetMapping
@@ -44,10 +48,31 @@ public class VoucherController {
         }
     }
     //Lấy voucher hợp lệ 
-    @GetMapping("/available")
-    public ResponseEntity<?> getAvailableVouchers(@RequestParam BigDecimal cartValue) {
-    return ResponseEntity.ok(Map.of("status", "success", "data", voucherRepository.findAvailableVouchers(cartValue)));
-    }
+@GetMapping("/available")
+public ResponseEntity<?> getAvailableVouchers(
+        @RequestParam BigDecimal cartValue,
+        @RequestParam Integer userId) { // <--- Thêm tham số userId ở đây
+    
+    // 1. Lấy danh sách voucher đủ điều kiện đơn tối thiểu và còn hạn từ DB
+    List<Voucher> allAvailable = voucherRepository.findAvailableVouchers(cartValue);
+    
+    // 2. Lọc bỏ những mã mà userId này đã dùng rồi (trừ đơn bị CANCELLED)
+    List<Voucher> filteredList = allAvailable.stream().filter(v -> {
+        // Kiểm tra xem khách đã có đơn nào dùng mã này chưa
+        boolean alreadyUsed = orderRepository.existsByCustomerIdAndVoucherIdAndOrderStatusNot(
+                userId, 
+                v.getVoucherId(), 
+                "CANCELLED"
+        );
+        // Trả về true nếu CHƯA dùng (alreadyUsed == false)
+        return !alreadyUsed;
+    }).toList(); 
+
+    return ResponseEntity.ok(Map.of(
+        "status", "success", 
+        "data", filteredList
+    ));
+}
     
     // Đổi từ xóa hẳn sang dừng (cập nhật isActive = 0)
     @PutMapping("/{id}/stop")

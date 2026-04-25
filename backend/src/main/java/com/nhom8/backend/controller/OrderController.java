@@ -146,4 +146,23 @@ public class OrderController {
             return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
         }
     }
+
+
+    // CHỨC NĂNG HỦY ĐƠN HÀNG
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable Integer id, @RequestParam(required = false) String reason) {
+    try {
+        // Gọi hàm Service mà Ngân vừa chèn lúc nãy
+        // Truyền "CUSTOMER" vì đây là API dành cho khách hàng
+        orderService.cancelOrder(id, "CUSTOMER", reason);
+        
+        return ResponseEntity.ok(Map.of(
+            "status", "success", 
+            "message", "Đã hủy đơn hàng và hoàn voucher thành công!"
+        ));
+    } catch (RuntimeException e) {
+        // Trả về lỗi nếu đơn đã nấu không cho hủy
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
 }

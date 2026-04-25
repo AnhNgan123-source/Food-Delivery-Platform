@@ -50,14 +50,31 @@ const RestaurantOrdersPage = () => {
         console.log("=== KẾT NỐI WEBSOCKET THÀNH CÔNG ===");
 
         stompClient.subscribe(`/topic/restaurant/${resId}`, (message) => {
-            // 1. Phát tiếng chuông ngay lập tức
-            const audio = new Audio('/sounds/ting.mp3');
-            audio.play().catch(e => console.log("Âm thanh bị chặn"));
-            // 2. Hiện thông báo
-            const newOrder = JSON.parse(message.body); 
-            alert(`CÓ ĐƠN HÀNG MỚI: #${newOrder.orderId}`);
+
+            const updatedOrder = JSON.parse(message.body);
+            // 1. Kiểm tra xem đây là ĐƠN MỚI hay ĐƠN BỊ HỦY
+            if (updatedOrder.orderStatus === 'CANCELLED') {
+                const audio = new Audio('/sounds/cancel.mp3'); // Tiếng báo hủy (nếu có)
+                audio.play().catch(e => {});
+                alert(`ĐƠN HÀNG #${updatedOrder.orderId} ĐÃ BỊ HỦY!\nLý do: ${updatedOrder.cancellationReason}`);
+            } else {
+                const audio = new Audio('/sounds/ting.mp3');
+                audio.play().catch(e => {});
+                alert(`CÓ ĐƠN HÀNG MỚI: #${updatedOrder.orderId}`);
+            }
             // 3. Load lại danh sách
-            fetchOrders();
+            setOrders(prevOrders => {
+            const isExist = prevOrders.find(o => o.orderId === updatedOrder.orderId);
+            if (isExist) {
+                // Nếu đơn đã có trong danh sách (khách bấm hủy), thì cập nhật đơn đó
+                return prevOrders.map(o => o.orderId === updatedOrder.orderId ? updatedOrder : o);
+            } else {
+                // Nếu là đơn mới hoàn toàn, đẩy vào đầu danh sách
+                return [updatedOrder, ...prevOrders];
+            }
+        });
+        // 3. Nếu đang mở xem chi tiết đúng đơn này, cập nhật cái khung bên phải luôn
+        setSelectedOrder(prev => (prev?.orderId === updatedOrder.orderId ? updatedOrder : prev));
         });
     }, (error) => {
         console.error("Lỗi kết nối WebSocket rồi", error);

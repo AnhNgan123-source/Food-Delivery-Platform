@@ -65,8 +65,22 @@ const CartCheckoutView = () => {
         }
 
         try {
-            const discount = appliedVoucher?.discountValue || 0;
-            const finalAmount = subtotal + shippingFee - discount;
+            let discount = 0;
+                        if (appliedVoucher) {
+                            if (appliedVoucher.discountType === 'percentage') {
+                                // Tính số tiền giảm dựa trên %
+                                const calculated = (subtotal * appliedVoucher.discountValue) / 100;
+                                // Chặn mức giảm tối đa (nếu có)
+                                discount = appliedVoucher.maxDiscountAmount > 0 
+                                    ? Math.min(calculated, appliedVoucher.maxDiscountAmount) 
+                                    : calculated;
+                            } else {
+                                // Nếu là tiền mặt thì lấy thẳng giá trị
+                                discount = appliedVoucher.discountValue;
+                            }
+                        }
+
+                        const finalTotal = subtotal + shippingFee - discount;
 
             const orderData = {
                 customerId: parseInt(localStorage.getItem('userId')),
@@ -76,7 +90,7 @@ const CartCheckoutView = () => {
                 subtotal,
                 shippingFee,
                 totalDiscount: discount,
-                finalAmount: finalAmount,
+                finalAmount: finalTotal,
                 voucherId: appliedVoucher?.voucherId || null, // Gửi voucher_id về DB
                 note: note || "Đơn từ Web",
                 items: selectedItems.map(i => ({ 
@@ -106,13 +120,21 @@ const CartCheckoutView = () => {
                 }
                 alert("Đặt món thành công!");
                 if (paymentMethod === 'ONLINE') {
-                    navigate(`/payment-vnpay?orderId=${newOrderId}&amount=${finalAmount}`);
+                    navigate(`/payment-vnpay?orderId=${newOrderId}&amount=${finalTotal}`);
                 } else {
                     navigate(`/order-tracking/${newOrderId}`);
                 }
             }
         } catch (error) {
-            alert("Hệ thống bận rồi, thử lại sau!");
+            // Hiện thông báo thật từ Backend trả về
+            const errorMsg = error.response?.data?.message || error.response?.data || "Lỗi hệ thống";
+            
+            // Nếu là lỗi "Bạn đã sử dụng mã này rồi", Ngân sẽ thấy nó hiện ra ngay ở đây!
+            alert("Thông báo: " + errorMsg); 
+
+            if (errorMsg.includes("mã giảm giá")) {
+                setAppliedVoucher(null); // Tự động bỏ voucher đã dùng ra để khách chọn cái khác
+            }
         }
     };
 

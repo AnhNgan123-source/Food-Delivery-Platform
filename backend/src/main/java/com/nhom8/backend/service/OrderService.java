@@ -9,6 +9,7 @@ import com.nhom8.backend.repository.MenuItemRepository;
 import com.nhom8.backend.repository.OrderItemRepository;
 import com.nhom8.backend.repository.OrderRepository;
 import com.nhom8.backend.repository.ShipperRepository;
+import com.nhom8.backend.repository.VoucherRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -26,7 +27,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final MenuItemRepository menuItemRepository;
-    private final ShipperRepository shipperRepository; // Thêm ShipperRepository
+    private final ShipperRepository shipperRepository; 
+    private final VoucherRepository voucherRepository; 
     
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -36,11 +38,13 @@ public class OrderService {
                         OrderItemRepository orderItemRepository,
                         MenuItemRepository menuItemRepository,
                         ShipperRepository shipperRepository,
+                        VoucherRepository voucherRepository,
                         SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.menuItemRepository = menuItemRepository;
         this.shipperRepository = shipperRepository; 
+        this.voucherRepository = voucherRepository;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -57,6 +61,37 @@ public class OrderService {
         order.setTotalDiscount(request.getTotalDiscount());
         order.setFinalAmount(request.getFinalAmount());
         order.setCreatedAt(LocalDateTime.now());
+        order.setCancellationReason(null);
+
+        
+            // 2. XỬ LÝ VOUCHER
+            if (request.getVoucherId() != null) {
+                // CHÈN THÊM LOGIC ( 1 VOUCHER/ KHÁCH HÀNG)
+                boolean alreadyUsed = orderRepository.existsByCustomerIdAndVoucherIdAndOrderStatusNot(
+                    request.getCustomerId(), 
+                    request.getVoucherId(), 
+                    "CANCELLED"
+                );
+
+                if (alreadyUsed) {
+                    throw new RuntimeException("Bạn đã sử dụng mã giảm giá này rồi!");
+                }
+                
+            // 3. LOGIC TRỪ LƯỢT DÙNG VOUCHER
+            voucherRepository.findById(request.getVoucherId()).ifPresent(voucher -> {
+                // Tăng số lượt đã dùng
+                int currentUsed = voucher.getUsedCount() != null ? voucher.getUsedCount() : 0;
+                voucher.setUsedCount(currentUsed + 1);
+                
+                // Nếu đạt giới hạn thì có thể set isActive = 0 
+                if (voucher.getUsedCount() >= voucher.getUsageLimit()) {
+                    voucher.setIsActive(0);
+                }
+                
+                voucherRepository.save(voucher); // Lưu lại thay đổi vào DB
+            });
+            order.setVoucherId(request.getVoucherId());
+        }
         
         if ("CASH".equalsIgnoreCase(request.getPaymentMethod())) {
             order.setOrderStatus("PENDING");
@@ -204,5 +239,48 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll(); 
     }
+    
+
+
+    // HỦY ĐƠN HÀNG DÀNH CHO KHÁCH HÀNG
+    @Transactional
+    public void cancelOrder(Integer orderId, String role, String reason) {
+    // 1. Tìm đơn hàng
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng #" + orderId));
+
+    // 2. Kiểm tra logic: Chỉ cho phép hoàn voucher nếu chưa nấu (PENDING/AWAITING_PAYMENT)
+    String status = order.getOrderStatus();
+    boolean canRefund = "PENDING".equals(status) || "AWAITING_PAYMENT".equals(status);
+
+    // Nếu khách tự hủy mà đơn đã CONFIRMED hoặc PREPARING thì chặn lại
+    if ("CUSTOMER".equals(role) && !canRefund) {
+        throw new RuntimeException("Đơn hàng đã được quán xử lý, bạn không thể tự hủy lúc này!");
+    }
+
+    // 3. Cập nhật trạng thái đơn thành CANCELLED
+    order.setOrderStatus("CANCELLED");
+
+    // Gán lý do từ tham số truyền vào, nếu rỗng thì mới lấy mặc định
+    if (reason != null && !reason.trim().isEmpty()) {
+        order.setCancellationReason(reason);
+    } else {
+        order.setCancellationReason("CUSTOMER".equals(role) ? "Khách hàng hủy đơn" : "Nhà hàng không thể phục vụ");
+    }
+
+    orderRepository.save(order);
+    messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), order);   
+
+    // 4. LOGIC HOÀN VOUCHER (Nếu đủ điều kiện chưa nấu)
+    if (canRefund && order.getVoucherId() != null) {
+        voucherRepository.findById(order.getVoucherId()).ifPresent(v -> {
+            if (v.getUsedCount() > 0) {
+                v.setUsedCount(v.getUsedCount() - 1); // Trả lại 1 lượt
+                v.setIsActive(1); // Mở lại mã nếu lỡ bị khóa do hết lượt
+                voucherRepository.save(v);
+            }
+        });
+    }
+}
 
 }

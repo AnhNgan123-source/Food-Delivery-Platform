@@ -8,6 +8,7 @@ public class OrderRequest {
     // 1. Thông tin chung của đơn hàng (Xếp theo đúng logic Database của Ngân)
     private Integer customerId;
     private Integer resId;
+    private Integer voucherId;
     private String deliveryAddress;
     private String note;
     private String paymentMethod;
@@ -44,6 +45,14 @@ public class OrderRequest {
     }
 
 
+    public Integer getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Integer voucherId) {
+        this.voucherId = voucherId;
+    }
+    
     public String getDeliveryAddress() {
         return deliveryAddress;
     }

@@ -40,4 +40,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
            "WHERE o.res_id = ?1 AND o.order_status = 'COMPLETED' " +
            "GROUP BY item_name ORDER BY sales DESC LIMIT 5", nativeQuery = true)
     List<Map<String, Object>> getTopSellingItems(Integer resId);
+
+    //Kiểm tra khách đã dùng mã này ở đơn nào CHƯA BỊ HỦY chưa
+    boolean existsByCustomerIdAndVoucherIdAndOrderStatusNot(Integer customerId, Integer voucherId, String orderStatus);
 }

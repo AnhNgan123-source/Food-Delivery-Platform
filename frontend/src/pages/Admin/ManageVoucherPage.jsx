@@ -39,6 +39,7 @@ const ManageVoucherPage = () => {
             discountValue: Number(newVoucher.discountValue),
             usageLimit: Number(newVoucher.usageLimit),
             // Format ngày cho khớp với Backend
+            startDate: newVoucher.startDate ? `${newVoucher.startDate}T00:00:00` : null,
             endDate: newVoucher.endDate ? `${newVoucher.endDate}T23:59:59` : null
         };
 

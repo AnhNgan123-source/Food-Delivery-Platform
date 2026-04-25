@@ -10,16 +10,21 @@ const customerApi = {
     createOrder: (orderData) => axiosClient.post('/orders', orderData),
     getMyOrders: (customerId) => axiosClient.get('/orders/history', { params: { customerId } }),
     getOrderDetail: (id) => axiosClient.get(`/orders/${id}`),
-    
+    cancelOrder: (orderId, reason) => axiosClient.put(`/orders/${orderId}/cancel`, null, {
+    params: { reason: reason } // Gửi qua query param cho đơn giản
+}),
     // 3. Thanh toán & Trạng thái
     // Khớp với @PutMapping("/{orderId}/pay") ở Backend
     markAsPaid: (orderId) => axiosClient.put(`/orders/${orderId}/pay`),
     
     // 4. Tìm kiếm & Voucher
     search: (keyword) => axiosClient.get('/search', { params: { q: keyword } }),
-    getVouchers: (subtotal) => axiosClient.get('/admin/vouchers/available', { 
-        params: { cartValue: subtotal } 
-    }),
+    getVouchers: (subtotal, userId) => axiosClient.get('/admin/vouchers/available', { 
+    params: { 
+        cartValue: subtotal,
+        userId: userId 
+    } 
+}),
 
     // 5. Cấu hình hệ thống (Sử dụng axios thuần để bypass Token nếu cần)
     getShippingConfig: () => {

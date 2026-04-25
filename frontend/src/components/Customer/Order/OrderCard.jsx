@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './OrderCard.module.css'; // Import styles từ module
 
-const OrderCard = ({ order, onReviewClick }) => {
+const OrderCard = ({ order, onReviewClick, onCancelClick }) => {
     const navigate = useNavigate();
 
     // Định dạng nhãn trạng thái
@@ -83,23 +83,28 @@ const OrderCard = ({ order, onReviewClick }) => {
                     <span>+{(order.shippingFee || 0).toLocaleString()}đ</span>
                 </div>
 
+                {/* Hiển thị Voucher nếu có giảm giá */}
                 {order.totalDiscount > 0 && (
-                <div className={styles.priceRow} style={{ color: '#2ecc71', fontWeight: '500' }}>
-                    <span>
-                        <i style={{ marginRight: '0px' }}></i>
-                        Voucher {order.voucher?.code ? `(${order.voucher.code})` : ''}:
-                    </span>
-                    <span>-{(order.totalDiscount || 0).toLocaleString()}đ</span>
-                </div>
-    )}
+                    <div className={styles.priceRow} style={{ color: '#2ecc71', fontWeight: '600' }}>
+                        <span>
+                            <i className="fas fa-tags" style={{ marginRight: '8px' }}></i>
+                            Ưu đãi từ Voucher 
+                            {/* Hiển thị mã code nếu Backend có trả về field voucherCode hoặc voucher.code */}
+                            {order.voucherCode ? ` [${order.voucherCode}]` : (order.voucher?.code ? ` [${order.voucher.code}]` : '')}:
+                        </span>
+                        <span>-{(order.totalDiscount || 0).toLocaleString()}đ</span>
+                    </div>
+                )}
             </div>
 
             {/* Lý do hủy (nếu có) */}
             {order.orderStatus === 'CANCELLED' && (
-                <div className={styles.cancelBox}>
-                    <small style={{ color: '#e74c3c', fontWeight: 'bold' }}>Lý do hủy:</small>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#fff' }}>
-                        {order.cancellationReason || "Nhà hàng không thể phục vụ"}
+                <div className={styles.cancelBox} style={{ backgroundColor: '#ff4d4f10', padding: '8px', borderRadius: '4px' }}>
+                    <small style={{ color: '#ff4d4f', fontWeight: 'bold', display: 'block' }}>
+                        <i className="fas fa-info-circle"></i> Chi tiết hủy đơn:
+                    </small>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#eee', fontStyle: 'italic' }}>
+                        "{order.cancellationReason || "Đơn hàng đã bị hủy từ nhà hàng"}"
                     </p>
                 </div>
             )}
@@ -114,6 +119,15 @@ const OrderCard = ({ order, onReviewClick }) => {
                 </div>
 
                 <div className={styles.actions}>
+
+                    {(order.orderStatus === 'PENDING' || order.orderStatus === 'AWAITING_PAYMENT') && (
+                        <button 
+                            className={styles.cancelBtn} 
+                            onClick={() => onCancelClick(order.orderId)}
+                        >
+                            <i className="fas fa-times-circle"></i> Hủy đơn
+                        </button>
+                    )}
                     {order.orderStatus === 'COMPLETED' && (
                         <button onClick={() => onReviewClick(order)} className={styles.reviewBtn}>
                             <i className="fas fa-star"></i> Đánh giá

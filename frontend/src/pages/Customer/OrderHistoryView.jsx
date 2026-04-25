@@ -84,6 +84,46 @@ const OrderHistoryView = () => {
         };
     }, [customerId, fetchOrders]);
 
+
+    // HÀM XỬ LÝ HỦY ĐƠN
+    const handleCancelOrder = async (orderId) => {
+    // 1. Cho khách nhập lý do (Hoặc hiện modal chọn, nhưng prompt là nhanh nhất)
+    const userReason = window.prompt(
+        "Lý do hủy đơn hàng của bạn là gì?", 
+        "Tôi không muốn đặt món nữa" // Lý do mặc định gợi ý cho khách
+    );
+
+    // Nếu khách bấm "Hủy" ở ô nhập hoặc để trống (nghĩa là không muốn hủy thực sự)
+    if (userReason === null) return; 
+
+    const finalReason = userReason.trim() || "Khách hàng tự hủy đơn";
+
+    try {
+        // 2. Gọi API và truyền kèm lý do
+        // Lưu ý: Ngân cần check lại file customerApi.js để hàm này nhận 2 tham số
+        await customerApi.cancelOrder(orderId, finalReason);
+        
+        alert("Đã hủy đơn hàng thành công!");
+        
+        // 3. Cập nhật state tại chỗ bao gồm cả lý do để UI hiển thị luôn
+        setOrders(prevOrders => 
+            prevOrders.map(o => o.orderId === orderId 
+                ? { 
+                    ...o, 
+                    orderStatus: 'CANCELLED', 
+                    cancellationReason: finalReason // Cập nhật lý do vào state
+                  } 
+                : o
+            )
+        );
+                
+            } catch (err) {
+                // Hiển thị lỗi từ Backend (Ví dụ: "Đơn hàng đã được quán xử lý...")
+                const errorMsg = err.response?.data?.message || err.response?.data || "Không thể hủy đơn hàng này!";
+                alert(errorMsg);
+            }
+        };
+
     return (
     <main className={styles.historyContainer}>
         {/* Nút quay lại */}
@@ -113,6 +153,7 @@ const OrderHistoryView = () => {
             <OrderList 
                 orders={orders}
                 onReviewClick={openReview}
+                onCancelClick={handleCancelOrder} 
                 emptyMessage="Bạn chưa có đơn hàng nào cả!" 
             />
         )}

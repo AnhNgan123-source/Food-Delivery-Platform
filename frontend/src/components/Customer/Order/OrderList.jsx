@@ -2,7 +2,7 @@ import React from 'react';
 import OrderCard from './OrderCard';
 import styles from './OrderList.module.css';
 
-const OrderList = ({ orders, onUpdateStatus, onReviewClick, emptyMessage }) => {
+const OrderList = ({ orders, onUpdateStatus, onReviewClick,onCancelClick, emptyMessage }) => {
     return (
         <div className={styles.ordersWrapper}>
             {orders.length === 0 ? (
@@ -17,6 +17,7 @@ const OrderList = ({ orders, onUpdateStatus, onReviewClick, emptyMessage }) => {
                             order={order} 
                             onUpdateStatus={onUpdateStatus} 
                             onReviewClick={onReviewClick}
+                            onCancelClick={onCancelClick} 
                         />
                     ))}
                 </div>
