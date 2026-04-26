@@ -21,7 +21,7 @@ public class UserService {
    public User updateProfile(String username, User newData) {
     // 1. Tìm user cũ trong database
     User existingUser = userRepository.findByUserName(username)
-            .orElseThrow(() -> new RuntimeException("Ngân ơi, không tìm thấy người dùng này!"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng này!"));
 
     // 2. Lấy thông tin MỚI từ client (newData) đắp vào user CŨ (existingUser)
     // Chỗ này phải gọi newData.get... thì nó mới lấy dữ liệu mới nhé!

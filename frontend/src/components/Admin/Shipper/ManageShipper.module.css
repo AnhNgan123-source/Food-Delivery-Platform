@@ -221,61 +221,82 @@
 }
 
 /* MODAL - Style đồng bộ */
+/* Lớp nền mờ phía sau */
 .overlay {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px); /* Làm mờ hậu cảnh cho sang */
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.5); /* Làm mờ nền mềm hơn */
     display: flex;
     align-items: center;
     justify-content: center;
-    zIndex: 1000;
-    backdrop-filter: blur(4px); /* Thêm hiệu ứng blur nền */
+    z-index: 1000;
 }
 
+/* Thân Modal */
 .modalBody {
-    background: #fff;
-    padding: 30px;
-    border-radius: 24px;
-    width: 400px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-    border: 1px solid #f1f5f9;
+    background: #1b254b; /* Màu xanh đen đặc trưng của Dashboard */
+    width: 100%;
+    max-width: 450px;
+    padding: 32px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.modalBody h3 {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.modalBody p {
+    color: #a3aed0;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Ô nhập liệu */
 .mInput {
     width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    outline: none;
-    font-size: 14px;
-    transition: 0.2s;
+    background: #111c44 !important; /* Đậm hơn nền modal */
+    border: 1px solid #2b3674;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: white;
+    margin-bottom: 16px;
+    font-size: 15px;
+    transition: all 0.2s ease;
 }
 
 .mInput:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+    border-color: #4318ff; 
+    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1);
+}
+
+/* Group nút bấm */
+.btnGroup {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
 }
 
 .btnCancel {
-    background: #f1f5f9;
-    color: #64748b;
-    border: none;
+    flex: 1;
+    background: transparent;
+    border: 1px solid #2b3674;
+    color: white;
     padding: 12px;
     border-radius: 12px;
-    flex: 1;
-    cursor: pointer;
     font-weight: 600;
+    cursor: pointer;
     transition: 0.2s;
 }
 
 .btnCancel:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.emptyTd {
-    text-align: center;
-    padding: 60px;
-    color: #cbd5e1;
-}

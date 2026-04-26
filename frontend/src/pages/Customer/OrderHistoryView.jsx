@@ -100,7 +100,6 @@ const OrderHistoryView = () => {
 
     try {
         // 2. Gọi API và truyền kèm lý do
-        // Lưu ý: Ngân cần check lại file customerApi.js để hàm này nhận 2 tham số
         await customerApi.cancelOrder(orderId, finalReason);
         
         alert("Đã hủy đơn hàng thành công!");

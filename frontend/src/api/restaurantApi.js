@@ -22,10 +22,7 @@ const restaurantApi = {
     },
 
     // --- QUẢN LÝ ĐƠN HÀNG (ORDERS) ---
-    getOrdersByResId: (resId) => {
-        const url = `/orders/restaurant/${resId}`;
-        return axiosClient.get(url);
-    },
+    getOrdersByResId: (resId) => axiosClient.get("/orders/restaurant/" + resId),
 
     updateOrderStatus: (orderId, status, shipperId = null) => {
         let url = `/orders/${orderId}/status?status=${status}`;
@@ -33,9 +30,9 @@ const restaurantApi = {
         return axiosClient.put(url);
     },
 
-    getShippers: () => {
-        return axiosClient.get('/admin/shippers');
-    },
+    getShippers: (resId) => {
+    return axiosClient.get(`/orders/shippers-by-restaurant/${resId}`);
+},
 
     // --- THỐNG KÊ DOANH THU (STATS) ---
     getRestaurantStats: (resId) => {

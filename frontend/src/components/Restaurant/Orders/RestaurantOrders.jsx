@@ -104,15 +104,26 @@ const RestaurantOrders = ({
                                     </div>
                                 </div>
                                 <div className={styles.infoBox}>
-                                    <div style={{ color: '#a3aed0', fontSize: '11px', fontWeight: 800, marginBottom: '8px', letterSpacing: '1px' }}>THÔNG TIN SHIPPER</div>
-                                    {selectedOrder.shipper ? (
+                                    <div style={{ color: '#a3aed0', fontSize: '11px', fontWeight: 800, marginBottom: '8px', letterSpacing: '1px' }}>
+                                        THÔNG TIN SHIPPER
+                                    </div>
+                                    
+                                    {selectedOrder?.shipper ? (
                                         <div style={{ color: '#2b3674', fontWeight: 700 }}>
                                             <i className="fas fa-user-ninja" style={{ marginRight: '8px', color: '#4318FF' }}></i>
                                             {selectedOrder.shipper.shipperName}
-                                            <div style={{ fontWeight: 400, color: '#a3aed0', marginLeft: '22px', fontSize: '13px' }}>{selectedOrder.shipper.phone}</div>
+                                            <div style={{ fontWeight: 400, color: '#a3aed0', marginLeft: '22px', fontSize: '13px' }}>
+                                                SĐT: {selectedOrder.shipper.phone}
+                                            </div>
+                                            <div style={{ fontWeight: 600, color: '#05CD99', marginLeft: '22px', fontSize: '11px' }}>
+                                                <i className="fas fa-truck"></i> {selectedOrder.shipper.vehicleNo}
+                                            </div>
                                         </div>
                                     ) : (
-                                        <div style={{ color: '#cbd5e0', fontStyle: 'italic' }}>Chưa chỉ định shipper</div>
+                                        <div style={{ color: '#cbd5e0', fontStyle: 'italic', fontSize: '14px' }}>
+                                            <i className="fas fa-user-clock" style={{marginRight: '5px'}}></i>
+                                            Chưa chỉ định shipper
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -159,8 +170,16 @@ const RestaurantOrders = ({
                                         value={selectedShipperId} 
                                         onChange={(e) => setSelectedShipperId(e.target.value)}
                                     >
-                                        <option value="">-- Chọn Shipper --</option>
-                                        {shippers.map(s => <option key={s.shipperId} value={s.shipperId}>{s.shipperName}</option>)}
+                                        <option value="">-- Chọn Shipper đang rảnh --</option>
+                                        {shippers
+                                            // LỌC TRIỆT ĐỂ: Chỉ hiện những người có status là IDLE
+                                            .filter(s => s.status === 'IDLE') 
+                                            .map(s => (
+                                                <option key={s.shipperId} value={s.shipperId}>
+                                                    {s.shipperName} ({s.vehicleNo})
+                                                </option>
+                                            ))
+                                        }
                                     </select>
                                     <button 
                                         disabled={!selectedShipperId} 

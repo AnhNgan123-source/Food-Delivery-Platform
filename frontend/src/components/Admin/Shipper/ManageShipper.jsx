@@ -2,25 +2,16 @@ import React from 'react';
 import styles from './ManageShipper.module.css';
 
 const ManageShipper = ({ 
-    shippers = [], 
-    restaurants = [], 
-    showModal, 
-    setShowModal, 
-    formData, 
-    setFormData, 
-    onSave, 
-    onDelete 
+    shippers, restaurants, showModal, formData, setFormData, 
+    onSave, onEdit, onDelete, onClose, isEditMode, loading, setShowModal 
 }) => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <div>
                     <h3 className={styles.title}>Quản lý nhân sự Shipper</h3>
-                    <p className={styles.subtitle}>
-                        Tổng cộng <span className={styles.countHighlight}>{shippers.length}</span> tài xế toàn hệ thống
-                    </p>
+                    <p className={styles.subtitle}>Tổng cộng {shippers.length} tài xế</p>
                 </div>
-                {/* Nút thêm mới style đồng bộ */}
                 <button onClick={() => setShowModal(true)} className={styles.btnAddPrimary}>
                     <i className="fas fa-plus"></i> THÊM TÀI XẾ MỚI
                 </button>
@@ -30,64 +21,45 @@ const ManageShipper = ({
                 <table className={styles.table}>
                     <thead>
                         <tr className={styles.theadTr}>
-                            <th className={styles.th} style={{textAlign: 'left'}}>Tài xế / SĐT</th>
-                            <th className={styles.th} style={{textAlign: 'left'}}>Thuộc nhà hàng</th>
-                            <th className={styles.th} style={{textAlign: 'left'}}>Biển số</th>
-                            <th className={styles.th} style={{textAlign: 'center'}}>Trạng thái</th>
-                            <th className={styles.th} style={{textAlign: 'right'}}>Thao tác</th>
+                            <th className={styles.th}>Tài xế / SĐT</th>
+                            <th className={styles.th}>Thuộc nhà hàng</th>
+                            <th className={styles.th}>Biển số</th>
+                            <th className={styles.th} style={{textAlign:'center'}}>Trạng thái</th>
+                            <th className={styles.th} style={{textAlign:'right'}}>Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {shippers.length > 0 ? (
-                            shippers.map(s => (
-                                <tr key={s.shipperId} className={styles.trBody}>
-                                    {/* Sử dụng tdLeft, tdMid, tdRight để bo góc giống trang nhà hàng */}
-                                    <td className={styles.tdLeft}>
-                                        <div className={styles.shipperInfo}>
-                                            <div className={styles.avatar}>{s.shipperName?.charAt(0)}</div>
-                                            <div>
-                                                <div className={styles.sName}>{s.shipperName}</div>
-                                                <div className={styles.sPhone}>{s.phone}</div>
-                                            </div>
+                        {shippers.map(s => (
+                            <tr key={s.shipperId} className={styles.trBody}>
+                                <td className={styles.tdLeft}>
+                                    <div className={styles.shipperInfo}>
+                                        <div className={styles.avatar}>{s.shipperName?.charAt(0)}</div>
+                                        <div>
+                                            <div className={styles.sName}>{s.shipperName}</div>
+                                            <div className={styles.sPhone}>{s.phone}</div>
                                         </div>
-                                    </td>
-                                    
-                                    <td className={styles.tdMid}>
-                                        <span className={styles.resNameTxt}>{s.restaurant?.resName || "N/A"}</span>
-                                    </td>
-                                    
-                                    <td className={styles.tdMid}>
-                                        <span className={styles.plateStyle}>{s.vehicleNo}</span>
-                                    </td>
-                                    
-                                    <td className={styles.tdCenter}>
-                                        <span className={`${styles.statusBadge} ${s.status === 'IDLE' ? styles.dotIdle : styles.dotBusy}`}>
-                                            {s.status === 'IDLE' ? 'Sẵn sàng' : 'Đang đi đơn'}
-                                        </span>
-                                    </td>
-                                    
-                                    <td className={styles.tdRight}>
-                                        <div className={styles.actionGroup}>
-                                            {/* Thay nút "Xóa" chữ bằng Icon giống trang nhà hàng */}
-                                            <button 
-                                                title="Xóa tài xế" 
-                                                className={`${styles.actionBtn} ${styles.deleteBtn}`} 
-                                                onClick={() => onDelete(s.shipperId)}
-                                            >
-                                                <i className="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className={styles.emptyTd}>
-                                    <i className="fas fa-user-slash" style={{display:'block', marginBottom:'10px', fontSize:'24px'}}></i>
-                                    Không có tài xế nào sếp ơi
+                                    </div>
+                                </td>
+                                <td className={styles.tdMid}>{s.restaurant?.resName}</td>
+                                <td className={styles.tdMid}>{s.vehicleNo}</td>
+                                <td className={styles.tdCenter}>
+                                    {/* Fix lỗi NULL: Mặc định là xanh nếu không phải BUSY */}
+                                    <span className={`${styles.statusBadge} ${s.status === 'BUSY' ? styles.dotBusy : styles.dotIdle}`}>
+                                        {s.status === 'BUSY' ? 'Đang đi đơn' : 'Sẵn sàng'}
+                                    </span>
+                                </td>
+                                <td className={styles.tdRight}>
+                                    <div className={styles.actionGroup}>
+                                        <button className={`${styles.actionBtn} ${styles.editBtn}`} onClick={() => onEdit(s)}>
+                                            <i className="fas fa-edit"></i>
+                                        </button>
+                                        <button className={`${styles.actionBtn} ${styles.deleteBtn}`} onClick={() => onDelete(s.shipperId)}>
+                                            <i className="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
@@ -95,24 +67,18 @@ const ManageShipper = ({
             {showModal && (
                 <div className={styles.overlay}>
                     <div className={styles.modalBody}>
-                        <h3 style={{marginTop:0, fontSize:'18px', fontWeight:700, color:'#0f172a'}}>Đăng ký Shipper mới</h3>
-                        <p style={{fontSize:'13px', color:'#64748b', marginBottom:'20px'}}>Nhập thông tin và gán tài xế vào nhà hàng.</p>
-                        
+                        <h3>{isEditMode ? "Cập nhật Shipper" : "Đăng ký Shipper mới"}</h3>
                         <input className={styles.mInput} placeholder="Tên tài xế" value={formData.shipperName} onChange={e => setFormData({...formData, shipperName: e.target.value})} />
                         <input className={styles.mInput} placeholder="Số điện thoại" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                        <input className={styles.mInput} placeholder="Biển số xe (VD: 29A-123.45)" value={formData.vehicleNo} onChange={e => setFormData({...formData, vehicleNo: e.target.value})} />
-                        
+                        <input className={styles.mInput} placeholder="Biển số xe" value={formData.vehicleNo} onChange={e => setFormData({...formData, vehicleNo: e.target.value})} />
                         <select className={styles.mInput} value={formData.resId} onChange={e => setFormData({...formData, resId: e.target.value})}>
-                            <option value="">-- Chọn nhà hàng quản lý --</option>
-                            {restaurants?.map(r => (
-                                <option key={r.resId} value={r.resId}>{r.resName}</option>
-                            ))}
+                            <option value="">-- Chọn nhà hàng --</option>
+                            {restaurants.map(r => <option key={r.resId} value={r.resId}>{r.resName}</option>)}
                         </select>
-
                         <div style={{display:'flex', gap:'12px', marginTop:'15px'}}>
-                            <button onClick={() => setShowModal(false)} className={styles.btnCancel}>Hủy bỏ</button>
-                            <button onClick={onSave} className={styles.btnAddPrimary} style={{flex: 2, justifyContent:'center'}}>
-                                <i className="fas fa-save"></i> Lưu vào hệ thống
+                            <button onClick={onClose} className={styles.btnCancel}>Hủy bỏ</button>
+                            <button onClick={onSave} className={styles.btnAddPrimary} style={{flex: 2}}>
+                                <i className="fas fa-save"></i> {isEditMode ? " Cập nhật" : " Lưu hệ thống"}
                             </button>
                         </div>
                     </div>

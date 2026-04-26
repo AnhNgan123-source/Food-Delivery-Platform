@@ -39,7 +39,6 @@ public class MenuItemController {
 
         try {
             MenuItem item = new MenuItem();
-            // --- Sửa lại cho khớp với MenuItem.java của Ngân ---
             item.setItemName(itemName); 
             item.setPrice(price);
             item.setDescription(description);
@@ -77,7 +76,7 @@ public class MenuItemController {
 
         try {
             MenuItem newItemData = new MenuItem();
-            // --- Sửa lại cho khớp với MenuItem.java của Ngân ---
+            // --- Sửa lại cho khớp với MenuItem.java 
             newItemData.setItemName(itemName);
             newItemData.setPrice(price);
             newItemData.setDescription(description);

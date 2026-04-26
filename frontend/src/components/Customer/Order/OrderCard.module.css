@@ -193,7 +193,7 @@
     opacity: 0.8;
 }
 
-/* Nếu Ngân muốn nút này nhỏ hơn các nút khác một chút để tránh bấm nhầm */
+
 @media (max-width: 480px) {
     .cancelBtn {
         padding: 5px 10px;

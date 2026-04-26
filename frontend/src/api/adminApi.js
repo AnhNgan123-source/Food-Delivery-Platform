@@ -20,6 +20,8 @@ const adminApi = {
     
     deleteShipper: (id) => axiosClient.delete(`/admin/shippers/${id}`),
 
+    updateShipper: (id, data) => axiosClient.put(`/admin/shippers/${id}`, data),
+
     // === CẤU HÌNH PHÍ SHIP (AdminShippingController) ===
     getShippingConfigs: () => axiosClient.get('/admin/shipping-config'),
     

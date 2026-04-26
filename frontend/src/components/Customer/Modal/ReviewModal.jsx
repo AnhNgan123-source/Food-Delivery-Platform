@@ -35,7 +35,7 @@ const ReviewModal = ({ order, isOpen, onClose, onReviewSuccess }) => {
     } catch (error) {
         console.error("Lỗi 400 hoặc 500:", error);
         // Nếu là lỗi 400 (đã đánh giá), Backend trả về string thì hiện string đó luôn
-        const errorMsg = error.response?.data?.message || error.response?.data || "Lỗi rồi Ngân ơi!";
+        const errorMsg = error.response?.data?.message || error.response?.data || "Lỗi rồi bạn ơi!";
         alert(typeof errorMsg === 'string' ? errorMsg : "Đơn hàng này bạn đã đánh giá rồi nha!");
         
         // Dù lỗi 400 (đã tồn tại) thì cũng nên đóng modal cho khách đỡ bấm lại

@@ -155,10 +155,38 @@ public class OrderService {
             Shipper shipper = order.getShipper();
             shipper.setStatus(Shipper.ShipperStatus.IDLE);
             shipperRepository.save(shipper);
+
+              messagingTemplate.convertAndSend("/topic/admin/shippers", shipper);
         }
 
         orderRepository.save(order);
+        // tạo thông báo cho khách với nhà hàng
+        messagingTemplate.convertAndSend("/topic/order/" + orderId, "COMPLETED");
+        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), order);
+      
     }
+
+// === THÊM HÀM GÁN SHIPPER MÀ CONTROLLER ĐANG GỌI ===
+    @Transactional
+public void assignShipperToOrder(Integer orderId, Integer shipperId) {
+    Order order = orderRepository.findById(orderId).orElseThrow();
+    Shipper shipper = shipperRepository.findById(shipperId).orElseThrow();
+
+    order.setShipper(shipper);
+    order.setOrderStatus("SHIPPING");
+    shipper.setStatus(Shipper.ShipperStatus.BUSY); // Đổi thành bận
+
+    orderRepository.save(order);
+    shipperRepository.save(shipper);
+
+    // --- DÒNG QUAN TRỌNG ĐỂ ĐỒNG BỘ REAL-TIME ---
+    // Báo cho giao diện Nhà hàng cập nhật ô "Thông tin Shipper"
+    messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), order);
+    
+    // Báo cho giao diện Admin 
+    messagingTemplate.convertAndSend("/topic/admin/shippers", shipper);
+}
+
 
     public Map<String, Object> getStatsByRestaurant(Integer resId) {
         Map<String, Object> stats = new HashMap<>();
@@ -191,51 +219,27 @@ public class OrderService {
         
         order.setOrderStatus(status);
 
-        if ("CANCELLED".equals(status) && reason != null) {
-            order.setCancellationReason(reason);
-            // Nếu hủy đơn mà đã có shipper, giải phóng shipper luôn
-            if (order.getShipper() != null) {
-                Shipper s = order.getShipper();
-                s.setStatus(Shipper.ShipperStatus.IDLE);
-                shipperRepository.save(s);
-            }
+        // Giải phóng shipper nếu Hủy hoặc Hoàn thành
+        if (("CANCELLED".equals(status) || "COMPLETED".equals(status)) && order.getShipper() != null) {
+            Shipper s = order.getShipper();
+            s.setStatus(Shipper.ShipperStatus.IDLE);
+            shipperRepository.save(s);
+            
+            // --- THÊM DÒNG NÀY ĐỂ ADMIN CẬP NHẬT ---
+            messagingTemplate.convertAndSend("/topic/admin/shippers", s);
         }
-        
+
         if ("COMPLETED".equals(status)) {
             order.setCompletedAt(LocalDateTime.now());
-            if (order.getShipper() != null) {
-                Shipper s = order.getShipper();
-                s.setStatus(Shipper.ShipperStatus.IDLE);
-                shipperRepository.save(s);
-            }
         }
         
         orderRepository.save(order);
-        messagingTemplate.convertAndSend("/topic/order/" + orderId, status + (reason != null ? ":" + reason : ""));
-        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), "UPDATE_LIST");
+
+        messagingTemplate.convertAndSend("/topic/restaurant/" + order.getResId(), order); 
+        messagingTemplate.convertAndSend("/topic/order/" + orderId, status);
     }
 
-    // === THÊM HÀM GÁN SHIPPER MÀ CONTROLLER ĐANG GỌI ===
-    @Transactional
-    public void assignShipperToOrder(Integer orderId, Integer shipperId) {
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
-            
-        Shipper shipper = shipperRepository.findById(shipperId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy shipper"));
-
-        // Cập nhật quan hệ và trạng thái
-        order.setShipper(shipper);
-        order.setOrderStatus("SHIPPING");
-        shipper.setStatus(Shipper.ShipperStatus.BUSY);
-
-        orderRepository.save(order);
-        shipperRepository.save(shipper);
-
-        // Báo qua WebSocket cho khách hàng biết đang đi giao
-        messagingTemplate.convertAndSend("/topic/order/" + orderId, "SHIPPING");
-    }
-
+    
     public List<Order> getAllOrders() {
         return orderRepository.findAll(); 
     }

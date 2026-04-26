@@ -16,6 +16,12 @@ const RestaurantOrdersPage = () => {
 
     const resId = localStorage.getItem('resId');
 
+
+    const handleSelectOrder = (order) => {
+    setSelectedOrder(order);
+    setSelectedShipperId(""); };  // Reset ô chọn shipper để không bị dính đơn cũ
+
+
     // 1. Bọc fetchOrders vào useCallback để không render nhiều lần
     const fetchOrders = useCallback(async () => {
         setLoading(true);
@@ -39,91 +45,120 @@ const RestaurantOrdersPage = () => {
     if (!resId) return;
 
     const socket = new SockJS('http://localhost:8080/ws-delivery');
-    // FIX LỖI FACTORY: Dùng () => socket
     const stompClient = Stomp.over(() => socket);
 
-    // Tắt mấy cái log linh tinh của thư viện cho đỡ rối mắt
+    // Tắt mấy cái log debug của thư viện cho đỡ rối console
     stompClient.debug = () => {}; 
 
     stompClient.connect({}, (frame) => {
-        // Chỉ in log khi thực sự kết nối thành công
         console.log("=== KẾT NỐI WEBSOCKET THÀNH CÔNG ===");
 
+        // Đăng ký kênh nhận thông báo riêng cho nhà hàng này
         stompClient.subscribe(`/topic/restaurant/${resId}`, (message) => {
-
             const updatedOrder = JSON.parse(message.body);
-            // 1. Kiểm tra xem đây là ĐƠN MỚI hay ĐƠN BỊ HỦY
+            console.log("Dữ liệu WebSocket nhận được:", updatedOrder);
+
+            // --- 1. XỬ LÝ THÔNG BÁO (SOUND & ALERT) ---
             if (updatedOrder.orderStatus === 'CANCELLED') {
-                const audio = new Audio('/sounds/cancel.mp3'); // Tiếng báo hủy (nếu có)
+                // Chỉ báo khi đơn bị hủy
+                const audio = new Audio('/sounds/cancel.mp3');
                 audio.play().catch(e => {});
-                alert(`ĐƠN HÀNG #${updatedOrder.orderId} ĐÃ BỊ HỦY!\nLý do: ${updatedOrder.cancellationReason}`);
-            } else {
+                alert(`ĐƠN HÀNG #${updatedOrder.orderId} ĐÃ BỊ HỦY!`);
+            } 
+            else if (updatedOrder.orderStatus === 'PENDING') {
+                // CHỈ báo "ĐƠN MỚI" khi trạng thái là PENDING (lúc khách vừa đặt xong)
                 const audio = new Audio('/sounds/ting.mp3');
                 audio.play().catch(e => {});
                 alert(`CÓ ĐƠN HÀNG MỚI: #${updatedOrder.orderId}`);
             }
-            // 3. Load lại danh sách
+            // Các trạng thái khác như SHIPPING, CONFIRMED... sẽ chạy ngầm, không hiện alert gây phiền
+
+            // --- 2. CẬP NHẬT DANH SÁCH ĐƠN HÀNG (SIDEBAR) ---
             setOrders(prevOrders => {
-            const isExist = prevOrders.find(o => o.orderId === updatedOrder.orderId);
-            if (isExist) {
-                // Nếu đơn đã có trong danh sách (khách bấm hủy), thì cập nhật đơn đó
-                return prevOrders.map(o => o.orderId === updatedOrder.orderId ? updatedOrder : o);
-            } else {
-                // Nếu là đơn mới hoàn toàn, đẩy vào đầu danh sách
-                return [updatedOrder, ...prevOrders];
-            }
-        });
-        // 3. Nếu đang mở xem chi tiết đúng đơn này, cập nhật cái khung bên phải luôn
-        setSelectedOrder(prev => (prev?.orderId === updatedOrder.orderId ? updatedOrder : prev));
+                const isExist = prevOrders.find(o => o.orderId === updatedOrder.orderId);
+                if (isExist) {
+                    // Nếu đơn đã có (cập nhật trạng thái), thì map lại phần tử đó
+                    return prevOrders.map(o => o.orderId === updatedOrder.orderId ? updatedOrder : o);
+                } else {
+                    // Nếu là đơn mới hoàn toàn, đẩy lên đầu danh sách
+                    return [updatedOrder, ...prevOrders];
+                }
+            });
+
+            // --- 3. CẬP NHẬT KHUNG CHI TIẾT ĐANG XEM (CHI TIẾT BÊN PHẢI) ---
+            setSelectedOrder(prev => {
+                // Nếu đang mở xem đúng cái đơn vừa có thay đổi, thì cập nhật nó luôn
+                if (prev?.orderId === updatedOrder.orderId) {
+                    return updatedOrder;
+                }
+                return prev;
+            });
         });
     }, (error) => {
-        console.error("Lỗi kết nối WebSocket rồi", error);
+        console.error("Lỗi kết nối WebSocket rồi sếp ơi:", error);
     });
 
-    // QUAN TRỌNG: Hàm dọn dẹp khi rời trang để không bị lỗi kết nối rác
+    // HÀM DỌN DẸP: Khi rời trang hoặc resId đổi thì ngắt kết nối để tiết kiệm tài nguyên
     return () => {
         if (stompClient && stompClient.connected) {
             stompClient.disconnect(() => {
-                console.log("Đã ngắt kết nối WebSocket");
+                console.log("Đã ngắt kết nối WebSocket an toàn");
             });
         }
     };
-}, [resId]); // Chỉ chạy lại khi resId thay đổi
+}, [resId]); // dependency resId là chuẩn bài
 
-
-    const fetchShippers = async () => {
+    const fetchShippers = useCallback(async () => {
         try {
-            const result = await restaurantApi.getShippers();
+            // Giả sử API nhận resId để lọc tài xế của quán đó
+            const result = await restaurantApi.getShippers(resId); 
             setShippers(result.data || result || []);
         } catch (error) {
             console.error("Lỗi tải shipper:", error);
         }
-    };
+    }, [resId]);
 
+    // 2. Cập nhật useEffect để fetch cả Đơn và Shipper ban đầu
     useEffect(() => {
         if (resId) {
             fetchOrders();
             fetchShippers();
         }
-    }, [resId]);
+    }, [resId, fetchOrders, fetchShippers]);
 
     const handleUpdateStatus = async (orderId, newStatus, shipperId = null) => {
-        try {
-            await restaurantApi.updateOrderStatus(orderId, newStatus, shipperId);
-            
-            // Cập nhật UI local
-            setOrders(prev => prev.map(o => o.orderId === orderId ? {...o, orderStatus: newStatus} : o));
-            setSelectedOrder(prev => ({...prev, orderStatus: newStatus}));
-            
-            // Nếu giao cho shipper, nên reload để lấy thông tin shipper hiển thị
-            if (newStatus === 'SHIPPING') fetchOrders();
-            
-            alert("Cập nhật trạng thái thành công!");
-        } catch (error) {
-            console.error("Lỗi cập nhật:", error);
-            alert("Không thể cập nhật trạng thái đơn hàng");
-        }
-    };
+    try {
+        setLoading(true); // Hiện loading để tránh bấm nhầm
+        
+        // 1. Gọi API cập nhật trạng thái đơn & gán shipper
+        // Backend PHẢI xử lý: Update Order status, Update Shipper status = BUSY
+        await restaurantApi.updateOrderStatus(orderId, newStatus, shipperId);
+
+        // 2. QUAN TRỌNG: Gọi lại cả 2 hàm lấy dữ liệu mới nhất từ DATABASE
+        // Việc này đảm bảo thông tin Shipper được lưu vĩnh viễn vào danh sách orders
+        await fetchOrders(); 
+        await fetchShippers();
+
+        // 3. Cập nhật lại cái Đơn đang xem để nó hiện Shipper ngay lập tức
+        // Mình tìm lại đơn vừa update trong danh sách mới nhất
+        setOrders(prevOrders => {
+            const updatedList = [...prevOrders];
+            const targetOrder = updatedList.find(o => o.orderId === orderId);
+            if (targetOrder) setSelectedOrder(targetOrder);
+            return updatedList;
+        });
+
+        // 4. Reset ô chọn shipper về rỗng cho đơn sau
+        setSelectedShipperId("");
+
+        alert("Thao tác thành công!");
+    } catch (error) {
+        console.error("Lỗi cập nhật:", error);
+        alert("Có lỗi xảy ra, vui lòng thử lại!");
+    } finally {
+        setLoading(false);
+    }
+};
 
     const filteredOrders = activeTab === 'ALL' 
         ? orders 
@@ -134,7 +169,7 @@ const RestaurantOrdersPage = () => {
             orders={filteredOrders}
             shippers={shippers}
             selectedOrder={selectedOrder}
-            setSelectedOrder={setSelectedOrder}
+            setSelectedOrder={handleSelectOrder}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onUpdateStatus={handleUpdateStatus}

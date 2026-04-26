@@ -28,4 +28,8 @@ public class AdminShipperController {
         shipperService.deleteShipper(id);
         return ResponseEntity.ok(new ResponseData("success", "Deleted"));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody Shipper shipper) {
+        return ResponseEntity.ok(new ResponseData("success", shipperService.updateShipper(id, shipper)));
+    }
 }

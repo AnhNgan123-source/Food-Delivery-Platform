@@ -32,7 +32,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 3. Hàm lấy Role từ Token (Hàm Ngân đang cần)
+    // 3. Hàm lấy Role từ Token 
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }

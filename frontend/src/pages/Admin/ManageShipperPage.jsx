@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import adminApi from '../../api/adminApi'; 
 import ManageShipper from '../../components/Admin/Shipper/ManageShipper';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const ManageShipperPage = () => {
     const [shippers, setShippers] = useState([]);
@@ -8,25 +10,44 @@ const ManageShipperPage = () => {
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({ shipperName: '', phone: '', vehicleNo: '', resId: '' });
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    
 
+    // --- 1. LẤY DỮ LIỆU & KẾT NỐI WEBSOCKET ---
     useEffect(() => {
         fetchShippers();
         fetchRestaurants();
+
+        const socket = new SockJS('http://localhost:8080/ws-delivery');
+        const stompClient = Stomp.over(() => socket);
+        stompClient.debug = () => {}; 
+
+        stompClient.connect({}, () => {
+            console.log("Admin đã sẵn sàng nhận cập nhật Shipper!");
+            stompClient.subscribe('/topic/admin/shippers', (message) => {
+                const updatedShipper = JSON.parse(message.body);
+                setShippers(prevList => {
+                    // Nếu shipper đã có trong bảng thì update, chưa có thì thêm vào đầu
+                    const isExist = prevList.find(s => s.shipperId === updatedShipper.shipperId);
+                    if (isExist) {
+                        return prevList.map(s => s.shipperId === updatedShipper.shipperId ? updatedShipper : s);
+                    }
+                    return [updatedShipper, ...prevList];
+                });
+            });
+        });
+
+        return () => { if (stompClient && stompClient.connected) stompClient.disconnect(); };
     }, []);
 
     const fetchShippers = async () => {
         setLoading(true);
         try {
-            const res = await adminApi.getAllShippers(); // Giả định adminApi đã có hàm này
-            const data = res?.data || res;
-            if (data?.status === "success") {
-                setShippers(data.data || []);
-            } else {
-                setShippers(Array.isArray(data) ? data : []);
-            }
+            const data = await adminApi.getAllShippers(); 
+            setShippers(Array.isArray(data) ? data : []);
         } catch (err) {
-            console.error("Lỗi lấy ds shipper:", err);
-            alert("Không lấy được danh sách tài xế sếp ơi!");
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -34,63 +55,82 @@ const ManageShipperPage = () => {
 
     const fetchRestaurants = async () => {
         try {
-            const res = await adminApi.getAllRestaurants();
-            const data = res?.data || res;
+            const data = await adminApi.getAllRestaurants();
             setRestaurants(Array.isArray(data) ? data : (data.data || []));
         } catch (err) {
-            console.error("Lỗi lấy ds nhà hàng:", err);
+            console.error(err);
         }
+    };
+
+    const handleEdit = (shipper) => {
+        setIsEditMode(true);
+        setEditingId(shipper.shipperId);
+        setFormData({
+            shipperName: shipper.shipperName,
+            phone: shipper.phone,
+            vehicleNo: shipper.vehicleNo,
+            resId: shipper.restaurant?.resId.toString() || ""
+        });
+        setShowModal(true);
     };
 
     const handleSave = async () => {
-        if (!formData.shipperName || !formData.resId) return alert("Vui lòng điền tên và chọn nhà hàng!");
+        if (!formData.shipperName || !formData.resId) return alert("Điền đủ thông tin sếp ơi!");
+
+        const payload = {
+            shipperName: formData.shipperName,
+            phone: formData.phone,
+            vehicleNo: formData.vehicleNo,
+            restaurant: { resId: parseInt(formData.resId) }
+        };
 
         try {
-            const payload = {
-                shipperName: formData.shipperName,
-                phone: formData.phone,
-                vehicleNo: formData.vehicleNo,
-                restaurant: { resId: parseInt(formData.resId) }
-            };
-            
-            await adminApi.createShipper(payload);
-            alert("Thêm tài xế mới thành công!");
-            setShowModal(false);
+            if (isEditMode) {
+                await adminApi.updateShipper(editingId, payload);
+                alert("Cập nhật thành công!");
+            } else {
+                await adminApi.createShipper(payload);
+                alert("Thêm mới thành công!");
+            }
+            closeModal();
             fetchShippers();
-            setFormData({ shipperName: '', phone: '', vehicleNo: '', resId: '' });
         } catch (err) {
-            console.error(err);
-            alert("Lỗi thêm tài xế rồi sếp!");
+            alert("Lỗi lưu dữ liệu!");
         }
     };
 
+    const closeModal = () => {
+        setShowModal(false);
+        setIsEditMode(false);
+        setEditingId(null);
+        setFormData({ shipperName: '', phone: '', vehicleNo: '', resId: '' });
+    };
+
     const handleDelete = async (id) => {
-        if (!window.confirm("Xóa tài xế này khỏi hệ thống?")) return;
+        if (!window.confirm("Xóa tài xế này sếp nhé?")) return;
         try {
             await adminApi.deleteShipper(id); 
-            alert("Đã xóa xong!");
             fetchShippers();
         } catch (err) {
-            console.error(err);
-            alert("Xóa không được sếp ơi.");
+            alert("Xóa không được!");
         }
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <ManageShipper 
-                shippers={shippers}
-                restaurants={restaurants}
-                showModal={showModal}
-                setShowModal={setShowModal}
-                formData={formData}
-                setFormData={setFormData}
-                onSave={handleSave}
-                onDelete={handleDelete}
-                onRefresh={fetchShippers}
-                loading={loading}
-            />
-        </div>
+        <ManageShipper 
+            shippers={shippers}
+            restaurants={restaurants}
+            showModal={showModal}
+            setShowModal={setShowModal}
+            formData={formData}
+            setFormData={setFormData}
+            onSave={handleSave}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onClose={closeModal}
+            isEditMode={isEditMode}
+            loading={loading}
+        />
     );
 };
 

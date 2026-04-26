@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OrderRequest {
 
-    // 1. Thông tin chung của đơn hàng (Xếp theo đúng logic Database của Ngân)
+    // 1. Thông tin chung của đơn hàng 
     private Integer customerId;
     private Integer resId;
     private Integer voucherId;

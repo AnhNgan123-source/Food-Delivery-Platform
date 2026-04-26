@@ -129,7 +129,6 @@ const CartCheckoutView = () => {
             // Hiện thông báo thật từ Backend trả về
             const errorMsg = error.response?.data?.message || error.response?.data || "Lỗi hệ thống";
             
-            // Nếu là lỗi "Bạn đã sử dụng mã này rồi", Ngân sẽ thấy nó hiện ra ngay ở đây!
             alert("Thông báo: " + errorMsg); 
 
             if (errorMsg.includes("mã giảm giá")) {

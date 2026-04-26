@@ -4,6 +4,7 @@ import com.nhom8.backend.dto.OrderRequest;
 import com.nhom8.backend.model.Order;
 import com.nhom8.backend.dto.ResponseData;
 import com.nhom8.backend.service.OrderService;
+import com.nhom8.backend.service.ShipperService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +18,11 @@ import java.util.Map;
 public class OrderController {
 
     private final OrderService orderService;
+    private final ShipperService shipperService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, ShipperService shipperService) {
         this.orderService = orderService;
+        this.shipperService = shipperService;
     }
 
     // 1. Tạo đơn hàng mới
@@ -89,12 +92,23 @@ public class OrderController {
 
     // Cập nhật trạng thái đơn hàng (Đang nấu, Hoàn thành, Hủy...)
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable Integer id, @RequestParam String status, @RequestParam(required = false)String reason) {
+    public ResponseEntity<?> updateOrderStatus(
+        @PathVariable Integer id, 
+        @RequestParam String status, 
+        @RequestParam(required = false) String reason,
+        @RequestParam(required = false) Integer shipperId // THÊM DÒNG NÀY
+    ) {
         try {
-            orderService.updateOrderStatus(id, status, reason);
+            // Nếu status là SHIPPING và có shipperId, ta gọi hàm assign trong service luôn cho tiện
+            if ("SHIPPING".equals(status) && shipperId != null) {
+                orderService.assignShipperToOrder(id, shipperId);
+            } else {
+                orderService.updateOrderStatus(id, status, reason);
+            }
+            
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
-            response.put("message", "Đã cập nhật trạng thái đơn hàng thành " + status);
+            response.put("message", "Đã cập nhật trạng thái thành " + status);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(new ResponseData("error", e.getMessage()));
@@ -152,7 +166,7 @@ public class OrderController {
     @PutMapping("/{id}/cancel")
     public ResponseEntity<?> cancelOrder(@PathVariable Integer id, @RequestParam(required = false) String reason) {
     try {
-        // Gọi hàm Service mà Ngân vừa chèn lúc nãy
+        // Gọi hàm Service 
         // Truyền "CUSTOMER" vì đây là API dành cho khách hàng
         orderService.cancelOrder(id, "CUSTOMER", reason);
         
@@ -165,4 +179,10 @@ public class OrderController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+
+    @GetMapping("/shippers-by-restaurant/{resId}")
+    public ResponseEntity<?> getShippersForMerchant(@PathVariable Integer resId) {
+        // Gọi hàm trong ShipperService mà mình đã bàn lúc nãy
+        return ResponseEntity.ok(new ResponseData("success", shipperService.getShippersByRestaurant(resId)));
+    }
 }
