@@ -68,7 +68,7 @@
     gap: 8px;
 }
 
-.resName {
+.resNameRestaurant {
     margin: 0;
     font-size: 18px;
     font-weight: 700;
@@ -79,7 +79,7 @@
     text-overflow: ellipsis;
 }
 
-.resAddress {
+.resAddressRestaurant {
     margin: 0;
     color: #636e72;
     font-size: 13px;

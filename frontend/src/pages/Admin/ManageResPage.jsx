@@ -10,54 +10,50 @@ const ManageResPage = () => {
         setLoading(true);
         try {
             const res = await adminApi.getAllRestaurants();
-            // Xử lý linh hoạt các kiểu response từ Axios
+            // Axios trả về data nằm trong res.data
             const data = res?.data || res;
-            
-            // Nếu data là object có field data bên trong (từ Backend bọc thêm)
-            if (data?.data && Array.isArray(data.data)) {
-                setRestaurants(data.data);
-            } else {
-                setRestaurants(Array.isArray(data) ? data : []);
+            if (data?.status === "success" || Array.isArray(data)) {
+                setRestaurants(Array.isArray(data) ? data : data.data);
             }
         } catch (err) {
-            console.error("Lỗi lấy danh sách nhà hàng:", err);
-            alert("Lỗi kết nối API lấy nhà hàng!");
+            console.error("Lỗi lấy danh sách:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchRestaurants();
-    }, []);
+    useEffect(() => { fetchRestaurants(); }, []);
+
+    // Logic lưu thông tin từ Modal (Nhận data từ Component con)
+    const handleSaveEdit = async (updatedData) => {
+        try {
+            setLoading(true);
+            await adminApi.updateRestaurant(updatedData.resId, updatedData);
+            alert("Cập nhật hệ thống thành công sếp ơi! ✨");
+            fetchRestaurants(); 
+        } catch (err) {
+            alert("Lỗi khi cập nhật dữ liệu!");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleToggleStatus = async (resItem) => {
         const newStatus = resItem.isActive === 1 ? 0 : 1;
-        const action = newStatus === 1 ? "Mở khóa" : "Khóa";
-        
-        if (window.confirm(`${action} nhà hàng ${resItem.resName} hả sếp?`)) {
+        if (window.confirm(`Sếp muốn thay đổi trạng thái của ${resItem.resName}?`)) {
             try {
-                await adminApi.updateRestaurant(resItem.resId, { 
-                    ...resItem, 
-                    isActive: newStatus 
-                });
-                alert(`${action} thành công!`);
-                fetchRestaurants(); 
-            } catch (err) {
-                alert("Không đổi trạng thái được sếp ơi!");
-            }
+                await adminApi.updateRestaurant(resItem.resId, { ...resItem, isActive: newStatus });
+                fetchRestaurants();
+            } catch (err) { alert("Lỗi đổi trạng thái!"); }
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm("Xóa là mất luôn đó, sếp chắc chưa?")) {
+        if (window.confirm("Xóa vĩnh viễn nhà hàng này nhé sếp?")) {
             try {
                 await adminApi.deleteRestaurant(id);
-                alert("Đã xóa vĩnh viễn!");
                 fetchRestaurants();
-            } catch (err) {
-                alert("Lỗi xóa rồi sếp.");
-            }
+            } catch (err) { alert("Lỗi xóa dữ liệu!"); }
         }
     };
 
@@ -67,6 +63,7 @@ const ManageResPage = () => {
                 list={restaurants} 
                 onUpdateStatus={handleToggleStatus} 
                 onDelete={handleDelete}
+                onSaveEdit={handleSaveEdit}
                 onRefresh={fetchRestaurants}
                 loading={loading}
             />

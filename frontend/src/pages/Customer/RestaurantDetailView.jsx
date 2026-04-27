@@ -21,6 +21,7 @@ const RestaurantDetailView = () => {
                 if (actualData) {
                     setRestaurant(actualData.restaurant);
                     setMenu(actualData.menu || []);
+                    localStorage.setItem('lastVisitedResId', resId);
                 }
             } catch (error) {
                 console.error("Lỗi lấy thực đơn:", error);
@@ -36,10 +37,11 @@ const RestaurantDetailView = () => {
         if (exist) {
             exist.quantity += 1;
         } else {
-            cart.push({ ...food, quantity: 1 });
+            cart.push({ ...food, quantity: 1, resId: parseInt(resId) });
         }
         
         localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('lastVisitedResId', resId);
         updateCartCount(); // Báo cho Header cập nhật số lượng ngay lập tức
         alert(`Đã thêm ${food.itemName} vào giỏ hàng nha! `);
     };

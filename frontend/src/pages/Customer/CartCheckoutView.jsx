@@ -84,8 +84,7 @@ const CartCheckoutView = () => {
 
             const orderData = {
                 customerId: parseInt(localStorage.getItem('userId')),
-                resId: parseInt(localStorage.getItem('lastVisitedResId')),
-                deliveryAddress: `${address.trim()}, ${district}, TP.HCM`,
+                resId: selectedItems[0]?.resId || parseInt(localStorage.getItem('lastVisitedResId')),                deliveryAddress: `${address.trim()}, ${district}, TP.HCM`,
                 paymentMethod,
                 subtotal,
                 shippingFee,

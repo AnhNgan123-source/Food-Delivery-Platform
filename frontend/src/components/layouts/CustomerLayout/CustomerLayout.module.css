@@ -88,3 +88,74 @@
         font-size: 16px;
     }
 }
+.userSection {
+    position: relative;
+    display: inline-block;
+}
+
+.userDropdown {
+    position: absolute;
+    top: 40px; /* Cách icon một khoảng vừa phải */
+    right: 0;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng sâu hơn nhìn cho sang */
+    border-radius: 12px;
+    width: 200px;
+    padding: 8px 0;
+    z-index: 2000; /* Đảm bảo nằm trên cùng */
+    border: 1px solid #f0f0f0;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.userDropdown div {
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #2d3436;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ĐỔI MÀU HOVER SANG XANH LÁ CHO KHỚP BRANDING */
+.userDropdown div:hover {
+    background: #f0fff4; /* Xanh lá cực nhạt */
+    color: #2ecc71;      /* Xanh lá đặc trưng của Ngân */
+}
+
+.divider {
+    margin: 5px 0;
+    border: 0;
+    border-top: 1px solid #f1f2f6;
+}
+
+.logoutItem {
+    color: #e74c3c !important; /* Màu đỏ warning chuyên nghiệp */
+    font-weight: 700;
+}
+
+.logoutItem:hover {
+    background: #fff5f5 !important;
+}
+
+/* --- RESPONSIVE CHO MOBILE --- */
+@media (max-width: 768px) {
+    .wfHeader {
+        padding: 10px 15px;
+    }
+    
+    .logo {
+        font-size: 16px;
+    }
+
+    .userDropdown {
+        width: 170px; /* Nhỏ lại một tí trên mobile */
+        right: -10px; /* Căn chỉnh lại cho vừa màn hình nhỏ */
+    }
+}

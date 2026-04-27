@@ -3,6 +3,16 @@ import axiosClient from './axiosConfig';
 const adminApi = {
     // === QUẢN LÝ NHÀ HÀNG (AdminRestaurantController) ===
     getAllRestaurants: () => axiosClient.get('/admin/restaurants'),
+
+    // Hàm upload ảnh mới cho Admin
+    uploadResImage: (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return axiosClient.post('/restaurant/upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    },
+    
     getRestaurantById: (id) => axiosClient.get(`/admin/restaurants/${id}`),
     getPendingRestaurants: () => axiosClient.get('/admin/restaurants/pending'),
     getActiveRestaurants: () => axiosClient.get('/admin/restaurants/active'),

@@ -1,207 +1,47 @@
-/* Ghi đè file CSS hiện tại của sếp */
+.container { background: #fff; border-radius: 24px; padding: 30px; box-shadow: 0 4px 25px rgba(0,0,0,0.04); }
+.header { display: flex; justify-content: space-between; margin-bottom: 30px; align-items: center; }
+.title { margin: 0; color: #0f172a; font-size: 20px; font-weight: 700; }
+.subtitle { margin: 5px 0 0; color: #64748b; font-size: 14px; }
+.countHighlight { color: #0ea5e9; font-weight: 700; }
+.refreshBtn { width: 42px; height: 42px; border-radius: 12px; border: none; background: #f8fafc; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.refreshBtn:hover { background: #e2e8f0; transform: rotate(180deg); }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.container {
-    background: #fff;
-    border-radius: 24px;
-    padding: 30px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.04); /* Làm bóng đổ mềm hơn tí */
-}
+/* Table */
+.tableWrapper { overflow-x: auto; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+.trBody { background: #fff; }
+.trBody:hover { transform: scale(1.005); transition: 0.2s; }
+.tdName { padding: 15px 20px; border: 1px solid #f1f5f9; border-right: none; border-radius: 16px 0 0 16px; }
+.resInfo { display: flex; align-items: center; gap: 15px; }
+.resLogo { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; }
+.resName { color: #1e293b; font-weight: 600; }
+.tdAddress { padding: 15px 20px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
+.addressText { color: #64748b; font-size: 13px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tdStatus { padding: 15px 20px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; text-align: center; }
+.statusBadge { color: #059669; font-size: 11px; font-weight: 700; background: #ecfdf5; padding: 5px 12px; border-radius: 20px; border: 1px solid #d1fae5; }
+.statusBadgeInactive { color: #dc2626; background: #fef2f2; border: 1px solid #fee2e2; }
+.tdActions { padding: 15px 20px; border: 1px solid #f1f5f9; border-left: none; border-radius: 0 16px 16px 0; text-align: right; }
+.actionGroup { display: flex; gap: 8px; justify-content: flex-end; }
+.actionBtn { width: 36px; height: 36px; border-radius: 10px; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+.editBtn { background: #eff6ff; color: #2563eb; }
+.lockBtn { background: #fffbeb; color: #d97706; }
+.deleteBtn { background: #fff1f2; color: #e11d48; }
+.actionBtn:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    align-items: center;
-}
-
-.title {
-    margin: 0;
-    color: #0f172a; 
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.subtitle {
-    margin: 5px 0 0;
-    color: #64748b;
-    font-size: 14px;
-}
-
-.countHighlight {
-    color: #0ea5e9;
-    font-weight: 700;
-}
-
-.refreshBtn {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px; /* Đổi sang bo góc vuông cho đồng bộ icon hành động */
-    border: none;
-    background: #f8fafc;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.refreshBtn:hover {
-    background: #e2e8f0;
-    color: #0f172a;
-    transform: rotate(180deg); /* Xoay nhẹ khi hover nhìn cho chuyên nghiệp */
-}
-
-.tableWrapper {
-    overflow-x: auto;
-}
-
-.table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 12px;
-}
-
-.theadTr {
-    color: #94a3b8;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.th {
-    padding: 0 20px;
-}
-
-.trBody {
-    background: #fff;
-    transition: transform 0.2s;
-}
-
-.trBody:hover {
-    transform: scale(1.005); /* Hiệu ứng nổi lên nhẹ khi di chuột vào dòng */
-}
-
-.tdName {
-    padding: 15px 20px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    border-left: 1px solid #f1f5f9;
-    border-radius: 16px 0 0 16px;
-}
-
-.resInfo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.resLogo {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.resName {
-    color: #1e293b;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.tdAddress {
-    padding: 15px 20px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.addressText {
-    color: #64748b;
-    font-size: 13px;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.tdStatus {
-    padding: 15px 20px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    text-align: center;
-}
-
-/* Badge trạng thái nhìn hiện đại hơn */
-.statusBadge {
-    color: #059669;
-    font-size: 11px;
-    font-weight: 700;
-    background: #ecfdf5;
-    padding: 5px 12px;
-    border-radius: 20px; /* Bo tròn hẳn nhìn cho mướt */
-    border: 1px solid #d1fae5;
-}
-
-.statusBadgeInactive {
-    color: #dc2626;
-    background: #fef2f2;
-    border: 1px solid #fee2e2;
-}
-
-.tdActions {
-    padding: 15px 20px;
-    border-top: 1px solid #f1f5f9;
-    border-bottom: 1px solid #f1f5f9;
-    border-right: 1px solid #f1f5f9;
-    border-radius: 0 16px 16px 0;
-    text-align: right;
-}
-
-.actionGroup {
-    display: inline-flex;
-    gap: 8px;
-}
-
-.actionBtn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 14px;
-}
-
-/* Tinh chỉnh bảng màu Icon */
-.editBtn { 
-    background: #eff6ff; 
-    color: #2563eb; 
-}
-.editBtn:hover { background: #2563eb; color: #fff; }
-
-.lockBtn { 
-    background: #fffbeb; 
-    color: #d97706; 
-}
-.lockBtn:hover { background: #d97706; color: #fff; }
-
-.deleteBtn { 
-    background: #fff1f2; 
-    color: #e11d48; 
-}
-.deleteBtn:hover { background: #e11d48; color: #fff; }
-
-.actionBtn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.emptyTd {
-    text-align: center;
-    padding: 50px;
-    color: #94a3b8;
-}
+/* Modal */
+.modalOverlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.modalContent { background: #fff; padding: 30px; border-radius: 24px; width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.modalHeader { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.closeBtn { background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; }
+.imageUploadSection { text-align: center; margin-bottom: 20px; }
+.previewWrapper { position: relative; width: 120px; height: 120px; margin: 0 auto; }
+.modalResLogo { width: 100%; height: 100%; border-radius: 20px; object-fit: cover; border: 4px solid #f8fafc; }
+.uploadLabel { position: absolute; bottom: -5px; right: -5px; background: #2563eb; color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.formGroup { margin-bottom: 15px; text-align: left; }
+.formGroup label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #475569; }
+.formGroup input, .formGroup textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: inherit; }
+.modalFooter { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+.btnSave { background: #2563eb; color: #fff; border: none; padding: 10px 25px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+.btnCancel { background: #f1f5f9; color: #64748b; border: none; padding: 10px 25px; border-radius: 12px; cursor: pointer; }

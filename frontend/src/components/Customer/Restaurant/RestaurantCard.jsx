@@ -24,8 +24,8 @@ const RestaurantCard = ({ res, onClick }) => {
             </div>
             
             <div className={styles.resContent}>
-                <h4 className={styles.resName}>{res.resName}</h4>
-                <p className={styles.resAddress}>
+                <h4 className={styles.resNameRestaurant}>{res.resName}</h4>
+                <p className={styles.resAddressRestaurant}>
                     <i className="fas fa-map-marker-alt"></i> {res.resAddress}
                 </p>
                 
