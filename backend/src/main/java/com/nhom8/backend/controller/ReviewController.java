@@ -31,4 +31,34 @@ public class ReviewController {
         List<Review> list = reviewRepository.findByResIdOrderByCreatedAtDesc(resId);
         return ResponseEntity.ok(Map.of("status", "success", "data", list));
     }
+
+    @PutMapping("/{reviewId}/reply")
+    public ResponseEntity<?> replyReview(@PathVariable Integer reviewId, @RequestBody Map<String, String> body) {
+    String replyText = body.get("reply");
+    Review review = reviewRepository.findById(reviewId).orElseThrow();
+    
+    // Lấy comment cũ, kiểm tra xem đã có phản hồi chưa để tránh ghi đè lặp lại
+    String currentComment = review.getComment();
+    if (currentComment.contains("||REPLY||")) {
+        // Nếu đã có phản hồi rồi thì chỉ cập nhật phần sau dấu ||REPLY||
+        currentComment = currentComment.split("\\|\\|REPLY\\|\\|")[0];
+    }
+    
+    // Gộp chung vào 1 cột duy nhất
+    review.setComment(currentComment + "||REPLY||" + replyText);
+    reviewRepository.save(review);
+    
+    return ResponseEntity.ok(Map.of("status", "success"));
+}
+
+    @GetMapping("/restaurant/{resId}/average")
+    public ResponseEntity<?> getAverage(@PathVariable Integer resId) {
+        Double avg = reviewRepository.getAverageRatingByResId(resId);
+        Long total = reviewRepository.countByResId(resId);
+    Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("average", avg != null ? avg : 0.0);
+        response.put("total", total != null ? total : 0); 
+        
+        return ResponseEntity.ok(response);    }
 }

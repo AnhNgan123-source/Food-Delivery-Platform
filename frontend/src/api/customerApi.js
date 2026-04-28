@@ -24,7 +24,7 @@ const customerApi = {
         cartValue: subtotal,
         userId: userId 
     } 
-}),
+    }),
 
     // 5. Cấu hình hệ thống (Sử dụng axios thuần để bypass Token nếu cần)
     getShippingConfig: () => {
@@ -37,6 +37,12 @@ const customerApi = {
 
     // 7. Lấy danh sách đánh giá của một nhà hàng cụ thể
     getRestaurantReviews: (resId) => axiosClient.get(`/reviews/restaurant/${resId}`),
+
+    // Lấy điểm trung bình và tổng số lượng đánh giá của nhà hàng
+    getRestaurantRating: (resId) => {
+        // Dùng chung endpoint với backend mà sếp đã viết cho Merchant
+        return axiosClient.get(`/reviews/restaurant/${resId}/average`);
+    },
 };
 
 export default customerApi;

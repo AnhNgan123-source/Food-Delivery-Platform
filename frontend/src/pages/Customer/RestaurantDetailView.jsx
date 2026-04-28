@@ -9,25 +9,43 @@ import FoodItemCard from '../../components/Customer/Menu/FoodItemCard';
 const RestaurantDetailView = () => {
     const { resId } = useParams();
     const navigate = useNavigate();
-    const { updateCartCount } = useOutletContext(); // Nhận hàm từ Layout để báo nhảy số giỏ hàng
+    const { updateCartCount } = useOutletContext(); 
+    
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
+    // BỔ SUNG: State lưu dữ liệu đánh giá
+    const [rating, setRating] = useState({ average: 0, total: 0 });
 
     useEffect(() => {
-        const fetchMenu = async () => {
+        const fetchAllData = async () => {
             try {
-                const res = await customerApi.getRestaurantMenu(resId);
-                const actualData = res?.data || res;
-                if (actualData) {
-                    setRestaurant(actualData.restaurant);
-                    setMenu(actualData.menu || []);
+                // CHẠY SONG SONG: Lấy Menu và Rating cùng lúc cho nhanh
+                const [menuRes, ratingRes] = await Promise.all([
+                    customerApi.getRestaurantMenu(resId),
+                    customerApi.getRestaurantRating(resId) // Gọi hàm API mới của sếp
+                ]);
+
+                // Xử lý dữ liệu Menu & Restaurant
+                const menuData = menuRes?.data || menuRes;
+                if (menuData) {
+                    setRestaurant(menuData.restaurant);
+                    setMenu(menuData.menu || []);
                     localStorage.setItem('lastVisitedResId', resId);
                 }
+
+                // Xử lý dữ liệu Rating (Điểm TB và số lượt đánh giá)
+                if (ratingRes) {
+                    setRating({
+                        average: ratingRes.average || 0,
+                        total: ratingRes.total || 0
+                    });
+                }
             } catch (error) {
-                console.error("Lỗi lấy thực đơn:", error);
+                console.error("Lỗi lấy dữ liệu nhà hàng:", error);
             }
         };
-        if (resId) fetchMenu();
+
+        if (resId) fetchAllData();
     }, [resId]);
 
     const handleAddToCart = (food) => {
@@ -42,7 +60,7 @@ const RestaurantDetailView = () => {
         
         localStorage.setItem('cart', JSON.stringify(cart));
         localStorage.setItem('lastVisitedResId', resId);
-        updateCartCount(); // Báo cho Header cập nhật số lượng ngay lập tức
+        updateCartCount(); 
         alert(`Đã thêm ${food.itemName} vào giỏ hàng nha! `);
     };
 
@@ -54,11 +72,11 @@ const RestaurantDetailView = () => {
                 onClick={() => navigate('/home')} 
                 style={{ cursor:'pointer', color:'#2ecc71', fontWeight:'bold', padding: '15px 5%' }}
             >
-                ← QUAY LẠI TRANG CHỦ
+                &larr; QUAY LẠI TRANG CHỦ
             </div>
 
-            {/* Banner riêng của quán */}
-            <RestaurantHero restaurant={restaurant} />
+            {/* CẬP NHẬT: Truyền thêm prop rating cho Hero */}
+            <RestaurantHero restaurant={restaurant} rating={rating} />
 
             <main style={{ padding: '0 5%' }}>
                 <h3 className={styles.sectionTitle}>Thực đơn hôm nay</h3>

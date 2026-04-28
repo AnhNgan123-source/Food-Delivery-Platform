@@ -31,7 +31,7 @@ const fetchPendingRestaurants = async () => {
     }, []);
 
     const handleApprove = async (resItem, newStatus) => {
-        if (window.confirm(`Sếp có chắc phê duyệt cho nhà hàng ${resItem.resName} không?`)) {
+        if (window.confirm(`Bạn có yêu cầu phê duyệt từ nhà hàng ${resItem.resName} ?`)) {
             try {
                 await adminApi.updateRestaurant(resItem.resId, {
                     ...resItem,
@@ -40,7 +40,7 @@ const fetchPendingRestaurants = async () => {
                 alert("Đã phê duyệt thành công!");
                 fetchPendingRestaurants(); // Refresh lại danh sách
             } catch (err) {
-                alert("Phê duyệt lỗi rồi sếp ơi!");
+                alert("Phê duyệt lỗi rồi!");
             }
         }
     };

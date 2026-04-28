@@ -98,7 +98,7 @@ const CartView = () => {
                     ))}
                     
                     <div style={{ marginTop: '30px', textAlign: 'right', borderTop: '1px solid #2d313d', paddingTop: '20px' }}>
-                        <h3 style={{ color: '#ccc' }}>Tổng thanh toán: 
+                        <h3 style={{ color: '#0c0c0c' }}>Tổng thanh toán: 
                             <span style={{ color: '#e74c3c', fontSize: '28px', marginLeft: '15px' }}>
                                 {total.toLocaleString()}đ
                             </span>

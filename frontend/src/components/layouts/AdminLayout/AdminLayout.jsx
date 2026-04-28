@@ -48,7 +48,7 @@ const AdminLayout = () => {
             <div className={styles.mainWrapper}>
                 <header className={styles.topHeader}>
                     <span className={styles.pageTitle}>{pageTitle}</span>
-                    {/* HeaderUserInfo giữ nguyên code của sếp */}
+                    {/* */}
                 </header>
                 <main className={styles.contentArea}>
                     <Outlet /> {/* Nơi chứa ApproveResPage */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import adminApi from '../../api/adminApi'; // Dùng hàng xịn sếp đã bọc
+import adminApi from '../../api/adminApi'; 
 import ManageVoucher from '../../components/Admin/Voucher/ManageVoucher';
 
 const ManageVoucherPage = () => {

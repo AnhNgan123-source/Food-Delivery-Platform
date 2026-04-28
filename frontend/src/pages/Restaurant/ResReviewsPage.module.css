@@ -1,0 +1,130 @@
+.pageContainer {
+    padding: 10px;
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.pageTitle {
+    color: #2b3674;
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.pageSubtitle {
+    color: #a3aed0;
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.highlight {
+    color: #4318ff;
+    font-weight: 700;
+}
+
+.statsBadge {
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    color: #ffb800;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.loadingState {
+    text-align: center;
+    padding: 100px 0;
+    color: #a3aed0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4318ff;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.header {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.avgBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0;
+    padding: 8px 15px;
+    background: #fff9e6; /* Màu vàng nhạt sang trọng */
+    border-radius: 50px;
+    width: fit-content;
+}
+
+.avgNumber {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffb800;
+}
+
+.starsWrap {
+    font-size: 16px;
+}
+
+.totalText {
+    margin: 0;
+    color: #636e72;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.statsBadge {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f0fff4;
+    padding: 15px 25px;
+    border-radius: 12px;
+    border: 1px solid #c6f6d5;
+}
+
+.badgeIcon i {
+    font-size: 24px;
+    color: #2ecc71;
+}
+
+.badgeText span {
+    display: block;
+    font-size: 12px;
+    color: #27ae60;
+}
+
+.badgeText strong {
+    font-size: 16px;
+    color: #1e272e;
+}

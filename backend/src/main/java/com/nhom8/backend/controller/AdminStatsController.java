@@ -56,7 +56,7 @@ public ResponseEntity<?> getOverview() {
             List<Map<String, Object>> data = jdbcTemplate.queryForList(sql);
             return ResponseEntity.ok(Map.of("status", "success", "data", data));
         } catch (Exception e) {
-            // Log lỗi ra console để sếp xem chính xác là thiếu cột hay sai bảng
+            // Log lỗi ra console để xem chính xác là thiếu cột hay sai bảng
             e.printStackTrace(); 
             return ResponseEntity.status(500).body(Map.of("status", "error", "message", e.getMessage()));
         }

@@ -25,7 +25,7 @@ const ShippingConfigPage = () => {
             alert("Đã cập nhật biểu phí vận chuyển mới! ");
             fetchFees();
         } catch (err) {
-            alert("Lỗi lưu biểu phí rồi sếp!");
+            alert("Lỗi lưu biểu phí rồi!");
         }
     };
 

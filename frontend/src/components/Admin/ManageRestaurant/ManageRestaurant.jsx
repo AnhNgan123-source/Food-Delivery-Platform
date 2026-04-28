@@ -29,7 +29,7 @@ const ManageRestaurant = ({ list = [], onUpdateStatus, onDelete, onSaveEdit, onR
             const fileName = res.data || res;
             setSelectedRes(prev => ({ ...prev, resImage: fileName }));
         } catch (error) {
-            alert("Lỗi upload ảnh sếp ơi!");
+            alert("Lỗi upload ảnh!");
         } finally {
             setIsUploading(false);
         }
@@ -130,7 +130,7 @@ const ManageRestaurant = ({ list = [], onUpdateStatus, onDelete, onSaveEdit, onR
                         <div className={styles.modalFooter}>
                             <button className={styles.btnCancel} onClick={handleCloseModal}>Hủy</button>
                             <button className={styles.btnSave} onClick={async () => { await onSaveEdit(selectedRes); handleCloseModal(); }} disabled={isUploading}>
-                                {isUploading ? 'Chờ tí sếp...' : 'Lưu dữ liệu'}
+                                {isUploading ? 'Chờ tí...' : 'Lưu dữ liệu'}
                             </button>
                         </div>
                     </div>

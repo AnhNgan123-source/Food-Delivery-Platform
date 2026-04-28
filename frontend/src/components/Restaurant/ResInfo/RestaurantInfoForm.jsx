@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './RestaurantInfoForm.module.css';
 
 const RestaurantInfoForm = ({ 
-    restaurant, isEditing, setIsEditing, loading, 
+    restaurant,reviews = [], isEditing, setIsEditing, loading, 
     formData, setFormData, onSave, onFileUpload 
 }) => {
     const noLogo = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'><rect width='250' height='250' fill='%23f4f7fe'/></svg>";
@@ -65,11 +65,29 @@ const RestaurantInfoForm = ({
                     </div>
 
                     <div className={styles.ratingBox}>
-                        <span className={styles.label}>Đánh giá từ khách hàng</span>
-                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginTop: '5px' }}>
-                            <span style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1 }}>{restaurant.ratingAvg?.toFixed(1) || "0.0"}</span>
-                            <div style={{ marginBottom: '4px' }}>{renderStars(restaurant.ratingAvg || 0)}</div>
+                    <span className={styles.label}>Đánh giá & Phản hồi</span>
+                    
+                    <div className={styles.ratingSummary}>
+                        <div className={styles.avgCircle}>
+                            {restaurant.ratingAvg?.toFixed(1) || "0.0"}
                         </div>
+                        <div className={styles.starsAndCount}>
+                            <div className={styles.starsRow}>{renderStars(restaurant.ratingAvg || 0)}</div>
+                            <span className={styles.totalCount}>Dựa trên {reviews.length} lượt đánh giá</span>
+                        </div>
+                    </div>
+
+                        {/* HIỂN THỊ REVIEW MỚI NHẤt */}
+                        {reviews.length > 0 && (
+                            <div className={styles.latestReviewBubble}>
+                                <div className={styles.quoteIcon}><i className="fas fa-quote-left"></i></div>
+                                <p className={styles.latestComment}>
+                                    {/* Lấy comment của review đầu tiên và chẻ chuỗi ||REPLY|| */}
+                                    {reviews[0].comment?.split("||REPLY||")[0]}
+                                </p>
+                                <span className={styles.latestAuthor}>— Khách hàng #{reviews[0].customerId}</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className={styles.fieldGroup}>

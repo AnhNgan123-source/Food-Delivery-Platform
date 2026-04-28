@@ -75,7 +75,7 @@ const ManageShipperPage = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.shipperName || !formData.resId) return alert("Điền đủ thông tin sếp ơi!");
+        if (!formData.shipperName || !formData.resId) return alert("Vui lòng điền đủ thông tin!");
 
         const payload = {
             shipperName: formData.shipperName,
@@ -107,7 +107,7 @@ const ManageShipperPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm("Xóa tài xế này sếp nhé?")) return;
+        if (!window.confirm("Bạn chắc chắn muốn xóa tài xế này không ?")) return;
         try {
             await adminApi.deleteShipper(id); 
             fetchShippers();

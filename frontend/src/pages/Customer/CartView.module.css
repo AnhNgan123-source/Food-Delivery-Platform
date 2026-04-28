@@ -1,28 +1,31 @@
 /* CartView.module.css */
 
-/* Bao quanh toàn bộ trang giỏ hàng */
+/* Bao quanh toàn bộ trang giỏ hàng - thêm màu nền xám cực nhạt để nổi bật thẻ trắng */
 .cartContainer {
-    min-height: 80vh;
-    padding: 30px 5%;
+    min-height: 100vh;
+    padding: 40px 5%;
+    background-color: #f8f9fa; 
 }
 
-/* Thẻ bao ngoài giỏ hàng (thay cho whiteCard nhưng phong cách Dark) */
+/* Thẻ bao ngoài giỏ hàng (Phong cách Light hiện đại) */
 .whiteCard {
-    background: #1a1e26 !important; /* Đè lại inline style nếu cần */
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: #ffffff !important; 
+    border-radius: 20px;
+    border: 1px solid #f1f2f6; /* Viền siêu nhạt */
+    /* Đổ bóng mịn, không bị gắt như bản Dark */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04); 
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 /* Nút quay lại hoặc các nút phụ */
 .btnPrimary {
     background-color: transparent;
     color: #2ecc71;
-    border: 1px solid #2ecc71;
-    padding: 10px 20px;
+    border: 1.5px solid #2ecc71;
+    padding: 10px 22px;
     border-radius: 12px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
     display: inline-flex;
@@ -33,11 +36,11 @@
 }
 
 .btnPrimary:hover {
-    background-color: rgba(46, 204, 113, 0.1);
+    background-color: #f0fff4; /* Xanh lá cực nhạt khi hover */
     transform: translateX(-5px);
 }
 
-/* Nút ĐẶT HÀNG NGAY (Nút quan trọng nhất) */
+/* Nút ĐẶT HÀNG NGAY (Giữ gradient xanh nhưng làm bóng đổ dịu hơn) */
 .btnConfirm {
     background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
     color: white;
@@ -47,7 +50,7 @@
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.25);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,7 +58,7 @@
 
 .btnConfirm:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 25px rgba(46, 204, 113, 0.4);
+    box-shadow: 0 15px 30px rgba(46, 204, 113, 0.35);
 }
 
 .btnConfirm:active {
@@ -65,27 +68,34 @@
 /* Trạng thái giỏ hàng trống */
 .emptyState {
     text-align: center;
-    padding: 100px 20px;
-    color: #718096;
+    padding: 120px 20px;
+    color: #b2bec3; /* Màu xám nhạt tinh tế */
 }
 
 .emptyState p {
     font-size: 18px;
-    margin-bottom: 20px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    color: #636e72;
 }
 
-/* Các tùy chỉnh bổ sung cho chữ trong giỏ hàng */
+/* Tối ưu chữ trong giỏ hàng cho nền sáng */
 .cartCard h3 {
+    color: #2d3436; /* Đen xám thay vì trắng */
     margin-bottom: 0;
-    font-weight: 600;
+    font-weight: 700;
 }
 
-/* Tối ưu cho scrollbar nếu giỏ hàng quá dài */
+/* Scrollbar phong cách Light */
 .whiteCard::-webkit-scrollbar {
     width: 6px;
 }
 
 .whiteCard::-webkit-scrollbar-thumb {
-    background: #2d313d;
+    background: #dfe6e9; /* Màu xám nhạt cho scrollbar */
     border-radius: 10px;
+}
+
+.whiteCard::-webkit-scrollbar-thumb:hover {
+    background: #b2bec3;
 }

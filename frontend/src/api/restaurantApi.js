@@ -77,7 +77,25 @@ const restaurantApi = {
     getMenuItemById: (itemId) => {
         const url = `/menu/${itemId}`;
         return axiosClient.get(url);
-    }
+    },
+    // Lấy danh sách đánh giá theo ID nhà hàng
+    getReviewsByResId: (resId) => {
+        const url = `/reviews/restaurant/${resId}`; 
+        // Lưu ý: Nếu axiosConfig chưa có tiền tố /api/v1, bạn hãy thêm vào: `/api/v1/reviews/restaurant/${resId}`
+        return axiosClient.get(url);
+    },
+
+    replyToReview: (reviewId, replyText) => {
+    const url = `/reviews/${reviewId}/reply`;
+    return axiosClient.put(url, { reply: replyText });
+    },
+
+    // restaurantApi.js
+    getAverageRating: (resId) => {
+        return axiosClient.get(`/reviews/restaurant/${resId}/average`);
+    },
+
+
 };
 
 export default restaurantApi;

@@ -29,7 +29,7 @@ const ManageResPage = () => {
         try {
             setLoading(true);
             await adminApi.updateRestaurant(updatedData.resId, updatedData);
-            alert("Cập nhật hệ thống thành công sếp ơi! ✨");
+            alert("Cập nhật hệ thống thành công!!!");
             fetchRestaurants(); 
         } catch (err) {
             alert("Lỗi khi cập nhật dữ liệu!");
@@ -40,7 +40,7 @@ const ManageResPage = () => {
 
     const handleToggleStatus = async (resItem) => {
         const newStatus = resItem.isActive === 1 ? 0 : 1;
-        if (window.confirm(`Sếp muốn thay đổi trạng thái của ${resItem.resName}?`)) {
+        if (window.confirm(`Bạn chắc chắn muốn thay đổi trạng thái của ${resItem.resName}?`)) {
             try {
                 await adminApi.updateRestaurant(resItem.resId, { ...resItem, isActive: newStatus });
                 fetchRestaurants();
@@ -49,7 +49,7 @@ const ManageResPage = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm("Xóa vĩnh viễn nhà hàng này nhé sếp?")) {
+        if (window.confirm("Nhà hàng sẽ được xóa vĩnh viễn?")) {
             try {
                 await adminApi.deleteRestaurant(id);
                 fetchRestaurants();

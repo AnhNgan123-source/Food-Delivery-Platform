@@ -95,7 +95,7 @@ const RestaurantOrdersPage = () => {
             });
         });
     }, (error) => {
-        console.error("Lỗi kết nối WebSocket rồi sếp ơi:", error);
+        console.error("Lỗi kết nối WebSocket rồi:", error);
     });
 
     // HÀM DỌN DẸP: Khi rời trang hoặc resId đổi thì ngắt kết nối để tiết kiệm tài nguyên
@@ -148,7 +148,7 @@ const RestaurantOrdersPage = () => {
             return updatedList;
         });
 
-        // 4. Reset ô chọn shipper về rỗng cho đơn sau
+        // 4. Reset ô chọn shipper về rỗng cho những đơn sau này
         setSelectedShipperId("");
 
         alert("Thao tác thành công!");

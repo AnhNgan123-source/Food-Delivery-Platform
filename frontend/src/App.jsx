@@ -25,7 +25,7 @@ import AddMenuItemForm from './components/Restaurant/Menu/AddMenuItemForm';
 import RestaurantOrdersPage from './pages/Restaurant/RestaurantOrdersPage'; 
 import ResInfoPage from './pages/Restaurant/ResInfoPage'; 
 import RestaurantStatsPage from './pages/Restaurant/RestaurantStatsPage';
-
+import ReviewList from './components/Restaurant/Reviews/ReviewList';
 // ADMIN PAGES
 import AdminHome from './pages/Admin/HomePage'; 
 import ApproveResPage from './pages/Admin/ApproveResPage'; 
@@ -37,6 +37,7 @@ import ManageAnalyticsPage from './pages/Admin/ManageAnalyticsPage';
 
 // Components
 import Profile from './components/Common/Profile/Profile';
+import ResReviewsPage from './pages/Restaurant/ResReviewsPage';
 
 function App() {
   return (
@@ -70,7 +71,7 @@ function App() {
           <Route path="menu-management" element={<ManageMenuPage />} />
           <Route path="add-food" element={<AddMenuItemForm />} />
           <Route path="edit-food/:id" element={<AddMenuItemForm />} />
-          
+          <Route path="reviews" element={<ResReviewsPage />} />
           <Route path="profile" element={<Profile />} />
         </Route>
 
@@ -84,6 +85,8 @@ function App() {
           <Route path="manage-vouchers" element={<ManageVoucherPage />} />
           <Route path="shipping-config" element={<ShippingConfigPage />} />
           <Route path="profile" element={<Profile />} />
+         
+
         </Route>
 
         {/* Catch-all route */}

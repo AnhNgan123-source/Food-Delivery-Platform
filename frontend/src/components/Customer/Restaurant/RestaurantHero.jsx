@@ -1,8 +1,7 @@
 import React from 'react';
 import styles from './Restaurant.module.css';
 
-const RestaurantHero = ({ restaurant }) => {
-    // Ảnh nền mặc định nếu quán chưa có ảnh
+const RestaurantHero = ({ restaurant, rating }) => { // Thêm prop rating ở đây
     const bgImage = restaurant?.resImage 
         ? `http://localhost:8080/uploads/${restaurant.resImage}` 
         : 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b';
@@ -26,7 +25,11 @@ const RestaurantHero = ({ restaurant }) => {
                     <div className={styles.resInfoRow}>
                         <div className={styles.infoBadge}>
                             <i className="fas fa-star"></i>
-                            <span>4.8 (500+ đánh giá)</span>
+                            {/* HIỂN THỊ DỮ LIỆU THẬT Ở ĐÂY */}
+                            <span>
+                                {rating?.average ? Number(rating.average).toFixed(1) : "0.0"} 
+                                ({rating?.total || 0}+ đánh giá)
+                            </span>
                         </div>
                         <div className={styles.infoBadge}>
                             <i className="fas fa-clock"></i>

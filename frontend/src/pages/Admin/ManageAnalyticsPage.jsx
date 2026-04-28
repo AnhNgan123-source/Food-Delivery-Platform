@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import adminApi from '../../api/adminApi'; // Dùng hàng xịn sếp bọc
+import adminApi from '../../api/adminApi'; 
 import AdminAnalytics from '../../components/Admin/Analytics/AdminAnalytics';
 
 const ManageAnalyticsPage = () => {
@@ -24,7 +24,7 @@ const ManageAnalyticsPage = () => {
             if (topRes) setTopRestaurants(topRes);
 
         } catch (error) {
-            console.error("Lỗi lấy dữ liệu sếp ơi:", error);
+            console.error("Lỗi lấy dữ liệu rồi:", error);
         } finally {
             setIsLoading(false);
         }

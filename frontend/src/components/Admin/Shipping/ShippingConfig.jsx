@@ -22,7 +22,7 @@ const ShippingConfig = ({ shippingFees, setShippingFees, handleSaveShippingFees 
                 <div className={styles.header}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            {/* Dùng đúng className styles.title sếp đã định nghĩa */}
+                            {/* Dùng đúng className styles.title đã định nghĩa */}
                             <h3 className={styles.title}>Cấu hình biểu phí ship</h3>
                             <p className={styles.subtitle}>Thiết lập chi phí vận chuyển cố định theo khu vực TP.HCM</p>
                         </div>

@@ -4,13 +4,13 @@ import styles from './AdminAnalytics.module.css';
 
 const AdminAnalytics = ({ stats, revenueData = [], topRestaurants = [], isLoading, onRefresh }) => {
     
-    // Log để sếp kiểm tra data thực tế nhận được từ API
+    // Log để kiểm tra data thực tế nhận được từ API
     console.log("Check stats in component:", stats);
 
     if (isLoading) return (
         <div className={styles.loadingContainer}>
             <div className={styles.spinner}></div>
-            <span>Đang cập nhật số liệu sếp ơi...</span>
+            <span>Đang cập nhật số liệu ...</span>
         </div>
     );
 
