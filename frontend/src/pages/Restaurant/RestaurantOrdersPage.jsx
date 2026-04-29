@@ -39,7 +39,7 @@ const RestaurantOrdersPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [resId, selectedOrder]); // Chỉ tạo lại khi resId hoặc selectedOrder đổi
+    }, [resId]); // Chỉ tạo lại khi resId hoặc selectedOrder đổi
 
    useEffect(() => {
     if (!resId) return;

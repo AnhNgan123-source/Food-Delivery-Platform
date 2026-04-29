@@ -75,4 +75,38 @@
         grid-template-columns: 1fr; /* Mobile hiện 1 cột cho rõ */
         gap: 20px;
     }
+    
+}
+
+/* Container bao quanh cả chữ và ô tìm kiếm */
+.sectionHeader {
+    display: flex;         /* Quan trọng: ép các thành phần nằm ngang */
+    align-items: center;   /* Căn giữa chữ và ô input theo chiều dọc */
+    gap: 20px;             /* Khoảng cách giữa chữ và ô input */
+    margin: 30px 0 20px;   /* Khoảng cách trên và dưới để không đụng banner/card */
+}
+
+/* Thẻ tiêu đề */
+.sectionTitle {
+    margin: 0;             /* Bỏ margin mặc định của h3 để không bị lệch */
+    white-space: nowrap;   /* Ngăn chữ nhảy xuống dòng */
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Ô input tìm kiếm */
+.searchInput {
+    padding: 10px 15px;
+    width: 100%;           /* Linh hoạt theo container */
+    max-width: 350px;      /* Giới hạn độ dài ô tìm kiếm */
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;   /* Bo tròn cho đẹp giống các app food */
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+    border-color: #28a745; /* Đổi màu viền khi click vào */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);
 }

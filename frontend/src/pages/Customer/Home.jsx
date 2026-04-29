@@ -28,7 +28,18 @@ const Home = () => {
                 </div>
             </section>
 
-            <h3 className={styles.sectionTitle}>Nhà hàng dành cho bạn</h3>
+            <div className={styles.sectionHeader}>
+                <h3 className={styles.sectionTitle}>Nhà hàng dành cho bạn</h3>
+                <input
+                    type="text"
+                    placeholder="Tìm tên nhà hàng..."
+                    className={styles.searchInput}
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                />
+            </div>
+
+            
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' }}>
                 {allRestaurants
                     .filter(res => (res.resName || '').toLowerCase().includes(searchKeyword.toLowerCase()))
