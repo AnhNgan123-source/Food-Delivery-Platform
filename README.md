@@ -24,27 +24,28 @@ Hệ thống được thiết kế 3 phân hệ chính, tổng cộng 18 tính n
 * Tiếp nhận và xác nhận các đơn hàng mới.  
 * Cập nhật trạng thái chế biến (Đang nấu, Sẵn sàng giao).  
 * Theo dõi báo cáo và thống kê doanh thu.
-* 
+  
 ### Phân hệ Quản trị viên (Admin)   
 * Kiểm duyệt và quản lý danh sách nhà hàng mới đăng ký.  
 * Quản lý đội ngũ Shipper (Giao hàng).  
 * Quản lý các chương trình khuyến mãi và Voucher.  
 * Cấu hình phí vận chuyển theo khu vực.  
 * Xem báo cáo tổng quan toàn hệ thống.
-* 
+  
 ## Công nghệ sử dụng
 - Backend: Spring Boot
 - Frontend: React / Thymeleaf
 - Database: PostgreSQL
 - Real-time: WebSocket (để theo dõi đơn hàng)
 - Mock VNPAY: Thanh toán trực tuyến
+  
 ## Cài đặt và chạy
 
 ### Yêu cầu
 - Java 17+
 - Node.js 18+ (nếu dùng React)
-- PostgreSQL
-- 
+- MySQL
+ 
 ### Chạy Backend
 cd backend
 ./mvnw spring-boot:run
