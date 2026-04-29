@@ -219,12 +219,12 @@
     color: #fff; 
     box-shadow: 0 4px 12px rgba(224, 29, 72, 0.3);
 }
+/* MODAL - White Mode Version */
 
-/* MODAL - Style đồng bộ */
 /* Lớp nền mờ phía sau */
 .overlay {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(4px); /* Làm mờ hậu cảnh cho sang */
+    background: rgba(0, 0, 0, 0.4); /* Giảm độ đậm của overlay cho đỡ nặng nề */
+    backdrop-filter: blur(5px); /* Làm mờ hậu cảnh để tập trung vào modal */
     position: fixed;
     inset: 0;
     display: flex;
@@ -235,37 +235,44 @@
 
 /* Thân Modal */
 .modalBody {
-    background: #1b254b; /* Màu xanh đen đặc trưng của Dashboard */
+    background: #ffffff; /* Trắng tinh */
     width: 100%;
     max-width: 450px;
     padding: 32px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px; /* Tăng bo góc cho hiện đại */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); /* Đổ bóng mịn và nhẹ hơn */
+    border: 1px solid #edf2f7;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .modalBody h3 {
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 700;
+    color: #2d3674; /* Màu xanh đậm chuyên nghiệp */
+    font-size: 24px;
+    font-weight: 800;
     margin-bottom: 8px;
     text-align: center;
 }
 
 .modalBody p {
-    color: #a3aed0;
+    color: #718096; /* Màu xám phụ */
     text-align: center;
     margin-bottom: 24px;
+    font-size: 15px;
 }
 
-/* Ô nhập liệu */
+/* Ô nhập liệu (Dành cho việc nhập mã hoặc ghi chú) */
 .mInput {
     width: 100%;
-    background: #111c44 !important; /* Đậm hơn nền modal */
-    border: 1px solid #2b3674;
-    border-radius: 12px;
-    padding: 12px 16px;
-    color: white;
+    background: #f8fafc !important; /* Nền xám xanh cực nhẹ */
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    color: #2d3436; /* Chữ đen xám */
     margin-bottom: 16px;
     font-size: 15px;
     transition: all 0.2s ease;
@@ -273,8 +280,9 @@
 
 .mInput:focus {
     outline: none;
-    border-color: #4318ff; 
-    box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1);
+    background: #ffffff !important;
+    border-color: #2ecc71; /* Chuyển sang xanh lá cho đồng bộ app */
+    box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.1);
 }
 
 /* Group nút bấm */
@@ -286,17 +294,37 @@
 
 .btnCancel {
     flex: 1;
-    background: transparent;
-    border: 1px solid #2b3674;
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    font-weight: 600;
+    background: #f1f5f9; /* Nút hủy màu xám nhạt trung tính */
+    border: none;
+    color: #64748b;
+    padding: 14px;
+    border-radius: 14px;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s;
 }
 
 .btnCancel:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #e2e8f0;
+    color: #2d3436;
 }
 
+/* Gợi ý thêm cho nút Xác nhận nếu có trong Modal */
+.btnSubmit {
+    flex: 1;
+    background: #2ecc71;
+    color: white;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+    transition: all 0.2s;
+}
+
+.btnSubmit:hover {
+    background: #27ae60;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+}

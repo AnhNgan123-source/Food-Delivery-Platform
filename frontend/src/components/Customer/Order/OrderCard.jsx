@@ -103,7 +103,7 @@ const OrderCard = ({ order, onReviewClick, onCancelClick }) => {
                     <small style={{ color: '#ff4d4f', fontWeight: 'bold', display: 'block' }}>
                         <i className="fas fa-info-circle"></i> Chi tiết hủy đơn:
                     </small>
-                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#eee', fontStyle: 'italic' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#0a0a0a', fontStyle: 'italic' }}>
                         "{order.cancellationReason || "Đơn hàng đã bị hủy từ nhà hàng"}"
                     </p>
                 </div>

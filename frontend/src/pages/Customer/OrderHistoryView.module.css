@@ -1,15 +1,15 @@
-/* OrderHistoryView.module.css */
+/* OrderHistoryView.module.css - Light Mode Version */
 
 .historyContainer {
     padding: 30px 5%;
     min-height: 80vh;
-    background-color: #121418; /* Nền tối sâu đồng bộ */
+    background-color: #f8f9fa; /* Nền xám nhạt để các card trắng nổi bật */
     animation: fadeIn 0.6s ease-out;
 }
 
 .backBtn {
     cursor: pointer;
-    color: #2ecc71;
+    color: #27ae60; /* Màu xanh lá đậm hơn để dễ đọc trên nền trắng */
     margin-bottom: 25px;
     font-weight: 700;
     display: flex;
@@ -20,7 +20,7 @@
 }
 
 .backBtn:hover {
-    color: #27ae60;
+    color: #219150;
     transform: translateX(-5px);
 }
 
@@ -32,35 +32,37 @@
 }
 
 .sectionTitle {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffffff;
+    font-size: 26px; /* Tăng nhẹ kích thước cho rõ ràng */
+    font-weight: 800;
+    color: #219150; /* Màu xanh đen chuyên nghiệp thay cho trắng */
     margin: 0;
     letter-spacing: -0.5px;
 }
 
 .refreshBtn {
-    background: transparent;
-    border: 1px solid #2ecc71;
+    background: #ffffff;
+    border: 1.5px solid #2ecc71;
     color: #2ecc71;
-    padding: 8px 18px;
+    padding: 10px 20px;
     border-radius: 12px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.1);
 }
 
 .refreshBtn:hover {
-    background: rgba(46, 204, 113, 0.1);
-    box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+    background: #2ecc71;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
 }
 
 .refreshBtn i {
-    font-size: 12px;
+    font-size: 13px;
 }
 
 /* Hiệu ứng xoay khi loading */
@@ -75,7 +77,7 @@
 
 .loadingState {
     text-align: center;
-    color: #718096;
+    color: #718096; /* Màu xám chữ phụ */
     margin-top: 100px;
     display: flex;
     flex-direction: column;
@@ -84,7 +86,7 @@
 }
 
 .loadingIcon {
-    font-size: 40px;
+    font-size: 45px;
     color: #2ecc71;
 }
 
@@ -93,14 +95,39 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Các gợi ý thêm để giao diện lịch sử đơn hàng đẹp hơn trên nền trắng */
+/* Bạn có thể áp dụng class này cho từng item đơn hàng */
+.orderItemCard {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+.orderItemCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
 /* Responsive cho mobile */
 @media (max-width: 768px) {
+    .historyContainer {
+        padding: 20px 4%;
+    }
+
     .headerRow {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
     }
     
+    .sectionTitle {
+        font-size: 22px;
+    }
+
     .refreshBtn {
         width: 100%;
         justify-content: center;

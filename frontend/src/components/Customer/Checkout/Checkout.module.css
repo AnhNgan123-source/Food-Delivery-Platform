@@ -1,10 +1,10 @@
-/* Checkout.module.css */
+/* Checkout.module.css - Light Version */
 
 .checkoutView {
     padding: 40px 5%;
-    background-color: #0f1117; /* Nền tối sâu */
+    background-color: #f8f9fa; /* Màu nền xám cực nhẹ để các card trắng nổi bật */
     min-height: 100vh;
-    color: #fff;
+    color: #2d3436; /* Chữ chính màu đen xám */
 }
 
 .container {
@@ -15,7 +15,7 @@
 .backLink {
     background: none;
     border: none;
-    color: #2ecc71;
+    color: #27ae60;
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
@@ -28,55 +28,56 @@
 
 .backLink:hover {
     transform: translateX(-5px);
+    color: #219150;
 }
 
 /* Bố cục 2 cột */
 .layout {
     display: grid;
-    grid-template-columns: 1fr 360px; /* Cột trái to, cột phải cố định */
+    grid-template-columns: 1fr 380px; 
     gap: 30px;
     align-items: start;
 }
 
-/* Card chung cho các phần */
+/* Card chung cho các phần - Đổi sang nền trắng tinh */
 .sectionCard {
-    background: #1a1d26;
-    border-radius: 20px;
+    background: #ffffff;
+    border-radius: 16px;
     padding: 25px;
-    border: 1px solid #2d313d;
+    border: 1px solid #edf2f7; /* Viền mờ */
     margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Đổ bóng nhẹ sang trọng */
 }
 
 .sectionTitle {
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 20px;
-    color: #fff;
+    color: #2d3674; /* Màu xanh đậm chuyên nghiệp */
 }
 
-/* Form Inputs */
+/* Form Inputs - Chuyển từ nền tối sang nền sáng */
 .inputGroup {
     margin-bottom: 20px;
 }
 
 .inputGroup label {
     display: block;
-    color: #888;
+    color: #4a5568; /* Màu nhãn đậm hơn */
     font-size: 13px;
     margin-bottom: 8px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .inputGroup input, 
 .inputGroup select, 
 .inputGroup textarea {
     width: 100%;
-    padding: 14px;
-    background: #252833;
-    border: 1px solid #333;
-    border-radius: 12px;
-    color: #fff;
+    padding: 12px 15px;
+    background: #ffffff; /* Nền trắng */
+    border: 1.5px solid #e2e8f0; /* Viền xám nhạt */
+    border-radius: 10px;
+    color: #2d3436;
     font-size: 14px;
     outline: none;
     transition: all 0.3s;
@@ -85,12 +86,13 @@
 .inputGroup input:focus, 
 .inputGroup select:focus {
     border-color: #2ecc71;
-    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.1);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
 }
 
 /* Voucher Section */
 .voucherPlaceholder {
-    background: rgba(46, 204, 113, 0.05);
+    background: #f0fff4; /* Nền xanh lá cực nhạt */
     border: 1px dashed #2ecc71;
     padding: 15px 20px;
     border-radius: 12px;
@@ -104,14 +106,13 @@
 .voucherCode {
     color: #2ecc71;
     font-weight: bold;
-    margin-left: 10px;
 }
 
 /* Payment Selector */
 .paymentTitle {
     font-size: 16px;
     margin-bottom: 15px;
-    color: #fff;
+    color: #2d3674;
 }
 
 .paymentGrid {
@@ -123,30 +124,34 @@
 .paymentItem {
     position: relative;
     padding: 20px;
-    background: #252833;
-    border: 1px solid #333;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
     border-radius: 15px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    transition: all 0.3s;
+    transition: all 0.2s;
+}
+
+.paymentItem:hover {
+    border-color: #cbd5e0;
 }
 
 .activePayment {
     border-color: #2ecc71;
-    background: rgba(46, 204, 113, 0.08);
+    background: #f0fff4;
 }
 
 .checkDot {
     position: absolute;
     top: 12px;
     right: 12px;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    border: 2px solid #333;
+    border: 2px solid #cbd5e0;
 }
 
 .activePayment .checkDot {
@@ -156,12 +161,13 @@
 
 /* Summary Card (Cột phải) */
 .summaryCard {
-    background: #1a1d26;
-    border-radius: 20px;
+    background: #ffffff;
+    border-radius: 16px;
     padding: 25px;
-    border: 1px solid #2d313d;
-    position: sticky; /* Giữ bảng tính tiền khi cuộn trang */
+    border: 1px solid #edf2f7;
+    position: sticky;
     top: 30px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .summaryRow {
@@ -169,16 +175,17 @@
     justify-content: space-between;
     margin-bottom: 12px;
     font-size: 14px;
-    color: #888;
+    color: #718096; /* Chữ phụ xám */
 }
 
 .discountText {
-    color: #2ecc71;
+    color: #e74c3c; /* Màu đỏ cho giảm giá nổi bật */
+    font-weight: bold;
 }
 
 .divider {
     border: none;
-    border-top: 1px solid #333;
+    border-top: 1px solid #edf2f7;
     margin: 20px 0;
 }
 
@@ -191,13 +198,14 @@
 
 .totalRow span:first-child {
     font-weight: bold;
-    color: #fff;
+    color: #2d3674;
+    font-size: 16px;
 }
 
 .finalPrice {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
-    color: #ff4757;
+    color: #2ecc71; /* Tổng tiền màu xanh lá cho tươi mới */
 }
 
 /* Nút xác nhận */
@@ -207,26 +215,23 @@
     background: #2ecc71;
     color: #fff;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 4px 14px rgba(46, 204, 113, 0.4);
     transition: all 0.3s;
 }
 
 .btnConfirm:hover {
     background: #27ae60;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
 }
 
-/* Responsive cho điện thoại */
 @media (max-width: 768px) {
     .layout {
         grid-template-columns: 1fr;
     }
-    
     .summaryCard {
         position: static;
     }

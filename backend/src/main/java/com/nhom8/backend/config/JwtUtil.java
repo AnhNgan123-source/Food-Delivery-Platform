@@ -12,17 +12,16 @@ import java.util.function.Function;
 public class JwtUtil {
     // Lưu ý: Key phải đủ dài (ít nhất 32 ký tự)
     private final String SECRET_KEY = "Nhom8FoodDeliveryPlatformSecretKeyVeryLongValueForSecurity"; 
-    private final long EXPIRATION_TIME = 86400000; // 24 giờ
-
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
     // 1. Hàm tạo Token (ĐÃ SỬA: Nhận thêm Role để nhét vào Token)
     public String generateToken(String username, String role) {
+        long expiration = role.equals("ADMIN") ? 7200000L : 604800000L;// (2ng - 7ng)
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role) // << QUAN TRỌNG: Nhét quyền vào thân Token
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
